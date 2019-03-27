@@ -28,7 +28,7 @@ void main(void)
 	OSTaskCreate(TaskStart,
                 (void*)0,
                 &TASK_START_STK[0],
-                START_TASK_Prio
+                APP_SYSTEM_START_TASK_PRIO
                 );          //起始任务 又这个任务再创建其他任务
 	OSStart();              //启动OS系统 并且打开总中断开关  即EA=1
 }

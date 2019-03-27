@@ -13,7 +13,7 @@
 */
 
 #ifndef  OS_MASTER_FILE
-#include "..\APP\includes.h"
+#include "includes.h"
 #endif
 
 #if (OS_VERSION >= 251) && (OS_FLAG_EN > 0) && (OS_MAX_FLAGS > 0)

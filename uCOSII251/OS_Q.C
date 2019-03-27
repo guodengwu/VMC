@@ -13,7 +13,7 @@
 */
 
 #ifndef  OS_MASTER_FILE//·ÀÖ¹±àÒëÆ÷°üº¬Ò»Ð©´úÂë
-#include "..\APP\includes.h"
+#include "includes.h"
 #endif
 
 #if (OS_Q_EN > 0) && (OS_MAX_QS > 0)

@@ -770,14 +770,6 @@ sbit CLKOUT1   = P3^4;
 
 /* Above is STC additional SFR or change */
 
-
-
-
-/**********************************************************/
-typedef 	unsigned char	u8;
-typedef 	unsigned int	u16;
-typedef 	unsigned long	u32;
-
 /**********************************************************/
 #define NOP1()  _nop_()
 #define NOP2()  NOP1(),NOP1()

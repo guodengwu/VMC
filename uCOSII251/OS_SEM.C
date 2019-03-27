@@ -13,7 +13,7 @@
 */
 
 #ifndef  OS_MASTER_FILE
-#include "..\APP\includes.h"
+#include "includes.h"
 #endif
 
 #if OS_SEM_EN > 0

@@ -14,7 +14,7 @@
 
 #ifndef  OS_MASTER_FILE
 #define  OS_GLOBALS
-#include "..\APP\includes.h"
+#include "includes.h"
 #endif
 
 /*

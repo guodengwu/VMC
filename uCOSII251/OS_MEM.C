@@ -13,7 +13,7 @@
 */
 
 #ifndef  OS_MASTER_FILE
-#include "..\APP\includes.h"
+#include "includes.h"
 #endif
 
 #if (OS_MEM_EN > 0) && (OS_MAX_MEM_PART > 0)//允许包含内在管理代码且内在分区数大于0

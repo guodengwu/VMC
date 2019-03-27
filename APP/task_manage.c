@@ -1,7 +1,7 @@
 
 /* Includes -----------------------------------------------------------------*/
 #include "includes.h"
-
+#include "app_usart.h"
 //////////////////////////////////////////////////////////
 OS_STK  TASK_START_STK[MaxStkSize+1]; //ÈÎÎñ¶ÑÕ»ÉùÃ÷
 
@@ -32,8 +32,9 @@ void TaskStart(void * ppdata) reentrant
 //´´½¨ÆäËûËùÓĞÈÎÎñ ÔÚÕâÀïÎÒ½¨Á¢ÁË¸öLEDÉÁË¸µÄÈÎÎñµ±Àı×Ó
 void TaskCreateOther(void) reentrant
 {  
-    OSTaskCreate(TaskTest, (void * )0, (OS_STK *)&TASK_TEST_STK[0], TEST_TASK_Prio);                  //TESTÈÎÎññ
-    OSTaskCreate(TaskLed,  (void * )0, (OS_STK *)&TASK_LED_STK[0], LED_TASK_Prio);                     //LEDÏÔÊ¾ÈÎÎññ
+    //OSTaskCreate(TaskTest, (void * )0, (OS_STK *)&TASK_TEST_STK[0], TEST_TASK_Prio);                  //TESTÈÎÎññ
+    //OSTaskCreate(TaskLed,  (void * )0, (OS_STK *)&TASK_LED_STK[0], LED_TASK_Prio);                     //LEDÏÔÊ¾ÈÎÎññ
+		UsartRxTaskInit();
 }
 
 

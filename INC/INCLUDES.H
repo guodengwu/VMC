@@ -10,8 +10,6 @@
 *                                           KEIL C51大模式编译
 *
 * 文件名 : INCLUDES.H
-* 作者   : Jean J. Labrosse
-* 改编   : 杨屹 gdtyy@ri.gdt.com.cn 巨龙公司系统集成开发部 2002.09.27
 *********************************************************************************************************
 */
 
@@ -19,26 +17,25 @@
 #ifndef __INCLUDES__
 #define __INCLUDES__
 
-
 #include    "..\uCOSII251\os_cpu.h"
 #include    "..\uCOSII251\os_cfg.h"
 #include    "..\uCOSII251\ucos_ii.h"
 
-
 #include    "app_cfg.h"
-
+#include    <string.h> 
 //用户头文件加在最后面
 //Your head file add here.
-
 #include    "..\BSP\bsp.h"
 #include    "..\BSP\globalvariable.h"
-
+#include  "msg.h"
 #include    "..\STC_LIB\config.h"
-#include    "..\STC_LIB\my_include.h"
+//#include    "..\STC_LIB\my_include.h"
 #include    "..\APP\task_manage.h"
 #include    "..\APP\test.h"
 #include    "..\APP\led.h"
 
+#include	"GPIO.h"
+#include  "USART.h"
 
 #endif
 

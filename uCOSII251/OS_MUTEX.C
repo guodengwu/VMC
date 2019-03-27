@@ -14,7 +14,7 @@
 */
 
 #ifndef  OS_MASTER_FILE
-#include "..\APP\includes.h"
+#include "includes.h"
 #endif
 
 /*
