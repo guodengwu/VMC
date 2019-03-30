@@ -29,7 +29,7 @@
 #define	GPIO_P3			3
 #define	GPIO_P4			4
 #define	GPIO_P5			5
-
+#define	GPIO_P6			6
 
 //u8 GPIO_PWM
 #define	GPIO_PWM2       2

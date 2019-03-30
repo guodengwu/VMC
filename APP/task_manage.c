@@ -7,7 +7,7 @@ OS_STK  TASK_START_STK[MaxStkSize+1]; //任务堆栈声明
 //////////////////////////////////////////////////////////
 void TaskCreateOther(void) reentrant;             //用这个函数来创建其他任务
 
-
+#include "tm1640.h"
 //////////////////////////////////////////////////////////
 //起始任务 又这个任务再创建其他任务
 void TaskStart(void * ppdata) reentrant
@@ -23,6 +23,11 @@ void TaskStart(void * ppdata) reentrant
     
     bsp();                              //板载硬件初始化
     globalvariable();                   //用户应用程序全局变量初始化
+		Update_DisString("----");
+		BEEP=1;
+		OSTimeDlyHMSM(0,0,1,500); 
+		Update_DisString("    ");
+		BEEP=0;
     TaskCreateOther();			        //建立其他的任务
     OSTaskSuspend(OS_PRIO_SELF);	    //suspend but not delete 挂起任务	
 }

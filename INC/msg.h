@@ -45,5 +45,6 @@ INT8U  UsartRxGetINT8U (u8 *buf,u32 *idx);
 INT16U  UsartRxGetINT16U (u8 *buf,u32 *idx);
 INT32U  UsartRxGetINT32U (u8 *buf,u32 *idx);
 u16 crc16(u8 *buf,u8 len);
+void delay_us(u32 us);
 
 #endif

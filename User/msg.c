@@ -1,4 +1,5 @@
 #include "msg.h"
+#include <intrins.h>
 
 void msg_init(void)
 {
@@ -43,6 +44,16 @@ INT32U  UsartRxGetINT32U (u8 *buf,u32 *idx)
     lowword = UsartRxGetINT16U(buf,idx);
     highword = UsartRxGetINT16U(buf,idx);
     return ((highword << 16) | lowword);
+}
+
+void delay_us(u32 us)
+{
+	u16 i,j;
+	
+	for(i=0;i<2;i++)	{
+		for(j=0;j<10;j++)
+				_nop_();
+	}
 }
 #if 0
 INT16U crc16(INT8U *buf,INT8U len)

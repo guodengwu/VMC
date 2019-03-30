@@ -13,6 +13,9 @@
 #define     LED4    P37  
 #define     BEEP    P31  
 
+#define TM1640_SCLK    P66
+#define TM1640_DIO     P67
+
 extern void bsp(void) reentrant;
 
 #endif
