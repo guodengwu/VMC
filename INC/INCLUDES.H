@@ -17,17 +17,18 @@
 #ifndef __INCLUDES__
 #define __INCLUDES__
 
-#include    "..\uCOSII251\os_cpu.h"
-#include    "..\uCOSII251\os_cfg.h"
-#include    "..\uCOSII251\ucos_ii.h"
-
-#include    "app_cfg.h"
 #include    <string.h> 
+
+#include    "os_cpu.h"
+#include    "os_cfg.h"
+#include    "ucos_ii.h"
+#include    "app_cfg.h"
+
+#include  "msg.h"
 //用户头文件加在最后面
 //Your head file add here.
 #include    "..\BSP\bsp.h"
 #include    "..\BSP\globalvariable.h"
-#include  "msg.h"
 #include    "..\STC_LIB\config.h"
 //#include    "..\STC_LIB\my_include.h"
 #include    "..\APP\task_manage.h"
@@ -36,6 +37,8 @@
 
 #include	"GPIO.h"
 #include  "USART.h"
+#include "ring_buffer.h"
+#include  "msg.h"
 
 #endif
 

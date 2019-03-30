@@ -48,7 +48,7 @@
 
 
 #if OS_MBOX_ACCEPT_EN > 0
-void  *OSMboxAccept (OS_EVENT *pevent)
+void  *OSMboxAccept (OS_EVENT *pevent) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;
@@ -97,10 +97,7 @@ void  *OSMboxAccept (OS_EVENT *pevent)
                  == (OS_EVENT *)0：如果没有可行事件控制块
 *********************************************************************************************************
 */
-
-
-
-OS_EVENT  *OSMboxCreate (void *msg)
+OS_EVENT  *OSMboxCreate (void *msg) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;
@@ -128,7 +125,7 @@ OS_EVENT  *OSMboxCreate (void *msg)
     return (pevent);                             /* Return pointer to event control block              */
 	//返回事件控制块的指针，对邮箱的操作都通过此指针完成。
 }
-/*$PAGE*/
+/*$PAGE*/
 /*
 *********************************************************************************************************
 *                                         DELETE A MAIBOX
@@ -188,7 +185,7 @@ OS_EVENT  *OSMboxCreate (void *msg)
 
 
 #if OS_MBOX_DEL_EN > 0
-OS_EVENT  *OSMboxDel (OS_EVENT *pevent, INT8U opt, INT8U *err)
+OS_EVENT  *OSMboxDel (OS_EVENT *pevent, INT8U opt, INT8U *err) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                                /* Allocate storage for CPU status register */
     OS_CPU_SR  cpu_sr;
@@ -304,7 +301,7 @@ OS_EVENT  *OSMboxDel (OS_EVENT *pevent, INT8U opt, INT8U *err)
 *********************************************************************************************************
 */
 
-void  *OSMboxPend (OS_EVENT *pevent, INT16U timeout, INT8U *err)
+void  *OSMboxPend (OS_EVENT *pevent, INT16U timeout, INT8U *err) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;
@@ -401,7 +398,7 @@ void  *OSMboxPend (OS_EVENT *pevent, INT16U timeout, INT8U *err)
 */
 
 #if OS_MBOX_POST_EN > 0
-INT8U  OSMboxPost (OS_EVENT *pevent, void *msg)
+INT8U  OSMboxPost (OS_EVENT *pevent, void *msg) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;
@@ -484,7 +481,7 @@ INT8U  OSMboxPost (OS_EVENT *pevent, void *msg)
 */
 
 #if OS_MBOX_POST_OPT_EN > 0
-INT8U  OSMboxPostOpt (OS_EVENT *pevent, void *msg, INT8U opt)
+INT8U  OSMboxPostOpt (OS_EVENT *pevent, void *msg, INT8U opt) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;
@@ -558,7 +555,7 @@ INT8U  OSMboxPostOpt (OS_EVENT *pevent, void *msg, INT8U opt)
 */
 
 #if OS_MBOX_QUERY_EN > 0
-INT8U  OSMboxQuery (OS_EVENT *pevent, OS_MBOX_DATA *pdata)
+INT8U  OSMboxQuery (OS_EVENT *pevent, OS_MBOX_DATA *pdata) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;

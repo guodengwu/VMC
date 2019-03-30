@@ -10,10 +10,10 @@
 #define  APP_USART_TX_TASK_PRIO                             3       // Usart?????????????
 #define  APP_USART_RX_TASK_PRIO                             4       // Usart?????????????
 
-#define  APP_TASK_STK_SIZE                              1024u
-#define  APP_TASK_SYS_MONITOR_STK_SIZE                 512
-#define  APP_TASK_Z_MOTOR_STK_SIZE                   	APP_TASK_STK_SIZE/2
+#define  APP_TASK_STK_SIZE                              MaxStkSize
+#define  APP_TASK_SYS_MONITOR_STK_SIZE                 100
+#define  APP_TASK_Z_MOTOR_STK_SIZE                   		APP_TASK_STK_SIZE
 #define  APP_TASK_USART_RX_STK_SIZE                     APP_TASK_STK_SIZE
-#define  APP_TASK_USART_TX_STK_SIZE                     APP_TASK_STK_SIZE
+#define  APP_TASK_USART_TX_STK_SIZE                     APP_TASK_STK_SIZE*2
 
 #endif

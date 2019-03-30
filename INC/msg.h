@@ -1,9 +1,12 @@
 #ifndef __MSG_H__
 #define __MSG_H__
 
+#include    "os_cpu.h"
+#include    "os_cfg.h"
 #include "sys_defs.h"
 #include "sys_types.h"
 #include "sys_bits.h"
+#include    "ucos_ii.h"
 
 typedef enum _message_src{
     /* Task Mbox */
@@ -32,18 +35,15 @@ typedef struct _message_pkt {
     u8           Cmd;        // 命令
     u16 			 pLen;		//参数长度
     u16          dLen;    // 消息长度
-    u8           *Data;       // 消息参数
+    u8         *Data;       // 消息参数
 } message_pkt_t;
-
-extern OS_EVENT           *piping_mail;
-extern u8 piping_buf[10];
 
 void msg_init(void);
 void mutex_lock (OS_EVENT *lock);
 void mutex_unlock (OS_EVENT *lock);
-INT8U  IG_RxGetINT8U (u8 *buf,u32 *idx);
-INT16U  IG_RxGetINT16U (u8 *buf,u32 *idx);
-INT32U  IG_RxGetINT32U (u8 *buf,u32 *idx);
+INT8U  UsartRxGetINT8U (u8 *buf,u32 *idx);
+INT16U  UsartRxGetINT16U (u8 *buf,u32 *idx);
+INT32U  UsartRxGetINT32U (u8 *buf,u32 *idx);
 u16 crc16(u8 *buf,u8 len);
 
 #endif

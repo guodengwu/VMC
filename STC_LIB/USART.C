@@ -1,13 +1,24 @@
 
 #include "includes.h"
+#include "app_usart.h"
 
-
-COMx_Define	COM1,COM2;
+COMx_Define	COM1,COM2,COM3,COM4;
 u8	xdata TX1_Buffer[COM_TX1_Lenth];	//发送缓冲
 u8 	xdata RX1_Buffer[COM_RX1_Lenth];	//接收缓冲
 u8	xdata TX2_Buffer[COM_TX2_Lenth];	//发送缓冲
 u8 	xdata RX2_Buffer[COM_RX2_Lenth];	//接收缓冲
+u8	xdata TX3_Buffer[COM_TX3_Lenth];	//发送缓冲
+u8 	xdata RX3_Buffer[COM_RX3_Lenth];	//接收缓冲
+u8	xdata TX4_Buffer[COM_TX4_Lenth];	//发送缓冲
+u8 	xdata RX4_Buffer[COM_RX4_Lenth];	//接收缓冲
+RINGBUFF_T uart3_rxring;
 
+void	UART3_Init(COMx_InitDefine *COMx)
+{
+	USART_Configuration(USART3, COMx);		//初始化串口2 USART1,USART2
+	RingBuffer_Init(&uart3_rxring, RX3_Buffer, 1, COM_RX3_Lenth);
+	//PrintString2("STC15F2K60S2 UART2 Test Prgramme!\r\n");	//SUART2发送一个字符串
+}
 u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 {
 	u8	i;
@@ -82,7 +93,7 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 		return	0;
 	}
 
-	if(UARTx == USART2)
+	else if(UARTx == USART2)
 	{
 		COM2.id = 2;
 		COM2.TX_read    = 0;
@@ -118,12 +129,83 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 		else								S2CON &= ~(1<<4);	//禁止接收
 		P_SW2 = (P_SW2 & ~1) | (COMx->UART_P_SW & 0x01);	//切换IO		
 	}
+	else if(UARTx == USART3)
+	{
+		COM3.id = 3;
+		COM3.TX_read    = 0;
+		COM3.TX_write   = 0;
+		COM3.B_TX_busy  = 0;
+		COM3.RX_Cnt     = 0;
+		COM3.RX_TimeOut = 0;
+		COM3.B_RX_OK    = 0;
+		for(i=0; i<COM_TX3_Lenth; i++)	TX3_Buffer[i] = 0;
+		for(i=0; i<COM_RX3_Lenth; i++)	RX3_Buffer[i] = 0;
+
+		if((COMx->UART_Mode == UART_9bit_BRTx) ||(COMx->UART_Mode == UART_8bit_BRTx))	//可变波特率
+		{
+			if(COMx->UART_Polity == PolityHigh)		IP2 |=  1;	//高优先级中断
+			else									IP2 &= ~1;	//低优先级中断
+			if(COMx->UART_Mode == UART_9bit_BRTx)	S3CON |=  (1<<7);	//9bit
+			else									S3CON &= ~(1<<7);	//8bit
+			j = (MAIN_Fosc / 4) / COMx->UART_BaudRate;	//按1T计算
+			if(j >= 65536UL)	return 2;	//错误
+			j = 65536UL - j;			
+			T4T3M &= ~(1<<3);	//Timer stop
+			T4T3M &= ~(1<<2);	//Timer3 set As Timer
+			T4T3M |=  (1<<1);	//Timer3 set as 1T mode		
+			S3CON |=  (1<<6);//S3ST3 1: Timer3 set as timer			
+			TH3 = (u8)(j>>8);
+			TL3 = (u8)j;
+			IE2  &= ~(1<<3);	//禁止中断
+			T4T3M |= (1<<3);	//Timer run enable
+		}
+		else	return 2;	//模式错误
+		if(COMx->UART_Interrupt == ENABLE)	IE2   |=  (1<<3);		//允许中断
+		else								IE2   &= ~(1<<3);		//禁止中断
+		if(COMx->UART_RxEnable == ENABLE)	S3CON |=  (1<<4);	//允许接收
+		else								S3CON &= ~(1<<4);	//禁止接收
+		P_SW2 = (P_SW2 & ~(1<<1)) | COMx->UART_P_SW;	//切换IO
+	}
+	else if(UARTx == USART4)
+	{
+		COM4.id = 4;
+		COM4.TX_read    = 0;
+		COM4.TX_write   = 0;
+		COM4.B_TX_busy  = 0;
+		COM4.RX_Cnt     = 0;
+		COM4.RX_TimeOut = 0;
+		COM4.B_RX_OK    = 0;
+		for(i=0; i<COM_TX4_Lenth; i++)	TX4_Buffer[i] = 0;
+		for(i=0; i<COM_RX4_Lenth; i++)	RX4_Buffer[i] = 0;
+
+		if((COMx->UART_Mode == UART_9bit_BRTx) ||(COMx->UART_Mode == UART_8bit_BRTx))	//可变波特率
+		{
+			if(COMx->UART_Polity == PolityHigh)		IP2 |=  1;	//高优先级中断
+			else									IP2 &= ~1;	//低优先级中断
+			if(COMx->UART_Mode == UART_9bit_BRTx)	S4CON |=  (1<<7);	//9bit
+			else									S4CON &= ~(1<<7);	//8bit
+			j = (MAIN_Fosc / 4) / COMx->UART_BaudRate;	//按1T计算
+			if(j >= 65536UL)	return 2;	//错误
+			j = 65536UL - j;
+			AUXR &= ~(1<<4);	//Timer stop
+			AUXR &= ~(1<<3);	//Timer2 set As Timer
+			AUXR |=  (1<<2);	//Timer2 set as 1T mode
+			TH4 = (u8)(j>>8);
+			TL4 = (u8)j;
+			IE2  &= ~(1<<4);	//禁止中断
+			AUXR |=  (1<<4);	//Timer run enable
+		}
+		else	return 2;	//模式错误
+		if(COMx->UART_Interrupt == ENABLE)	IE2   |=  (1<<4);		//允许中断
+		else								IE2   &= ~(1<<4);		//禁止中断
+		if(COMx->UART_RxEnable == ENABLE)	S4CON |=  (1<<4);	//允许接收
+		else								S4CON &= ~(1<<4);	//禁止接收
+		P_SW2 = (P_SW2 & ~(1<<2)) | COMx->UART_P_SW;	//切换IO		
+	}
 	return 0;
 }
-
-
+#if 0
 /*************** 装载串口发送缓冲 *******************************/
-
 void TX1_write2buff(u8 dat)	reentrant//写入发送缓冲，指针+1
 {
 	TX1_Buffer[COM1.TX_write] = dat;	//装发送缓冲
@@ -147,16 +229,28 @@ void TX2_write2buff(u8 dat) reentrant	//写入发送缓冲，指针+1
 		SET_TI2();				//触发发送中断
 	}
 }
-
-void PrintString1(u8 *puts) reentrant
+#endif
+void TX3_write2buff(u8 dat) reentrant	//写入发送缓冲，指针+1
 {
-    for (; *puts != 0;	puts++)  TX1_write2buff(*puts); 	//遇到停止符0结束
+	TX3_Buffer[COM3.TX_write] = dat;	//装发送缓冲
+	if(++COM3.TX_write >= COM_TX3_Lenth)	COM3.TX_write = 0;
+
+	if(COM3.B_TX_busy == 0)		//空闲
+	{  
+		COM3.B_TX_busy = 1;		//标志忙
+		SET_TI3();				//触发发送中断
+	}
 }
 
-void PrintString2(u8 *puts) reentrant
+void PrintString(u8 *puts) reentrant
+{
+    for (; *puts != 0;	puts++)  TX3_write2buff(*puts); 	//遇到停止符0结束
+}
+
+/*void PrintString2(u8 *puts) reentrant
 {
     for (; *puts != 0;	puts++)  TX2_write2buff(*puts); 	//遇到停止符0结束
-}
+}*/
 
 /*
 void COMx_write2buff(COMx_Define *COMx, u8 dat)	//写入发送缓冲，指针+1
@@ -170,8 +264,23 @@ void PrintString(COMx_Define *COMx, u8 *puts)
     for (; *puts != 0;	puts++)  COMx_write2buff(COMx,*puts); 	//遇到停止符0结束
 }
 */
-
-
+//中断发送数据
+void USART_SendByte(u8 UARTx,u8 dat)
+{
+   if(UARTx==USART1)	{
+			SBUF = dat;
+			//TI = 1;					//触发发送中断
+	 }else    if(UARTx==USART2)	{
+			S2BUF = dat;
+			//SET_TI2();				//触发发送中断
+	 }else    if(UARTx==USART3)	{
+			S3BUF = dat;
+			//SET_TI3();				//触发发送中断
+	 }else    if(UARTx==USART4)	{
+			S4BUF = dat;
+			//SET_TI4();				//触发发送中断
+	 }
+}
 /********************* UART1中断函数************************/
 void UART1_int (void) interrupt UART1_VECTOR
 {
@@ -226,12 +335,58 @@ void UART2_int (void) interrupt UART2_VECTOR
 		}
 		else	COM2.B_TX_busy = 0;
 	}
-    OSIntExit();					// Must be called finally at every hardware interupt exit point 
-
+  OSIntExit();					// Must be called finally at every hardware interupt exit point 
 }
+#if 1
+/********************* UART3中断函数************************/
+void UART3_int (void) interrupt UART3_VECTOR
+{
+	u8 rxdat;
+	
+  OSIntExit();					// Must be called finally at every hardware interupt exit point 
+	if(RI3)//接收中断有效
+	{
+			CLR_RI3();
+			rxdat = S3BUF;
+			RingBuffer_Insert(&uart3_rxring, &rxdat);
+			OSSemPost(usart.sem);
+	}
 
-/////////////////////////////////////////////////
-//关于串口3和4没有添加 如有兴趣 可自行添加
+	if(TI3)//发送中断有效
+	{
+		CLR_TI3();/* Clear the USART1 transmit interrupt                  */
+		if (usart.tx_complete != NULL) usart.tx_complete(&usart);
+	}
+  OSIntExit();					// Must be called finally at every hardware interupt exit point 
+}
+#else
+/********************* UART3中断函数************************/
+void UART3_int (void) interrupt UART3_VECTOR
+{
+	u8 rxdat;
+	
+  OSIntExit();					// Must be called finally at every hardware interupt exit point 
+	if(RI3)//接收中断有效
+	{
+		CLR_RI3();
+		if(COM3.B_RX_OK == 0)
+		{
+			if(COM3.RX_Cnt >= COM_RX3_Lenth)	COM3.RX_Cnt = 0;
+			RX3_Buffer[COM3.RX_Cnt++] = S3BUF;
+		}
+	}
 
-
-
+	if(TI3)//发送中断有效
+	{
+		CLR_TI3();/* Clear the USART1 transmit interrupt                  */
+		if(COM3.TX_read != COM3.TX_write)
+		{
+		 	S3BUF = TX3_Buffer[COM3.TX_read];
+			if(++COM3.TX_read >= COM_TX3_Lenth)		COM3.TX_read = 0;
+		}
+		else	COM3.B_TX_busy = 0;
+		//if (usart.tx_complete != NULL) usart.tx_complete(&usart);
+	}
+  OSIntExit();					// Must be called finally at every hardware interupt exit point 
+}
+#endif

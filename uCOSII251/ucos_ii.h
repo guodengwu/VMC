@@ -10,7 +10,8 @@
 * By   : Jean J. Labrosse
 *********************************************************************************************************
 */
-
+#ifndef __UCOSII_H
+#define __UCOSII_H
 /*
 *********************************************************************************************************
 *                                             MISCELLANEOUS
@@ -1134,3 +1135,4 @@ void          OSTickISR(void);
 #error  "OS_CFG.H, Missing OS_SCHED_LOCK_EN: Include code for OSSchedLock() and OSSchedUnlock()"
 #endif
 
+#endif

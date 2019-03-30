@@ -10,7 +10,8 @@
 #define     LED1    P42
 #define     LED2    P41
 #define     LED3    P35   
-#define     LED4    P34   
+#define     LED4    P37  
+#define     BEEP    P31  
 
 extern void bsp(void) reentrant;
 

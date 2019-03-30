@@ -477,8 +477,19 @@ sbit CLKOUT1   = P3^4;
 #define		S2_USE_P10P11()		P_SW2 &= ~1		//UART2 使用P1口	默认
 #define		S2_USE_P46P47()		P_SW2 |=  1		//UART2 使用P4口
 
+#define		TI3					(S3CON & 2) != 0
+#define		RI3					(S3CON & 1) != 0
+#define		SET_TI3()			S3CON |=  2
+#define		CLR_TI3()			S3CON &= ~2
+#define		CLR_RI3()			S3CON &= ~1
 #define		S3_USE_P00P01()		P_SW2 &= ~2		//UART3 使用P0口	默认
 #define		S3_USE_P50P51()		P_SW2 |=  2		//UART3 使用P5口
+
+#define		TI4					(S4CON & 2) != 0
+#define		RI4					(S4CON & 1) != 0
+#define		SET_TI4()			S4CON |=  2
+#define		CLR_TI4()			S4CON &= ~2
+#define		CLR_RI4()			S4CON &= ~1
 #define		S4_USE_P02P03()		P_SW2 &= ~4		//UART4 使用P0口	默认
 #define		S4_USE_P52P53()		P_SW2 |=  4		//UART4 使用P5口
 

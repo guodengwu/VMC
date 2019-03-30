@@ -324,7 +324,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\INC;..\STC_LIB;..\APP;..\User</IncludePath>
+              <IncludePath>..\INC;..\STC_LIB;..\APP;..\User;..\uCOSII251</IncludePath>
             </VariousControls>
           </C51>
           <Ax51>
@@ -500,6 +500,23 @@
         </Group>
         <Group>
           <GroupName>USER</GroupName>
+          <Files>
+            <File>
+              <FileName>ring_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\ring_buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>protocol.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\protocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>msg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\msg.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
