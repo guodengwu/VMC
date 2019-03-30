@@ -34,7 +34,7 @@
 #define OS_MAX_TASKS              10    /* Max. number of tasks in your application ...                 */
                                        /* ... MUST be >= 2                                             */
 
-#define OS_LOWEST_PRIO            8    /* Defines the lowest priority that can be assigned ...         */
+#define OS_LOWEST_PRIO            10    /* Defines the lowest priority that can be assigned ...         */
                                        /* ... MUST NEVER be higher than 63!                            */
 
 #define OS_TASK_IDLE_STK_SIZE    MaxStkSize    /* Idle task stack size (# of OS_STK wide entries),使用相同的栈大小*/
@@ -112,7 +112,7 @@
 #define OS_VERSION_EN             0    /* Enable (1) or Disable (0) code generation for OSVersion()    */
 #define OS_SCHED_LOCK_EN          0    /*     Include code for OSSchedLock() and OSSchedUnlock()       */
 
-#define OS_TICKS_PER_SEC         50    /* Set the number of ticks in one second                        */
+#define OS_TICKS_PER_SEC         100    /* Set the number of ticks in one second                        */
 
 
 typedef INT8U              OS_FLAGS;   /* Date type for event flag bits (8, 16 or 32 bits)             */

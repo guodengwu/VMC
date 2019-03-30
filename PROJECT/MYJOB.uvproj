@@ -442,6 +442,11 @@
               <FileType>1</FileType>
               <FilePath>..\APP\app_usart.c</FilePath>
             </File>
+            <File>
+              <FileName>app_display.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\app_display.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

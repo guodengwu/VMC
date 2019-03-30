@@ -269,8 +269,8 @@ void OSTaskIdleHook (void) reentrant
 
 void UserTickTimer(void)
 {
-    TH0=0x63;    		    //普通51定时器方式1，必须在发生中断时，重新赋值并再次启动计时
-    TL0=0XC0;            	//Tick=50次/秒(即0.02秒/次)，晶振24M
+    TH0=0xB1;    		    //普通51定时器方式1，必须在发生中断时，重新赋值并再次启动计时
+    TL0=0XE0;            	//Tick=100次/秒(即0.01秒/次)，晶振24M
     TR0=1;
 }
 
@@ -290,13 +290,17 @@ void OSTickISR(void) interrupt 1
   初始化定时器0,作为ucOS-II的系统时钟。
   还有其他的与硬件相关的初始化也可以放在这里。
 */
-
+//定時器計算公式：N=65536-(Fosc/FD)*T
+//N      : 定时器16位计数器
+//Fosc: 晶振频率，系统频率
+//FD    : 分频, 這裡使用12分頻
+//T : 定時週期 s
 void SystickInitOfTmer0(void) reentrant
 {   
     AUXR&=0X7F;
     TMOD &= 0xF0;
-    TH0  = 0x63;   //定义Tick=50次/秒(即0.02秒/次),TH,TL值与CPU的频率有关(24M)!!!!!gai!!!!!!
-    TL0  = 0xC0;   //OS_CPU_C.C中定时器中断响应UserTickTimer也要设置，OS_CFG.H中OS_TICKS_PER_SEC也有关系
+    TH0  = 0xB1;   //定义Tick=100次/秒(即0.01秒/次),TH,TL值与CPU的频率有关(24M)!!!!!gai!!!!!!
+    TL0  = 0xE0;   //OS_CPU_C.C中定时器中断响应UserTickTimer也要设置，OS_CFG.H中OS_TICKS_PER_SEC也有关系
     //ET0  = 1;    //允许T0中断(在第一个任务开始执行时才开时钟中断,否则万一中断系统进入不可知状态)
     TR0  = 1;
 }

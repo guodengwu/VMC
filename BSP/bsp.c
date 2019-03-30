@@ -53,7 +53,7 @@ void	UART3_config(void)
 void bsp(void) reentrant
 {
     GPIO_config();          //IO配置函数
-    UART3_config();\
+    UART3_config();
 		Init_Display();
 	//PrintString("test");
     /*GPIO_PWMInit(GPIO_PWM5_2,GPIO_PullUp);//LED1设置为准双向口 凡是跟PWM相关的IO口上电都是高阻输入态

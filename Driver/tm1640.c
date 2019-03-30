@@ -7,7 +7,7 @@
 #define DISPLAY_EN          0x8A        // 开显示
 #define DISPLAY_DIS         0x80        // 关显示
 
-u8 DisBuf[16];           // 显示缓存
+static u8 DisBuf[16];           // 显示缓存
 
 u8 code ch_table[]={
         0x3F,  //"0"
@@ -37,7 +37,7 @@ u8 code ch_table[]={
 };
 
 // 开始
-void start()
+static void start()
 {
     TM1640_SCLK=1;
     delay_us(1);
@@ -48,7 +48,7 @@ void start()
     TM1640_SCLK=0;   
 }
 
-void send_data(u8 x)          //送数据    低位先传
+static void send_data(u8 x)          //送数据    低位先传
 {
     u8  i,dat;
 		
@@ -66,7 +66,7 @@ void send_data(u8 x)          //送数据    低位先传
 }
 
 // 结束
-void stop()
+static void stop()
 {
     TM1640_SCLK=0;
     TM1640_DIO=0;
@@ -89,7 +89,7 @@ void Init_Display()
     send_data(0x8F);                // 开显示
     stop();
 }
-void convert_dat(u8 *pbuf, s16 dat)
+static void convert_dat(u8 *pbuf, s16 dat)
 {
 	u16 temp;
 	u8 len=0;
@@ -112,7 +112,7 @@ void convert_dat(u8 *pbuf, s16 dat)
 	}
 }
 
-void Update_Display(void)
+static void Update_Display(void)
 {
 	u8 i;
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */

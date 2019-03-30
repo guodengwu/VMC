@@ -27,3 +27,6 @@
 !*.axf
 /EWARM/settings
 /EWARM/STM32F103RC_Nucleo
+/PROJECT/LIST/*.m51
+/PROJECT/MYJOB.uvgui.Administrator
+/PROJECT/*.uvopt
