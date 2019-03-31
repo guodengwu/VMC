@@ -5,11 +5,11 @@
 #include	"config.h"
 
 #define	COM_TX1_Lenth	30
-#define	COM_RX1_Lenth	100
-#define	COM_TX2_Lenth	2
-#define	COM_RX2_Lenth	2
+#define	COM_RX1_Lenth	50
+#define	COM_TX2_Lenth	30
+#define	COM_RX2_Lenth	50
 #define	COM_TX3_Lenth	30
-#define	COM_RX3_Lenth	100
+#define	COM_RX3_Lenth	50
 #define	COM_TX4_Lenth	2
 #define	COM_RX4_Lenth	2
 
@@ -77,6 +77,7 @@ u8	USART_Configuration(u8 UARTx, COMx_InitDefine *COMx)reentrant;
 void TX1_write2buff(u8 dat)reentrant;	//写入发送缓冲，指针+1
 void TX2_write2buff(u8 dat)reentrant;	//写入发送缓冲，指针+1
 void PrintString(u8 *puts) reentrant;
+void	UART1_Init(COMx_InitDefine *COMx);
 void	UART3_Init(COMx_InitDefine *COMx);
 void USART_SendByte(u8 UARTx,u8 dat);
 //void COMx_write2buff(COMx_Define *COMx, u8 dat);	//写入发送缓冲，指针+1

@@ -16,9 +16,9 @@ void TaskLed(void * ppdata) reentrant
 	ppdata = ppdata;
 	for(;;)
 	{          
-        LED4=0;
+        //LED4=0;
         OSTimeDlyHMSM(0,0,0,500); 
-        LED4=1;  
+        //LED4=1;  
         OSTimeDlyHMSM(0,0,0,500);  
     }
 }

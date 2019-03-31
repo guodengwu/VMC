@@ -493,7 +493,8 @@ sbit CLKOUT1   = P3^4;
 #define		S4_USE_P02P03()		P_SW2 &= ~4		//UART4 使用P0口	默认
 #define		S4_USE_P52P53()		P_SW2 |=  4		//UART4 使用P5口
 
-
+#define		SET_TI1()			SCON |=  2
+#define		CLR_TI1()			SCON &= ~2
 /**********************************************************/
 
 #define		Timer0_16bitAutoReload()	TMOD &= ~0x03					//16位自动重装

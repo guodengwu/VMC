@@ -11,8 +11,15 @@ u8	xdata TX3_Buffer[COM_TX3_Lenth];	//发送缓冲
 u8 	xdata RX3_Buffer[COM_RX3_Lenth];	//接收缓冲
 u8	xdata TX4_Buffer[COM_TX4_Lenth];	//发送缓冲
 u8 	xdata RX4_Buffer[COM_RX4_Lenth];	//接收缓冲
+RINGBUFF_T uart1_rxring;
 RINGBUFF_T uart3_rxring;
 
+void	UART1_Init(COMx_InitDefine *COMx)
+{
+	USART_Configuration(USART1, COMx);		//初始化串口2 USART1,USART2
+	RingBuffer_Init(&uart1_rxring, RX1_Buffer, 1, COM_RX1_Lenth);
+	//PrintString2("STC15F2K60S2 UART2 Test Prgramme!\r\n");	//SUART2发送一个字符串
+}
 void	UART3_Init(COMx_InitDefine *COMx)
 {
 	USART_Configuration(USART3, COMx);		//初始化串口2 USART1,USART2
@@ -204,7 +211,7 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 	}
 	return 0;
 }
-#if 0
+#if 1
 /*************** 装载串口发送缓冲 *******************************/
 void TX1_write2buff(u8 dat)	reentrant//写入发送缓冲，指针+1
 {
@@ -284,30 +291,30 @@ void USART_SendByte(u8 UARTx,u8 dat)
 /********************* UART1中断函数************************/
 void UART1_int (void) interrupt UART1_VECTOR
 {
-    OSIntEnter();					// Must be called first at every hardware interrupt entry point 
+	u8 rxdat;
+	
+  OSIntEnter();					// Must be called first at every hardware interrupt entry point 
 	if(RI)
 	{
 		RI = 0;
-		if(COM1.B_RX_OK == 0)
-		{
-     
-			if(COM1.RX_Cnt >= COM_RX1_Lenth)	COM1.RX_Cnt = 0;
-			RX1_Buffer[COM1.RX_Cnt++] = SBUF;
-			COM1.RX_TimeOut = TimeOutSet1;
-		}
+		rxdat = SBUF;
+		RingBuffer_Insert(&uart1_rxring, &rxdat);
+		OSSemPost(usart.sem);
 	}
 
 	if(TI)
 	{
 		TI = 0;
-		if(COM1.TX_read != COM1.TX_write)
+		if (usart.tx_complete != NULL) usart.tx_complete(&usart);
+		//BEEP=1;
+			/*	if(COM1.TX_read != COM1.TX_write)
 		{
 		 	SBUF = TX1_Buffer[COM1.TX_read];
 			if(++COM1.TX_read >= COM_TX1_Lenth)		COM1.TX_read = 0;
 		}
-		else	COM1.B_TX_busy = 0;
+		else	COM1.B_TX_busy = 0;*/
 	}
-    OSIntExit();					// Must be called finally at every hardware interupt exit point 
+  OSIntExit();					// Must be called finally at every hardware interupt exit point 
 }
 
 /********************* UART2中断函数************************/

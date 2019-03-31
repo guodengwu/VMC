@@ -301,7 +301,7 @@ void UsartTxTaskInit (void)
 ********************************************************************************************************/
 static void UsartInit (void)
 {
-		usart.Usart = USART3;
+		usart.Usart 			 = USART1;
     usart.lock         = OSSemCreate(1);
     usart.sem          = OSSemCreate(0);
     usart.mbox         = OSMboxCreate((void *)0);
@@ -324,7 +324,7 @@ static void UsartInit (void)
     //usart.rx_indicate  = &message_rx_handler;
     usart.tx_complete  = &message_tx_handler;
 }
-extern RINGBUFF_T uart3_rxring;
+extern RINGBUFF_T uart1_rxring;
 /*******************************************************************************************************
 *                                              Usart接收任务
 ********************************************************************************************************/
@@ -337,7 +337,7 @@ static void AppUsartRxTask(void *parg)
     {
         OSSemPend(usart.sem, 0, &err);
         if(err==OS_NO_ERR)    {
-          if(RingBuffer_Pop(&uart3_rxring, (INT8U *)&rxdat))    {			
+          if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    {			
             if(message_rx_handler(&usart, rxdat))  {
               UsartCmdParsePkt(&usart);       
             }

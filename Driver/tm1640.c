@@ -1,5 +1,4 @@
 #include "tm1640.h"
-#include "bsp.h"
 
 #define WRITE_DATA_MODE_Z   0x40        // 地址自动加
 #define WRITE_DATA_MODE_G   0x44        // 固定地址
