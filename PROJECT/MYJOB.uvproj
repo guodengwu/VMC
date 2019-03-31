@@ -447,6 +447,11 @@
               <FileType>1</FileType>
               <FilePath>..\APP\app_display.c</FilePath>
             </File>
+            <File>
+              <FileName>app_sysmonitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\app_sysmonitor.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

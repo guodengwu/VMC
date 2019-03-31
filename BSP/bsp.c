@@ -5,18 +5,91 @@
 static void	GPIO_config(void) reentrant
 {
 	GPIO_InitTypeDef	GPIO_InitStructure;		        //结构定义
+//输入
+	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
+	GPIO_InitStructure.Mode = GPIO_HighZ;
+	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);
 	
-	GPIO_InitStructure.Pin  = GPIO_Pin_1;    //4 5 管脚
+	GPIO_InitStructure.Pin  = GPIO_Pin_5;
+	GPIO_InitStructure.Mode = GPIO_HighZ;
+	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
+	
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3;
+	GPIO_InitStructure.Mode = GPIO_HighZ;
+	GPIO_Inilize(GPIO_P6,&GPIO_InitStructure);
+	
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4;
+	GPIO_InitStructure.Mode = GPIO_HighZ;
+	GPIO_Inilize(GPIO_P5,&GPIO_InitStructure);
+
+//输出
+	GPIO_InitStructure.Pin  = GPIO_Pin_4;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);	
+	
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P1,&GPIO_InitStructure);	
+	
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P2,&GPIO_InitStructure);	
+	
+	GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_5;    //4 5 管脚
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	        //初始化 P3
 	
-	GPIO_InitStructure.Pin  = GPIO_Pin_6|GPIO_Pin_7;    //4 5 管脚
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_7;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
+	
+	GPIO_InitStructure.Pin  = GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_5;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P5,&GPIO_InitStructure);	
+
+	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6||GPIO_Pin_6|GPIO_Pin_7;    //4 5 管脚
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 	GPIO_Inilize(GPIO_P6,&GPIO_InitStructure);	        //初始化 P3
+	
+ 	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P7,&GPIO_InitStructure);
+	
 	BEEP=0;
-	//LED4=0;
 	TM1640_SCLK = 0;
-	TM1640_DIO = 0;
+	TM1640_DIO = 0;/////////////////////////////////
+
+	LIGHT_CTRL = 0; 
+	PUMP = 			0;
+	IR_CTRL = 		0; 
+	FOG_CTRL = 	0;
+	RELAY = 0;
+	//升降机
+	UP_DOWN_BI = 0;//后退
+	UP_DOWN_FI = 0;//前进
+	//电机控制
+	MOTOR_NPN0 = 0;
+	MOTOR_NPN1 = 0;
+	MOTOR_NPN2 = 0;
+	MOTOR_NPN3 = 0;
+	MOTOR_NPN4 = 0;
+	MOTOR_NPN5 = 0;
+	MOTOR_NPN6 = 0;
+	MOTOR_NPN7 = 0;
+	MOTOR_NPN8 = 0;
+	MOTOR_NPN9 = 0;
+
+	MOTOR_PNP0 = 0;
+	MOTOR_PNP1 = 0;
+	MOTOR_PNP2 = 0;
+	MOTOR_PNP3 = 0;
+	MOTOR_PNP4 = 0;
+	MOTOR_PNP5 = 0;
+	MOTOR_PNP6 = 0;
+	MOTOR_PNP7 = 0;
+	MOTOR_PNP8 = 0;
+	MOTOR_PNP9 = 0;
+	MOTOR_AD = 0;
 }
 #if 1
 /*************  串口1初始化函数 *****************/

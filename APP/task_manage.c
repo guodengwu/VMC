@@ -2,6 +2,8 @@
 #include "includes.h"
 #include "app_usart.h"
 #include "app_display.h"
+#include "app_sysmonitor.h"
+
 //////////////////////////////////////////////////////////
 OS_STK  TASK_START_STK[MaxStkSize+1]; //ÈÎÎñ¶ÑÕ»ÉùÃ÷
 
@@ -36,6 +38,7 @@ void TaskCreateOther(void) reentrant
 		UsartTxTaskInit();
 		UsartRxTaskInit();
 		DisplayTaskInit();
+		SysMonitorTaskInit();
 }
 
 
