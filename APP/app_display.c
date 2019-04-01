@@ -33,6 +33,7 @@ static void AppDisplayTask(void *parg)
 	OSTimeDlyHMSM(0,0,1,500); 
 	Update_DisInt(15);
 	BEEP=0;
+	//TimerStart(Timer1);
 	
 	while (DEF_True)
 	{

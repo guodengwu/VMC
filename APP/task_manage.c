@@ -38,7 +38,7 @@ void TaskCreateOther(void) reentrant
 		UsartTxTaskInit();
 		UsartRxTaskInit();
 		DisplayTaskInit();
-		SysMonitorTaskInit();
+		//SysMonitorTaskInit();
 }
 
 
