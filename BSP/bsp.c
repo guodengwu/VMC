@@ -1,8 +1,10 @@
 #include "bsp.h"
 #include "tm1640.h"
+#include "motor.h"
+
 ////////////////////////////////////
 //IO配置函数
-static void	GPIO_config(void) reentrant
+static void	GPIO_config(void)
 {
 	GPIO_InitTypeDef	GPIO_InitStructure;		        //结构定义
 //输入
@@ -93,11 +95,11 @@ static void	GPIO_config(void) reentrant
 }
 #if 1
 /*************  串口1初始化函数 *****************/
-static void	UART1_config(void) reentrant
+static void	UART1_config(void)
 {
 	COMx_InitDefine		COMx_InitStructure;					//结构定义	
 	COMx_InitStructure.UART_Mode      = UART_8bit_BRTx;		//模式,       UART_ShiftRight,UART_8bit_BRTx,UART_9bit,UART_9bit_BRTx
-	COMx_InitStructure.UART_BRT_Use   = BRT_Timer1;			//使用波特率,   BRT_Timer1, BRT_Timer2 (注意: 串口2固定使用BRT_Timer2)
+	COMx_InitStructure.UART_BRT_Use   = BRT_Timer2;			//使用波特率,   BRT_Timer1, BRT_Timer2 (注意: 串口2固定使用BRT_Timer2)
 	COMx_InitStructure.UART_BaudRate  = 38400ul;			    //波特率, 一般 110 ~ 115200
 	COMx_InitStructure.UART_RxEnable  = ENABLE;				//接收允许,   ENABLE或DISABLE
 	COMx_InitStructure.BaudRateDouble = DISABLE;			//波特率加倍, ENABLE或DISABLE
@@ -120,15 +122,30 @@ void	UART3_config(void)
 	COMx_InitStructure.UART_P_SW      = UART3_SW_P00_P01;	//切换端口,   UART3_SW_P00_P01,UART3_SW_P50_P51
 	UART3_Init(&COMx_InitStructure);
 }
+void Timer1_config(void)
+{
+	TIM_InitTypeDef		TIM_InitStructure;
+	
+	TIM_InitStructure.TIM_Mode      = TIM_16BitAutoReload;	//指定工作模式,   TIM_16BitAutoReload,TIM_16Bit,TIM_8BitAutoReload,TIM_16BitAutoReloadNoMask
+	TIM_InitStructure.TIM_Polity    = PolityLow;			//指定中断优先级, PolityHigh,PolityLow
+	TIM_InitStructure.TIM_Interrupt = ENABLE;				//中断是否允许,   ENABLE或DISABLE
+	TIM_InitStructure.TIM_ClkSource = TIM_CLOCK_1T;			//指定时钟源, TIM_CLOCK_1T,TIM_CLOCK_12T,TIM_CLOCK_Ext
+	TIM_InitStructure.TIM_ClkOut    = ENABLE;				//是否输出高速脉冲, ENABLE或DISABLE
+	TIM_InitStructure.TIM_Value     = 65536UL - (MAIN_Fosc / 1000);		//初值,
+	TIM_InitStructure.TIM_Run       = DISABLE;				//是否初始化后启动定时器, ENABLE或DISABLE
+	Timer_Inilize(Timer1,&TIM_InitStructure);				//初始化Timer1	  Timer0,Timer1,Timer2
+}
 ///////////////////////////////////////////////////////////
 //函数名:   bsp
 //功能:    板载硬件初始化
-void bsp(void) reentrant
+void bsp(void)
 {
     GPIO_config();          //IO配置函数
 		UART1_config();//接上控
     UART3_config();//用于串口调试打印
+		Timer1_config();//电机运动计时
 		Init_Display();
+		motor_init();		
 	//PrintString("test");
     /*GPIO_PWMInit(GPIO_PWM5_2,GPIO_PullUp);//LED1设置为准双向口 凡是跟PWM相关的IO口上电都是高阻输入态
     LED1=1;                 //上电后，灯全灭	

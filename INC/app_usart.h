@@ -69,7 +69,7 @@ typedef struct _usart {
     OS_EVENT           *mbox;
 
     INT8U               rx_state;
-    INT8U              rx_idx;
+    INT32U              rx_idx;
     INT8U              rx_cnt;
 		INT8U              rx_cmd;
     INT8U              rx_len;

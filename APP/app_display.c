@@ -45,7 +45,7 @@ static void AppDisplayTask(void *parg)
 				Update_DisInt(15);
 			}else if(display_t.ui_flag==UI_MOTORNUM)	{
 				display_t.ui_flag=UI_TEMP;
-				Update_DisInt(-50);
+				Update_DisInt(sys_status.inside_temp);
 			}
 		}
 	}

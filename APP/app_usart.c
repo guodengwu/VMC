@@ -208,7 +208,7 @@ void usart_tx_start(usart_t *pUsart, message_pkt_t *pmsg)
     pUsart->tx_cmd = pmsg->Cmd|0xA0;//·µ»ØÂë
     len = pmsg->dLen;
     if (len) {
-        memcpy(&pUsart->tx_buf, pmsg->Data, len);
+        memcpy(pUsart->tx_buf, pmsg->Data, len);
     }
     pUsart->tx_len = len;
     usart_tx_int_enable(pUsart);//enable uart tx

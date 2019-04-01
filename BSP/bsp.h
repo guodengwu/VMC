@@ -57,6 +57,6 @@
 #define     MOTOR_PNP9    P42
 #define     MOTOR_AD   		P16  
 
-extern void bsp(void) reentrant;
+void bsp(void);
 
 #endif
