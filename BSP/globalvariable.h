@@ -6,6 +6,7 @@
 
 typedef struct _sys_status	{
 	volatile s8 inside_temp;
+	//volatile u8 IR_CheckFlag;
 }_sys_status_t;
 
 extern _sys_status_t sys_status;

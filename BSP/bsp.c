@@ -1,6 +1,7 @@
 #include "bsp.h"
 #include "tm1640.h"
 #include "motor.h"
+#include "Exti.h"
 
 ////////////////////////////////////
 //IO配置函数
@@ -61,9 +62,9 @@ static void	GPIO_config(void)
 	TM1640_SCLK = 0;
 	TM1640_DIO = 0;/////////////////////////////////
 
-	LIGHT_CTRL = 0; 
+	LIGHT_CTRL = 0;
 	PUMP = 0;
-	IR_CTRL = 0; 
+	IR_CTRL = 0;//红外货物检测开关控制 
 	FOG_CTRL = 1;
 	RELAY = 0;
 	//升降机
@@ -136,6 +137,16 @@ void Timer1_config(void)
 	TIM_InitStructure.TIM_Run       = DISABLE;				//是否初始化后启动定时器, ENABLE或DISABLE
 	Timer_Inilize(Timer1,&TIM_InitStructure);				//初始化Timer1	  Timer0,Timer1,Timer2
 }
+
+void	EXTI_config(void)
+{
+	EXTI_InitTypeDef	EXTI_InitStructure;					//结构定义
+
+	EXTI_InitStructure.EXTI_Mode      = EXT_MODE_RiseFall;	//中断模式,  	EXT_MODE_RiseFall, EXT_MODE_Fall
+	EXTI_InitStructure.EXTI_Polity    = PolityHigh;			//中断优先级,   PolityLow,PolityHigh
+	EXTI_InitStructure.EXTI_Interrupt = DISABLE;				//中断允许,     ENABLE或DISABLE
+	Ext_Inilize(EXT_INT0,&EXTI_InitStructure);				//初始化INT0	EXT_INT0,EXT_INT1,EXT_INT2,EXT_INT3,EXT_INT4
+}
 ///////////////////////////////////////////////////////////
 //函数名:   bsp
 //功能:    板载硬件初始化
@@ -147,6 +158,7 @@ void bsp(void)
 		Timer1_config();//电机运动计时
 		Init_Display();
 		motor_init();		
+		EXTI_config();
 	//PrintString("test");
     /*GPIO_PWMInit(GPIO_PWM5_2,GPIO_PullUp);//LED1设置为准双向口 凡是跟PWM相关的IO口上电都是高阻输入态
     LED1=1;                 //上电后，灯全灭	

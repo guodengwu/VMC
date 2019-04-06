@@ -474,6 +474,11 @@
               <FileType>1</FileType>
               <FilePath>..\STC_LIB\timer.c</FilePath>
             </File>
+            <File>
+              <FileName>Exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STC_LIB\Exti.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

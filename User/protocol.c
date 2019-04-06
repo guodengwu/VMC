@@ -13,7 +13,7 @@ void protocol_process(usart_t *pUsart,message_pkt_t msg[2])
 			data_buf[len++] = motor.status.errCode;//¹ÊÕÏÂë
 			data_buf[len++] = motor.status.ship_status;//³ö»õ×´Ì¬
 			data_buf[len++] = sys_status.inside_temp;//ÏäÄÚÎÂ¶È
-			msg[1].Data    = data_buf;
+			msg[1].Data = data_buf;
 			msg[1].dLen = len;
 			OSMboxPost(pUsart->mbox, &msg[1]);
 			break;

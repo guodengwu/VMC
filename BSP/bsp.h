@@ -6,7 +6,8 @@
 #include "includes.h"
 
 /////////////////////////////////
-#define     BEEP    			P31  
+#define     BEEP    			P31
+#define     IR_CHK    			P32
 #define     LIGHT_CTRL    P10  
 #define     PUMP    			P11  
 #define     IR_CTRL    		P55 

@@ -40,6 +40,7 @@
 #include "ring_buffer.h"
 #include  "msg.h"
 #include "timer.h"
+#include	"Exti.h"
 
 #endif
 
