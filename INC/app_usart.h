@@ -44,8 +44,8 @@ H*******************************************************************************
 
 #define usart_rx_int_enable(pUsart)     ;//USART_ITConfig(pUsart->Usart, USART_IT_RXNE, ENABLE)
 #define usart_rx_int_disable(pUsart)    ;//USART_ITConfig(pUsart->Usart, USART_IT_RXNE, DISABLE)
-#define usart_tx_int_enable(pUsart)     (TI = 1);//USART_ITConfig(pUsart->Usart, USART_IT_TXE, ENABLE)
-#define usart_tx_int_disable(pUsart)    (TI = 0);// USART_ITConfig(pUsart->Usart, USART_IT_TXE, DISABLE)
+#define usart_tx_int_enable(pUsart)     SET_TI3();//(TI = 1);//USART_ITConfig(pUsart->Usart, USART_IT_TXE, ENABLE)
+#define usart_tx_int_disable(pUsart)    CLR_TI3();//(TI = 0);// USART_ITConfig(pUsart->Usart, USART_IT_TXE, DISABLE)
 
 /*
 *********************************************************************************************************

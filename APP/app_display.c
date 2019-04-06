@@ -30,7 +30,7 @@ static void AppDisplayTask(void *parg)
 	DisDataInit();
 	Update_DisString("----");
 	BEEP=1;
-	OSTimeDlyHMSM(0,0,1,500); 
+	OSTimeDlyHMSM(0,0,1,0); 
 	Update_DisInt(15);
 	BEEP=0;
 	//TimerStart(Timer1);

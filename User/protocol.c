@@ -19,22 +19,23 @@ void protocol_process(usart_t *pUsart,message_pkt_t msg[2])
 			break;
 		case CMD_MotorMoveOneCircle://出货电机转一圈
 		{
-			u8 row,col,timeout;
+			u8 row,col,timeout=0;
 			
-			row= UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//行
-			col= UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//列
+			row= UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//行 货盘
+			col= UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//列 货道
 			param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//参数
-			timeout = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)/10;//运行时间 s
-			start_motor(row, col, param, timeout);
+			//timeout = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)/10;//运行时间 s
+			start_motor(row, col, param);
+			msg[1].dLen = 0;
+			OSMboxPost(pUsart->mbox, &msg[1]);	
+			break;
+		}
+		case CMD_ClearMoveResult://清除运行结果
+		{
 			msg[1].dLen = 0;
 			OSMboxPost(pUsart->mbox, &msg[1]);
 			break;
 		}
-		case CMD_ClearMoveResult://清除运行结果
-			
-			msg[1].dLen = 0;
-			OSMboxPost(pUsart->mbox, &msg[1]);
-			break;
 		default:
 			break;
 	}

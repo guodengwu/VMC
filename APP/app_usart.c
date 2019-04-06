@@ -168,19 +168,20 @@ static void message_tx_handler(usart_t *pUsart)
           break;        
       case IG_TX_STATE_LEN:					 //数据内容长度
           USART_SendByte(pUsart->Usart, pUsart->tx_len);
-          pUsart->tx_state  = IG_TX_STATE_DATA;
+					if(pUsart->tx_len > 0)	{
+						pUsart->tx_state  = IG_TX_STATE_DATA;
+					}else	{
+						pUsart->tx_state  = IG_TX_STATE_CHKSUM;
+					}
           pUsart->tx_crc	 += pUsart->tx_len;
           break;
       case IG_TX_STATE_DATA:
-					if (pUsart->tx_len > 0) {
-						tx_dat = pUsart->tx_buf[pUsart->tx_idx];
-						USART_SendByte(pUsart->Usart, tx_dat);
-						pUsart->tx_crc   += tx_dat;
-						pUsart->tx_idx++;
-						if (pUsart->tx_idx >= pUsart->tx_len) {   /* See if we are done sending the packet           */
-								pUsart->tx_state  = IG_TX_STATE_CHKSUM;
-								pUsart->tx_len    = 0;
-						}
+					tx_dat = pUsart->tx_buf[pUsart->tx_idx++];
+					USART_SendByte(pUsart->Usart, tx_dat);
+					pUsart->tx_crc   += tx_dat;
+					if (pUsart->tx_idx >= pUsart->tx_len) {   /* See if we are done sending the packet           */
+							pUsart->tx_state  = IG_TX_STATE_CHKSUM;
+							pUsart->tx_len    = 0;
 					}
           break;
       case IG_TX_STATE_CHKSUM:  //发送校验和
@@ -301,7 +302,7 @@ void UsartTxTaskInit (void)
 ********************************************************************************************************/
 static void UsartInit (void)
 {
-		usart.Usart 			 = USART1;
+		usart.Usart 			 = USART3;
     usart.lock         = OSSemCreate(1);
     usart.sem          = OSSemCreate(0);
     usart.mbox         = OSMboxCreate((void *)0);
@@ -324,7 +325,8 @@ static void UsartInit (void)
     //usart.rx_indicate  = &message_rx_handler;
     usart.tx_complete  = &message_tx_handler;
 }
-extern RINGBUFF_T uart1_rxring;
+//extern RINGBUFF_T uart1_rxring;
+extern RINGBUFF_T uart3_rxring;
 /*******************************************************************************************************
 *                                              Usart接收任务
 ********************************************************************************************************/
@@ -337,7 +339,7 @@ static void AppUsartRxTask(void *parg)
     {
         OSSemPend(usart.sem, 0, &err);
         if(err==OS_NO_ERR)    {
-          if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    {			
+          if(RingBuffer_Pop(&uart3_rxring, (INT8U *)&rxdat))    {			
             if(message_rx_handler(&usart, rxdat))  {
               UsartCmdParsePkt(&usart);       
             }

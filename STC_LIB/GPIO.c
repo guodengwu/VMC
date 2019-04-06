@@ -17,7 +17,7 @@ cocoguojia 修改过
 //========================================================================
 u8	GPIO_Inilize(u8 GPIO, GPIO_InitTypeDef *GPIOx) reentrant
 {
-	if(GPIO > GPIO_P5)				return 1;	//空操作
+	if(GPIO > GPIO_P7)				return 1;	//空操作
 	if(GPIOx->Mode > GPIO_OUT_PP)	return 2;	//错误
 
 	if(GPIO == GPIO_P0)

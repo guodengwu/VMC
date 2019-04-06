@@ -29,11 +29,14 @@ typedef struct _motor {
 	u8 row;
 	u8 col;
 	u8 timeout;
+	volatile u16 timecnt;
 }_motor_t;
 
 extern _motor_t motor;
 
 void motor_init(void);
-void start_motor(u8 row, u8 col, u8 param, u8 timeout);
+void start_motor(u8 row, u8 col, u8 param);
+void stop_motor(_motor_t *pMotor);
+
 
 #endif

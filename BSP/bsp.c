@@ -62,15 +62,15 @@ static void	GPIO_config(void)
 	TM1640_DIO = 0;/////////////////////////////////
 
 	LIGHT_CTRL = 0; 
-	PUMP = 			0;
-	IR_CTRL = 		0; 
-	FOG_CTRL = 	0;
+	PUMP = 0;
+	IR_CTRL = 0; 
+	FOG_CTRL = 1;
 	RELAY = 0;
 	//升降机
 	UP_DOWN_BI = 0;//后退
 	UP_DOWN_FI = 0;//前进
 	//电机控制
-	MOTOR_NPN0 = 0;
+	MOTOR_NPN0 = 0;//1货道
 	MOTOR_NPN1 = 0;
 	MOTOR_NPN2 = 0;
 	MOTOR_NPN3 = 0;
@@ -81,7 +81,7 @@ static void	GPIO_config(void)
 	MOTOR_NPN8 = 0;
 	MOTOR_NPN9 = 0;
 
-	MOTOR_PNP0 = 0;
+	MOTOR_PNP0 = 0;//1货盘
 	MOTOR_PNP1 = 0;
 	MOTOR_PNP2 = 0;
 	MOTOR_PNP3 = 0;
@@ -127,7 +127,7 @@ void Timer1_config(void)
 	TIM_InitTypeDef		TIM_InitStructure;
 	
 	TIM_InitStructure.TIM_Mode      = TIM_16BitAutoReload;	//指定工作模式,   TIM_16BitAutoReload,TIM_16Bit,TIM_8BitAutoReload,TIM_16BitAutoReloadNoMask
-	TIM_InitStructure.TIM_Polity    = PolityLow;			//指定中断优先级, PolityHigh,PolityLow
+	TIM_InitStructure.TIM_Polity    = PolityHigh;			//指定中断优先级, PolityHigh,PolityLow
 	TIM_InitStructure.TIM_Interrupt = ENABLE;				//中断是否允许,   ENABLE或DISABLE
 	TIM_InitStructure.TIM_ClkSource = TIM_CLOCK_12T;			//指定时钟源, TIM_CLOCK_1T,TIM_CLOCK_12T,TIM_CLOCK_Ext
 	TIM_InitStructure.TIM_ClkOut    = DISABLE;				//是否输出高速脉冲, ENABLE或DISABLE
@@ -142,7 +142,7 @@ void Timer1_config(void)
 void bsp(void)
 {
     GPIO_config();          //IO配置函数
-		UART1_config();//接上控
+		//UART1_config();//接上控
     UART3_config();//用于串口调试打印
 		Timer1_config();//电机运动计时
 		Init_Display();

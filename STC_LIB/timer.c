@@ -1,6 +1,7 @@
 #include	"timer.h"
 
 static volatile u16 data timer1_cnt;
+extern void motor_timer_handler(void);
 /********************* Timer0中断函数************************/
 /*void timer0_int (void) interrupt TIMER0_VECTOR
 {
@@ -12,13 +13,13 @@ void timer1_int (void) interrupt TIMER1_VECTOR
 {
 	OSIntEnter();
 	timer1_cnt++;
-	if(timer1_cnt>=50)	//1s
+	if(timer1_cnt>=3)	//100ms
 	{
-		timer1_cnt=0;
-		BEEP = ~BEEP;
+		timer1_cnt=0;		
+		//BEEP = ~BEEP;
+		motor_timer_handler();
 	}
   OSIntExit();
-	//motor_timer_handler();
 }
 
 /********************* Timer2中断函数************************/
