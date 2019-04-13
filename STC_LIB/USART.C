@@ -344,7 +344,7 @@ void UART2_int (void) interrupt UART2_VECTOR
 	}
   OSIntExit();					// Must be called finally at every hardware interupt exit point 
 }
-#if 1
+#if 0
 /********************* UART3ÖÐ¶Ïº¯Êý************************/
 void UART3_int (void) interrupt UART3_VECTOR
 {
