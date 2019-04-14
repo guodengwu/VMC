@@ -36,7 +36,7 @@ static void motor_choose(_motor_t *pMotor)
 	motor_pnp_h.ubyte=0;
 	
 	row_tmp = pMotor->row-1;
-	col_tmp = pMotor->col;
+	col_tmp = pMotor->col-1;
 	motor_pnp_l.ubyte = (1<<(row_tmp&0xff));//货盘
 	motor_npn_l.ubyte = (1<<(col_tmp&0xff));//货道
 	motor_pnp_h.ubyte = (1<<(row_tmp>>8));//货盘
@@ -72,7 +72,7 @@ void motor_timer_handler(void)
 	motor.timecnt ++;
 	if(motor.timecnt >= motor.timeout)	{
 		stop_motor(&motor);
-		stop_motor_timer();
+		stop_motor_timer(&motor);
 	}
 }
 

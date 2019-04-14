@@ -22,49 +22,65 @@
 
 #define BUFF_SIZE                      100u
 
-#define MSG_SYSTEM_ACK_CMD              0x78    // 系统应答命令
-#define MSG_ABNORMAL_CMD                0x79    // 消息错误命令
+#define MSG_SYSTEM_CMD_NONE								0X00
+#define MSG_SYSTEM_CMD_ACK             		0x06    // 系统应答命令
+#define MSG_SYSTEM_CMD_NAK                0x15    // 消息错误命令
+#define MSG_FEEDBACK_ENABLE	1
+#define MSG_FEEDBACK_DISABLE	0
 
-#define  IG_PROTOCOL_RX_SD0        0x20           /* Start delimiters                                */
+#define  IG_PROTOCOL_RX_SD0        0x02           /* Start delimiters                                */
 #define  IG_PROTOCOL_RX_SD1        0x00
-#define  IG_PROTOCOL_RX_END        0x0D           /* End   delimiter                                 */
+#define  IG_PROTOCOL_RX_END        0x03           /* End   delimiter                                 */
                                                      /* Outbound packets (to NIOS-II)                   */
-#define  IG_PROTOCOL_TX_SD0        0x20           /* Start delimiters                                */
+#define  IG_PROTOCOL_TX_SD0        0x02           /* Start delimiters                                */
 #define  IG_PROTOCOL_TX_SD1        0x00
-#define  IG_PROTOCOL_TX_END        0x0D           /* End   delimiter                                 */
+#define  IG_PROTOCOL_TX_END        0x03           /* End   delimiter                                 */
 
 #define	 IG_CMD_POSITION     6 
 #define	 IG_LENGTH_SIZE     4                                               ///< 消息中Length所占字节数
 #define  IG_START_LEN       5                                               ///< 4字节长度 + 1字节命令
 #define  IG_EXTENT_LEN      4                                               ///< 1字节命令 + 2字节校验和 + 1字节结束符
 #define  IG_END_LEN         3                                               ///< 2字节校验和 + 1字节结束符
+#define  IG_CMDANDSN_LEN         5
 
 #define  IG_RX_STATE_SD0              0           /* waiting for start first  start delimiter (SD0)  */
-#define  IG_RX_STATE_SD1              1           /* waiting for start second start delimiter (SD1)  */
-#define  IG_RX_STATE_CMD            	2           /* waiting for len0  byte                       */
-#define  IG_RX_STATE_LEN             3           /* waiting for len1  byte                      */
-//#define  IG_RX_STATE_LEN2             4           /* waiting for len2  byte                       */
-//#define  IG_RX_STATE_LEN3             5           /* waiting for len3  byte                      */
-#define  IG_RX_STATE_DATA             6           /* waiting for data                                */
-#define  IG_RX_STATE_CHKSUM          7           /* waiting for checksum0 low byte                  */
+#define  IG_RX_STATE_LEN0             1           /* waiting for len1  byte                      */
+#define  IG_RX_STATE_LEN1             2           /* waiting for len2  byte                       */
+#define  IG_RX_STATE_CMD            	3           /* waiting for len0  byte                       */
+#define  IG_RX_STATE_SN0             4           /* waiting for len3  byte                      */
+#define  IG_RX_STATE_SN1             5 
+#define  IG_RX_STATE_SN2             6 
+#define  IG_RX_STATE_SN3             7 
+#define  IG_RX_STATE_DATA             8           /* waiting for data                                */
+#define  IG_RX_STATE_CHKSUM          9           /* waiting for checksum0 low byte                  */
 //#define  IG_RX_STATE_CHKSUM1          8           /* waiting for checksum1 high byte                 */
-//#define  IG_RX_STATE_END              9           /* waiting for end delimiter                       */
+#define  IG_RX_STATE_END              10           /* waiting for end delimiter                       */
 
-#define  IG_TX_STATE_SD0              0           /* Transmit state machine states                   */
-#define  IG_TX_STATE_SD1              1
-#define  IG_TX_STATE_CMD             2
-#define  IG_TX_STATE_LEN             3
-//#define  IG_TX_STATE_LEN2             4
-//#define  IG_TX_STATE_LEN3             5
-#define  IG_TX_STATE_DATA             6
-#define  IG_TX_STATE_CHKSUM          7
-//#define  IG_TX_STATE_CHKSUM1          8
-#define  IG_TX_STATE_END              9
+#define  IG_TX_STATE_SD0              0           /* waiting for start first  start delimiter (SD0)  */
+#define  IG_TX_STATE_LEN0             1           /* waiting for len1  byte                      */
+#define  IG_TX_STATE_LEN1             2           /* waiting for len2  byte                       */
+#define  IG_TX_STATE_CMD            	3           /* waiting for len0  byte                       */
+#define  IG_TX_STATE_SN0             4           /* waiting for len3  byte                      */
+#define  IG_TX_STATE_SN1             5 
+#define  IG_TX_STATE_SN2             6 
+#define  IG_TX_STATE_SN3             7 
+#define  IG_TX_STATE_DATA             8           /* waiting for data                                */
+#define  IG_TX_STATE_CHKSUM          9           /* waiting for checksum0 low byte                  */
+//#define  IG_RX_STATE_CHKSUM1          8           /* waiting for checksum1 high byte                 */
+#define  IG_TX_STATE_END              10
 
 typedef enum {
-    CMD_ReadSysStatus								=	0x01,//读取机器状态
-    CMD_MotorMoveOneCircle					=	0x02,//出货电机转一圈
-		CMD_ClearMoveResult							=	0x03,//清除运行结果
+		CMD_ReportParam					= 0x01,//VMC机器参数上报
+		CMD_ReportError					= 0x02,//VMC故障上报
+		CMD_ReportShipResult	  = 0x04,//VMC出货结果上报
+		CMD_GetOnlineStatus			= 0x05,//VMC获取联网状态
+	
+    CMD_NotifyShip					=	0x14,//通知出货
+    CMD_ReplyOnlineStatus		=	0x15,//回复联网状态
+		CMD_ModifyTempParm			=	0x16,//修改温控参数
+		CMD_LightOnOff					=	0x17,//灯开关
+		CMD_FogOnOff						=	0x18,//除雾开关
+		CMD_SysReset						=	0x19//重启
 } EMessageCmd;
 
 enum USART_MSG_ERR {
@@ -80,6 +96,6 @@ enum USART_MSG_ERR {
     IG_MSG_ERR_UNKNOWN           =  0xFFFFu
 };
 
-void protocol_process(usart_t *pUsart,message_pkt_t msg[2]);
+u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck);
 
 #endif

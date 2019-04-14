@@ -7,6 +7,7 @@ void globalvariable (void)
 {
 		//sys_status.IR_CheckFlag = DEF_False;
 		sys_status.inside_temp = -50;
+		memset(sys_status.IMEI,0,IMEI_LEN);
 }
 
 

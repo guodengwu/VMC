@@ -29,8 +29,8 @@ H*******************************************************************************
 *********************************************************************************************************
 */
 #define USART_BUFF_SIZE                      128u
-#define USART_TX_BUFF_SIZE        COM_TX3_Lenth
-#define USART_RX_BUFF_SIZE        COM_RX3_Lenth
+#define USART_TX_BUFF_SIZE        COM_TX1_Lenth
+#define USART_RX_BUFF_SIZE        COM_RX1_Lenth
 #define USART_BAUDRATE                      115200uL	
 
 

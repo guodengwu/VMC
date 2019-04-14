@@ -55,6 +55,19 @@ void delay_us(u32 us)
 				_nop_();
 	}
 }
+
+void DecToBCD(u32 Dec, u8 *pBCD, u8 len)
+{
+	u8 i;
+	u32 temp;
+	
+	for(i=len-1;i>=0;i--)	{
+		temp = Dec%100;
+		pBCD[i] = ((temp/10)<<4) + ((temp%10)&0x0f);
+		Dec /= 100;
+	}
+	return;
+}
 #if 0
 INT16U crc16(INT8U *buf,INT8U len)
 {
