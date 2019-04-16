@@ -1,4 +1,5 @@
 #include "app_sysmonitor.h"
+#include "motor.h"
 
 OS_STK      AppSysMonitorStk       [APP_TASK_SYS_MONITOR_STK_SIZE];           // Usart接收任务堆栈
 static void SysMonitorTask();
@@ -126,11 +127,18 @@ static void ReportSysError30min(void)
 static void CalcInsideTemp(void)
 {
 	static u16 count;
+	u32 Vad,Rx;
+	float temp;
 	count++;
 	if(count>=100)	{//5s计算一次温度
 		count=0;
-		//Get_ADC10bitResult(6);
-		CalculateTemperature(1,10000,3950);
+		temp = Cal_Vol(ADC_CH7,1);
+		Vad = (u32)(temp*100);
+		temp = Vad*1.0/(500-Vad);
+		temp *= 51000;
+		Rx = (u32)temp;
+		temp = CalculateTemperature(Rx,10000,3950);
+		sys_status.inside_temp = (s8)temp;
 	}
 }
 
@@ -160,6 +168,7 @@ static void SysMonitorTask(void *parg)
 					}
 				}
 				//CalcInsideTemp();
+				CheckMotorMoveState();//电机运转状态检测
 		}
 	}
 }

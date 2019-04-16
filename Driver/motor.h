@@ -10,17 +10,23 @@ enum {
 	MOTORSTATUS_ID_ERR = 3,//电机变化错误
 };
 
-enum {
-	SHIP_IDLE = 0,
-	SHIPING = 1,
-	SHIP_OK = 2,
-	SHIP_FAILED = 3,
+enum eMotorState {
+    MotorState_Stop         = 0,    // Motor State:stop
+    MotorState_Run          = 1,    // Motor State:run
+};
+
+enum eMotorAbortType {
+		MotorAbort_NONE = 0,
+    MotorAbort_Stuck		= 4,	//????
+    MotorAbort_UNDETECTED= 5,	//????
 };
 
 typedef struct {
-    volatile INT8U   ship_status;
-    volatile INT8U   errCode;
-    //INT8U   abort_type;
+    volatile INT8U   is_run;
+    INT8U   action;
+    INT8U   abort_type;
+    //u8 postion;
+    //u8 stuck_check_enable;
 } motor_state_t;
 
 typedef struct _motor {
@@ -37,6 +43,6 @@ extern _motor_t motor;
 void motor_init(void);
 u8 start_motor(u8 row, u8 col);
 void stop_motor(_motor_t *pMotor);
-
+void CheckMotorMoveState(void);
 
 #endif

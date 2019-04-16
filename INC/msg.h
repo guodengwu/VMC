@@ -14,7 +14,7 @@ typedef enum _message_src{
     MSG_START_SHIP,          		// 邮箱消息来自Slider Motor(滑动电机)任务(Mbox From Slider Motor Task)
     MSG_SHIP_MOTOR_NOMAL,        		// 邮箱消息来自Rotating Motor(旋转电机)任务(Mbox From Rotating Motor Task)
     SYSTEM_MONITOR_TASK,        // 邮箱消息来自System Monitor(系统监控)任务(Mbox From System Monitor Task)
-    MSG_SHIP_MOTOR_STUCK,//
+    MSG_SHIP_MOTOR_ABORT,//
     MSG_SYSTEM_RESTART,//阻抗单孔测试
     IMP_AUTO_TEST,
     IMP_TEMPERATURE_TEST,//温度电阻阻抗采集
@@ -43,7 +43,6 @@ INT8U  UsartRxGetINT8U (u8 *buf,u32 *idx);
 INT16U  UsartRxGetINT16U (u8 *buf,u32 *idx);
 INT32U  UsartRxGetINT32U (u8 *buf,u32 *idx);
 u16 crc16(u8 *buf,u8 len);
-void delay_us(u32 us);
-void DecToBCD(u32 Dec, u8 *pBCD, u8 len);
+
 
 #endif

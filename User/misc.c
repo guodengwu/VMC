@@ -1,9 +1,34 @@
 #include "misc.h"
 
-//????log??
+
+void delay_us(u32 us)
+{
+	u16 i,j;
+	
+	for(i=0;i<us;i++)	{
+		for(j=0;j<20;j++)
+				_nop_();
+	}
+}
+
+void DecToBCD(u32 Dec, u8 *pBCD, u8 len)
+{
+	u8 i;
+	u32 temp,dec_tmp;
+	
+	dec_tmp=Dec;
+	for(i=len-1;i>=0;i--)	{
+		temp = dec_tmp%100;
+		pBCD[i] = ((temp/10)<<4) + ((temp%10)&0x0f);
+		dec_tmp /= 100;
+	}
+	return;
+}
+
+//自己写的log函数
 float MYLOG(float a)
 {
-   int N = 10;//?????10+1????
+   int N = 5;//取5+1项计算
    int k,nk;
    float x,xx,y;
    x = (a-1)/(a+1);
@@ -17,7 +42,7 @@ float MYLOG(float a)
    }
    return 2.0*x*y;
 }
-//???????????1/T1 =ln(Rt/Rp)/Bx+1/T2
+//热敏电阻和温度转换公式 1/T1 =ln(Rt/Rp)/Bx+1/T2
 /*#define Rp				120
 #define Bx				3910*/
 #define	Ka				273.15f

@@ -59,12 +59,12 @@ static void AppShipTask(void *parg)
 							sys_status.pError->IR = 1;//红外传感器异常
 					}
 					Ext_Disable(EXT_INT0);//关闭货物检测
-			}else if(msg->Src==MSG_SHIP_MOTOR_STUCK)	{//出货过程中电机卡死
+			}else if(msg->Src==MSG_SHIP_MOTOR_ABORT)	{//出货过程中电机异常停止
 					Ext_Disable(EXT_INT0);//关闭货物检测
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
 					data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;
-					data_buf[1] = SHIP_MOTOR_STUCK;//
+					data_buf[1] = motor.status.abort_type;//停止原因
 			}
 			memcpy(data_buf+2, sys_status.pIMEI->dat, sys_status.pIMEI->len);//拷贝订单号
 			msg_pkt_ship.Data = data_buf;

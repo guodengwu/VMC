@@ -56,7 +56,7 @@
 #define     MOTOR_PNP7    P44
 #define     MOTOR_PNP8    P43
 #define     MOTOR_PNP9    P42
-#define     MOTOR_AD   		P16  
+//#define     MOTOR_AD   		P16  
 
 #define     DOOR_STATE    P42//цев╢л╛
 void bsp(void);

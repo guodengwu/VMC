@@ -46,28 +46,6 @@ INT32U  UsartRxGetINT32U (u8 *buf,u32 *idx)
     return ((highword << 16) | lowword);
 }
 
-void delay_us(u32 us)
-{
-	u16 i,j;
-	
-	for(i=0;i<2;i++)	{
-		for(j=0;j<10;j++)
-				_nop_();
-	}
-}
-
-void DecToBCD(u16 Dec, u8 *pBCD, u8 len)
-{
-	u8 i;
-	u16 temp,dec_tmp=Dec;
-	
-	for(i=len-1;i>=0;i--)	{
-		temp = dec_tmp%100;
-		pBCD[i] = ((temp/10)<<4) + ((temp%10)&0x0f);
-		dec_tmp /= 100;
-	}
-	return;
-}
 #if 0
 INT16U crc16(INT8U *buf,INT8U len)
 {

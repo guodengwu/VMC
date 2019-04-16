@@ -7,8 +7,7 @@ static  message_pkt_t    msg_pkt_motor;
 void motor_init(void)
 {
 		motor.timer = Timer1;
-	  motor.status.errCode = MOTORSTATUS_NO_ERR;
-		motor.status.ship_status = SHIP_IDLE;
+	  motor.status.is_run = MotorState_Stop;
 		motor.row = 0;
 		motor.col = 0;
 		motor.timecnt = 0;
@@ -66,6 +65,8 @@ static void motor_choose(_motor_t *pMotor)
 	MOTOR_PNP8 = motor_pnp_h.bits.b0;
 	MOTOR_PNP9 = motor_pnp_h.bits.b1;
 	start_motor_timer(pMotor);
+	pMotor->status.is_run = MotorState_Run;
+	pMotor->status.abort_type = MotorAbort_NONE;
 }
 //由timer1定时中断调用，电机运动超时
 void motor_timer_handler(void)
@@ -85,7 +86,7 @@ u8 start_motor(u8 row, u8 col)
 	if(row>0&&row<=10&&col>0&&col<=10)	{
 		motor.timecnt = 0;
 		motor.row = row;
-		motor.col = col;
+		motor.col = col;	
 		motor_choose(&motor);
 		return 1;
 	}else	{
@@ -95,6 +96,7 @@ u8 start_motor(u8 row, u8 col)
 
 void stop_motor(_motor_t *pMotor)
 {
+	motor.status.is_run = MotorState_Stop;
 	MOTOR_NPN0 = 0;//1货道
 	MOTOR_NPN1 = 0;
 	MOTOR_NPN2 = 0;
@@ -116,4 +118,40 @@ void stop_motor(_motor_t *pMotor)
 	MOTOR_PNP7 = 0;
 	MOTOR_PNP8 = 0;
 	MOTOR_PNP9 = 0;
+}
+
+//检测电机是否运转/卡死 测量MOTOR_AD的反馈电压：小于0.2V--未检测到电机；0.2-1.5V--ok；>1.5V--堵转
+//被系统监控任务调用，50ms执行一次
+void CheckMotorMoveState(void)
+{
+	u16 Vad;
+	float temp;
+	static u8 movecnt;
+	//static u8 movecnt1,movecnt2,movecnt3;
+	
+	if(motor.status.is_run == MotorState_Run)	{
+		movecnt++;
+		if(movecnt>=3)	{//移动150ms后，再计算
+				temp = Cal_Vol(ADC_CH6,3);
+				Vad = (u16)(temp*100);//放大100倍								
+				if(Vad<=20)	{//电机未检测到转动
+					motor.status.abort_type = MotorAbort_UNDETECTED;
+					stop_motor(&motor);
+					stop_motor_timer(&motor);
+					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机正常停止
+					OSMboxPost(appShip.MBox, &msg_pkt_motor);
+				}else if(Vad>20&&Vad<=150)	{//ok
+					motor.status.abort_type = MotorAbort_NONE;			
+				}else if(Vad>150)	{//
+					motor.status.abort_type = MotorAbort_Stuck;
+					stop_motor(&motor);
+					stop_motor_timer(&motor);
+					BEEP=1;
+					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机正常停止
+					OSMboxPost(appShip.MBox, &msg_pkt_motor);
+				}
+		}
+	}else	{
+		movecnt = 0;
+	}
 }

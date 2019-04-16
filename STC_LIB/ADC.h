@@ -32,7 +32,6 @@
 #define ADC_RES_H2L8	1
 #define ADC_RES_H8L2	0
 
-
 typedef struct
 {
 	u8	ADC_Px;			//设置要做ADC的IO,	ADC_P10 ~ ADC_P17,ADC_P1_All
@@ -46,5 +45,6 @@ typedef struct
 void	ADC_Inilize(ADC_InitTypeDef *ADCx);
 void	ADC_PowerControl(u8 pwr);
 u16		Get_ADC10bitResult(u8 channel);	//channel = 0~7
+float Cal_Vol(u8 ch, u8 times);
 
 #endif

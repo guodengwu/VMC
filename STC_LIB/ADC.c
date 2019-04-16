@@ -13,7 +13,7 @@
 
 #include	"adc.h"
 
-
+#define ADC_FACTOR		(float)(5.0/1024)
 //========================================================================
 // 函数: void	ADC_Inilize(ADC_InitTypeDef *ADCx)
 // 描述: ADC初始化程序.
@@ -102,4 +102,28 @@ void ADC_int (void) interrupt ADC_VECTOR
 	ADC_CONTR &= ~ADC_FLAG;
 }
 
+u16 Get_Adc_Average(u8 ch,u8 times)
+{
+    u16 temp_val=0;
+    u8 t;
+    
+    for(t=0;t<times;t++)        {
+        OSTimeDlyHMSM(0,0,0,10);
+        temp_val+=Get_ADC10bitResult(ch);        
+    }
+    return temp_val/times;
+}
 
+float Cal_Vol(u8 ch, u8 times)
+{
+    float Vol;
+    u16 adcx;
+    
+		if(times==1)	{
+			adcx = Get_ADC10bitResult(ch);  
+		}else	{
+			adcx = Get_Adc_Average(ch,times);
+		}			
+    Vol=(float)adcx*ADC_FACTOR;
+    return Vol;
+}

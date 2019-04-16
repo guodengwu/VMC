@@ -370,7 +370,7 @@ void UART3_int (void) interrupt UART3_VECTOR
 /********************* UART3中断函数************************/
 void UART3_int (void) interrupt UART3_VECTOR
 {
-	u8 rxdat;
+//	u8 rxdat;
 	
   OSIntExit();					// Must be called finally at every hardware interupt exit point 
 	if(RI3)//接收中断有效

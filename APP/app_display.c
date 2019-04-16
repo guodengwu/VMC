@@ -7,7 +7,7 @@ static void AppDisplayTask(void *parg);
 	
 void DisplayTaskInit (void)
 {
-    INT8U  err;
+//    INT8U  err;
 	
     (void)OSTaskCreate(AppDisplayTask,
                        (void          * ) 0,

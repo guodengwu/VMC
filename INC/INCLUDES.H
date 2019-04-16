@@ -43,6 +43,7 @@
 #include	"Exti.h"
 #include "protocol.h"
 #include "misc.h"
+#include "ADC.h"
 #endif
 
 
