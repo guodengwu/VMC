@@ -11,13 +11,11 @@
 typedef enum _message_src{
     /* Task Mbox */
     USART_MSG_RX_TASK = 0,      // 邮箱消息来自Usart Rx(串口接收)任务(Mbox From Usart Message Receive Task)
-    USB_MSG_RX_TASK,
-    USB_DATA_SEND_TASK,
-    X_MOTOR_TASK,          		// 邮箱消息来自Slider Motor(滑动电机)任务(Mbox From Slider Motor Task)
-    Y_MOTOR_TASK,        		// 邮箱消息来自Rotating Motor(旋转电机)任务(Mbox From Rotating Motor Task)
+    MSG_START_SHIP,          		// 邮箱消息来自Slider Motor(滑动电机)任务(Mbox From Slider Motor Task)
+    MSG_SHIP_MOTOR_NOMAL,        		// 邮箱消息来自Rotating Motor(旋转电机)任务(Mbox From Rotating Motor Task)
     SYSTEM_MONITOR_TASK,        // 邮箱消息来自System Monitor(系统监控)任务(Mbox From System Monitor Task)
-    IMP_SELF_TEST,//Sys_Self_Test
-    IMP_SINGLE_HOLE_TEST,//阻抗单孔测试
+    MSG_SHIP_MOTOR_STUCK,//
+    MSG_SYSTEM_RESTART,//阻抗单孔测试
     IMP_AUTO_TEST,
     IMP_TEMPERATURE_TEST,//温度电阻阻抗采集
     IMP_SYS_POWER_TEST,//系统功率采集

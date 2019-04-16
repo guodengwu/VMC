@@ -58,6 +58,8 @@
 #define     MOTOR_PNP9    P42
 #define     MOTOR_AD   		P16  
 
+#define     DOOR_STATE    P42//цев╢л╛
 void bsp(void);
+void soft_reset(void);
 
 #endif

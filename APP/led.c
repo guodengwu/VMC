@@ -3,7 +3,7 @@
 //////////////////////////////////
 //头文件
 #include "includes.h"
-
+/*
 //////////////////////////////////
 //堆栈
 OS_STK  TASK_LED_STK[MaxStkSize+1]; //任务堆栈声明
@@ -22,5 +22,5 @@ void TaskLed(void * ppdata) reentrant
         OSTimeDlyHMSM(0,0,0,500);  
     }
 }
-
+*/
 

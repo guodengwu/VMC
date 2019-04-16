@@ -56,15 +56,15 @@ void delay_us(u32 us)
 	}
 }
 
-void DecToBCD(u32 Dec, u8 *pBCD, u8 len)
+void DecToBCD(u16 Dec, u8 *pBCD, u8 len)
 {
 	u8 i;
-	u32 temp;
+	u16 temp,dec_tmp=Dec;
 	
 	for(i=len-1;i>=0;i--)	{
-		temp = Dec%100;
+		temp = dec_tmp%100;
 		pBCD[i] = ((temp/10)<<4) + ((temp%10)&0x0f);
-		Dec /= 100;
+		dec_tmp /= 100;
 	}
 	return;
 }

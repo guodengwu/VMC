@@ -146,7 +146,7 @@ void Update_DisString(u8 *string)
 	for(i=0;i<4;i++)	{
 		if(string[i]>='A' && string[i]<= 'L'){
 			DisBuf[i] = ch_table[string[i] - 0X37];
-		} else if(' '){
+		} else if(string[i] == ' '){
 			DisBuf[i] = ch_table[23];
 		}	else	{
 			DisBuf[i] = ch_table[22];

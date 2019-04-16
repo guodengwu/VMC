@@ -44,7 +44,7 @@ static  INT8U       usart_ringbuf       [USART_RX_BUFF_SIZE];
 
 static  message_pkt_t    msg_pkt_usart[2];
 //static BIT32 uart_rx_sn;
-static u32 uart_tx_sn;
+static u16 uart_tx_sn;
 struct uart_rx_sn_t	{
 	u8 ubyte[4];
 }uart_rx_sn;
@@ -221,7 +221,12 @@ static void message_tx_handler(usart_t *pUsart)
 			case IG_TX_STATE_SN3:                    /* Include the packet length in the packet         */
 					tx_dat = pUsart->tx_buf[pUsart->tx_idx++];
 					USART_SendByte(pUsart->Usart, tx_dat);
-          pUsart->tx_state  = IG_TX_STATE_DATA;
+					if(pUsart->tx_len == IG_CMDANDSN_LEN)	{
+						pUsart->tx_state  = IG_TX_STATE_CHKSUM;
+						pUsart->tx_len    = 0;
+					}else	{
+						pUsart->tx_state  = IG_TX_STATE_DATA;
+					}
           pUsart->tx_crc    += tx_dat;
           break;
       case IG_TX_STATE_DATA:
@@ -261,12 +266,13 @@ static void message_tx_handler(usart_t *pUsart)
 void usart_tx_start(usart_t *pUsart, message_pkt_t *pmsg)
 {
     INT16U len;
-		u8 BCD[4];
+		u8 BCD[4]={0};
 
     mutex_lock(pUsart->lock);
-    pUsart->tx_buf[0] = pmsg->Cmd&(~0x10);//·µ»ØÂë
-    len = pmsg->dLen;	
-		DecToBCD(uart_tx_sn++,BCD,8);
+    pUsart->tx_buf[0] = pmsg->Cmd;//·µ»ØÂë
+    len = pmsg->dLen;
+		uart_tx_sn++;		
+		//DecToBCD(uart_tx_sn,BCD,4);		//BEEP=1;	
 		memcpy(pUsart->tx_buf+1, BCD, 4);
     if (len) {
         memcpy(pUsart->tx_buf + IG_CMDANDSN_LEN, pmsg->Data, len);

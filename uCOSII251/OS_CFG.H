@@ -23,7 +23,7 @@
 
 #define MaxStkSize                100    /*根据修改，每个任务使用同样大小的堆栈，这就是每个堆栈的大小*/
 
-#define OS_MAX_EVENTS             10    /* Max. number of event control blocks in your application ...  */
+#define OS_MAX_EVENTS             20    /* Max. number of event control blocks in your application ...  */
                                        /* ... MUST be > 0                                              */
 #define OS_MAX_FLAGS              1    /* Max. number of Event Flag Groups    in your application ...  */
                                        /* ... MUST be > 0                                              */

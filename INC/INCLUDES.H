@@ -41,7 +41,8 @@
 #include  "msg.h"
 #include "timer.h"
 #include	"Exti.h"
-
+#include "protocol.h"
+#include "misc.h"
 #endif
 
 

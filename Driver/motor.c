@@ -1,6 +1,8 @@
 #include "motor.h"
+#include "app_ship.h"
 
 _motor_t motor;
+static  message_pkt_t    msg_pkt_motor;
 
 void motor_init(void)
 {
@@ -73,15 +75,22 @@ void motor_timer_handler(void)
 	if(motor.timecnt >= motor.timeout)	{
 		stop_motor(&motor);
 		stop_motor_timer(&motor);
+		msg_pkt_motor.Src = MSG_SHIP_MOTOR_NOMAL;//出货过程电机正常停止
+		OSMboxPost(appShip.MBox, &msg_pkt_motor);
 	}
 }
 
-void start_motor(u8 row, u8 col, u8 param)
+u8 start_motor(u8 row, u8 col)
 {
-	motor.timecnt = 0;
-	motor.row = row;
-	motor.col = col;
-	motor_choose(&motor);
+	if(row>0&&row<=10&&col>0&&col<=10)	{
+		motor.timecnt = 0;
+		motor.row = row;
+		motor.col = col;
+		motor_choose(&motor);
+		return 1;
+	}else	{
+		return 0;
+	}
 }
 
 void stop_motor(_motor_t *pMotor)

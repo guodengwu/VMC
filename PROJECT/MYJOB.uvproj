@@ -439,6 +439,11 @@
               <FileType>1</FileType>
               <FilePath>..\APP\app_sysmonitor.c</FilePath>
             </File>
+            <File>
+              <FileName>app_ship.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\app_ship.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -478,6 +483,11 @@
               <FileName>Exti.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\STC_LIB\Exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>ADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STC_LIB\ADC.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -563,6 +573,11 @@
               <FileName>msg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\msg.c</FilePath>
+            </File>
+            <File>
+              <FileName>misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\misc.c</FilePath>
             </File>
           </Files>
         </Group>

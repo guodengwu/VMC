@@ -25,7 +25,7 @@
 void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
 {
 	OSIntEnter();
-//	sys_status.IR_CheckFlag = DEF_True;
+	sys_status.IR_CheckFlag = DEF_True;
 	//BEEP = 1;
 	OSIntExit();
 }

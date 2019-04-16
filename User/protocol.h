@@ -73,7 +73,7 @@ typedef enum {
 		CMD_ReportParam					= 0x01,//VMC机器参数上报
 		CMD_ReportError					= 0x02,//VMC故障上报
 		CMD_ReportShipResult	  = 0x04,//VMC出货结果上报
-		CMD_GetOnlineStatus			= 0x05,//VMC获取联网状态
+		CMD_CheckOnlineStatus			= 0x05,//VMC获取联网状态
 	
     CMD_NotifyShip					=	0x14,//通知出货
     CMD_ReplyOnlineStatus		=	0x15,//回复联网状态

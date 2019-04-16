@@ -2,6 +2,7 @@
 #include "tm1640.h"
 #include "motor.h"
 #include "Exti.h"
+#include "ADC.h"
 
 ////////////////////////////////////
 //IO配置函数
@@ -57,6 +58,10 @@ static void	GPIO_config(void)
  	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P7,&GPIO_InitStructure);
+//双向口
+	GPIO_InitStructure.Pin  = GPIO_Pin_2;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 	
 	BEEP=0;
 	TM1640_SCLK = 0;
@@ -64,8 +69,8 @@ static void	GPIO_config(void)
 
 	LIGHT_CTRL = 0;
 	PUMP = 0;
-	IR_CTRL = 0;//红外货物检测开关控制 
-	FOG_CTRL = 1;
+	IR_CTRL = 1;//红外货物检测开关控制 
+	FOG_CTRL = 1;//默认打开
 	RELAY = 0;
 	//升降机
 	UP_DOWN_BI = 0;//后退
@@ -147,6 +152,19 @@ void	EXTI_config(void)
 	EXTI_InitStructure.EXTI_Interrupt = DISABLE;				//中断允许,     ENABLE或DISABLE
 	Ext_Inilize(EXT_INT0,&EXTI_InitStructure);				//初始化INT0	EXT_INT0,EXT_INT1,EXT_INT2,EXT_INT3,EXT_INT4
 }
+void	ADC_config(void)
+{
+	ADC_InitTypeDef		ADC_InitStructure;				//结构定义
+	ADC_InitStructure.ADC_Px        = ADC_P16;	//设置要做ADC的IO,	ADC_P10 ~ ADC_P17(或操作),ADC_P1_All
+	ADC_InitStructure.ADC_Speed     = ADC_360T;			//ADC速度			ADC_90T,ADC_180T,ADC_360T,ADC_540T
+	ADC_InitStructure.ADC_Power     = ENABLE;			//ADC功率允许/关闭	ENABLE,DISABLE
+	ADC_InitStructure.ADC_AdjResult = ADC_RES_H8L2;		//ADC结果调整,	ADC_RES_H2L8,ADC_RES_H8L2
+	ADC_InitStructure.ADC_Polity    = PolityLow;		//优先级设置	PolityHigh,PolityLow
+	ADC_InitStructure.ADC_Interrupt = DISABLE;			//中断允许		ENABLE,DISABLE
+	ADC_Inilize(&ADC_InitStructure);					//初始化
+	ADC_PowerControl(ENABLE);							//单独的ADC电源操作函数, ENABLE或DISABLE
+}
+
 ///////////////////////////////////////////////////////////
 //函数名:   bsp
 //功能:    板载硬件初始化
@@ -159,10 +177,16 @@ void bsp(void)
 		Init_Display();
 		motor_init();		
 		EXTI_config();
+		ADC_config();
 	//PrintString("test");
     /*GPIO_PWMInit(GPIO_PWM5_2,GPIO_PullUp);//LED1设置为准双向口 凡是跟PWM相关的IO口上电都是高阻输入态
     LED1=1;                 //上电后，灯全灭	
     LED2=1;    
     LED3=1;                
     LED4=1;   */           
+}
+
+void soft_reset(void)
+{
+		((void (code *) (void)) 0x0000) ();
 }
