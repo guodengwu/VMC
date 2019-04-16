@@ -31,7 +31,7 @@ static void	GPIO_config(void)
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);	
 	
-	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_7;
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5/*|GPIO_Pin_7*/;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P1,&GPIO_InitStructure);	
 	
@@ -43,7 +43,7 @@ static void	GPIO_config(void)
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	        //初始化 P3
 	
-	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_7;
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1/*|GPIO_Pin_2*/|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_7;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 	
@@ -67,11 +67,11 @@ static void	GPIO_config(void)
 	TM1640_SCLK = 0;
 	TM1640_DIO = 0;/////////////////////////////////
 
-	LIGHT_CTRL = 0;
-	PUMP = 0;
-	IR_CTRL = 1;//红外货物检测开关控制 
-	FOG_CTRL = 1;//默认打开
-	RELAY = 0;
+	IO_LIGHT_CTRL = 0;
+	IO_PUMP = 0;
+	IO_IR_CTRL = 1;//红外货物检测开关控制 
+	IO_FOG_CTRL = 1;//默认打开
+	IO_RELAY = 0;
 	//升降机
 	UP_DOWN_BI = 0;//后退
 	UP_DOWN_FI = 0;//前进
@@ -121,7 +121,7 @@ void	UART3_config(void)
 {
 	COMx_InitDefine		COMx_InitStructure;					//结构定义
 	COMx_InitStructure.UART_Mode      = UART_8bit_BRTx;		//模式,       UART_ShiftRight,UART_8bit_BRTx,UART_9bit,UART_9bit_BRTx
-	COMx_InitStructure.UART_BaudRate  = 38400ul;			//波特率,     110 ~ 115200
+	COMx_InitStructure.UART_BaudRate  = 115200ul;			//波特率,     110 ~ 115200
 	COMx_InitStructure.UART_RxEnable  = ENABLE;				//接收允许,   ENABLE或DISABLE
 	COMx_InitStructure.UART_Interrupt = ENABLE;				//中断允许,   ENABLE或DISABLE
 	COMx_InitStructure.UART_Polity    = PolityLow;			//中断优先级, PolityLow,PolityHigh
@@ -172,7 +172,7 @@ void bsp(void)
 {
     GPIO_config();          //IO配置函数
 		UART1_config();//接上控
-    //UART3_config();//用于串口调试打印
+    UART3_config();//用于串口调试打印
 		Timer1_config();//电机运动计时
 		Init_Display();
 		motor_init();		

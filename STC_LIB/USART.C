@@ -7,7 +7,7 @@ u8	xdata TX1_Buffer[COM_TX1_Lenth];	//·¢ËÍ»º³å
 u8 	xdata RX1_Buffer[COM_RX1_Lenth];	//½ÓÊÕ»º³å
 u8	xdata TX2_Buffer[COM_TX2_Lenth];	//·¢ËÍ»º³å
 u8 	xdata RX2_Buffer[COM_RX2_Lenth];	//½ÓÊÕ»º³å
-u8	xdata TX3_Buffer[COM_TX3_Lenth];	//·¢ËÍ»º³å
+char	xdata TX3_Buffer[COM_TX3_Lenth];	//·¢ËÍ»º³å
 u8 	xdata RX3_Buffer[COM_RX3_Lenth];	//½ÓÊÕ»º³å
 u8	xdata TX4_Buffer[COM_TX4_Lenth];	//·¢ËÍ»º³å
 u8 	xdata RX4_Buffer[COM_RX4_Lenth];	//½ÓÊÕ»º³å
@@ -237,7 +237,7 @@ void TX2_write2buff(u8 dat) reentrant	//Ð´Èë·¢ËÍ»º³å£¬Ö¸Õë+1
 	}
 }
 #endif
-void TX3_write2buff(u8 dat) reentrant	//Ð´Èë·¢ËÍ»º³å£¬Ö¸Õë+1
+void TX3_write2buff(char dat) reentrant	//Ð´Èë·¢ËÍ»º³å£¬Ö¸Õë+1
 {
 	TX3_Buffer[COM3.TX_write] = dat;	//×°·¢ËÍ»º³å
 	if(++COM3.TX_write >= COM_TX3_Lenth)	COM3.TX_write = 0;

@@ -11,10 +11,10 @@ void delay_us(u32 us)
 	}
 }
 
-void DecToBCD(u32 Dec, u8 *pBCD, u8 len)
+void DecToBCD(u16 Dec, u8 *pBCD, u8 len)
 {
 	u8 i;
-	u32 temp,dec_tmp;
+	u16 temp,dec_tmp;
 	
 	dec_tmp=Dec;
 	for(i=len-1;i>=0;i--)	{
@@ -28,7 +28,7 @@ void DecToBCD(u32 Dec, u8 *pBCD, u8 len)
 //自己写的log函数
 float MYLOG(float a)
 {
-   int N = 5;//取5+1项计算
+   int N = 10;//取5+1项计算
    int k,nk;
    float x,xx,y;
    x = (a-1)/(a+1);

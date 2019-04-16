@@ -74,7 +74,7 @@ void motor_timer_handler(void)
 	//motor.status.errCode = MOTORSTATUS_MOVE_TIMEOUT;
 	motor.timecnt ++;
 	if(motor.timecnt >= motor.timeout)	{
-		stop_motor(&motor);
+		stop_motor();
 		stop_motor_timer(&motor);
 		msg_pkt_motor.Src = MSG_SHIP_MOTOR_NOMAL;//出货过程电机正常停止
 		OSMboxPost(appShip.MBox, &msg_pkt_motor);
@@ -94,7 +94,7 @@ u8 start_motor(u8 row, u8 col)
 	}
 }
 
-void stop_motor(_motor_t *pMotor)
+void stop_motor()
 {
 	motor.status.is_run = MotorState_Stop;
 	MOTOR_NPN0 = 0;//1货道
@@ -136,7 +136,7 @@ void CheckMotorMoveState(void)
 				Vad = (u16)(temp*100);//放大100倍								
 				if(Vad<=20)	{//电机未检测到转动
 					motor.status.abort_type = MotorAbort_UNDETECTED;
-					stop_motor(&motor);
+					stop_motor();
 					stop_motor_timer(&motor);
 					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机正常停止
 					OSMboxPost(appShip.MBox, &msg_pkt_motor);
@@ -144,7 +144,7 @@ void CheckMotorMoveState(void)
 					motor.status.abort_type = MotorAbort_NONE;			
 				}else if(Vad>150)	{//
 					motor.status.abort_type = MotorAbort_Stuck;
-					stop_motor(&motor);
+					stop_motor();
 					stop_motor_timer(&motor);
 					BEEP=1;
 					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机正常停止

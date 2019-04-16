@@ -42,7 +42,7 @@ extern _motor_t motor;
 
 void motor_init(void);
 u8 start_motor(u8 row, u8 col);
-void stop_motor(_motor_t *pMotor);
+void stop_motor();
 void CheckMotorMoveState(void);
 
 #endif

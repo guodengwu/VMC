@@ -44,7 +44,7 @@ static  INT8U       usart_ringbuf       [USART_RX_BUFF_SIZE];
 
 static  message_pkt_t    msg_pkt_usart[2];
 //static BIT32 uart_rx_sn;
-static u16 uart_tx_sn;
+u32 uart_tx_sn=0;
 struct uart_rx_sn_t	{
 	u8 ubyte[4];
 }uart_rx_sn;
@@ -270,9 +270,13 @@ void usart_tx_start(usart_t *pUsart, message_pkt_t *pmsg)
 
     mutex_lock(pUsart->lock);
     pUsart->tx_buf[0] = pmsg->Cmd;//·µ»ØÂë
-    len = pmsg->dLen;
-		uart_tx_sn++;		
+    len = pmsg->dLen;		
 		//DecToBCD(uart_tx_sn,BCD,4);		//BEEP=1;	
+		BCD[3] = uart_tx_sn&0xff;
+		BCD[2] = (uart_tx_sn>>8)&0xff;
+		BCD[1] = (uart_tx_sn>>16)&0xff;
+		BCD[0] = (uart_tx_sn>>24)&0xff;
+		uart_tx_sn++;
 		memcpy(pUsart->tx_buf+1, BCD, 4);
     if (len) {
         memcpy(pUsart->tx_buf + IG_CMDANDSN_LEN, pmsg->Data, len);

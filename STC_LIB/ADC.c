@@ -59,7 +59,7 @@ void	ADC_PowerControl(u8 pwr)
 u16	Get_ADC10bitResult(u8 channel)	//channel = 0~7
 {
 	u16	adc;
-	u8	i;
+	u16	i;
 
 	if(channel > ADC_CH7)	return	1024;	//错误,返回1024,调用的程序判断	
 	ADC_RES = 0;
@@ -120,7 +120,7 @@ float Cal_Vol(u8 ch, u8 times)
     u16 adcx;
     
 		if(times==1)	{
-			adcx = Get_ADC10bitResult(ch);  
+			adcx = Get_ADC10bitResult(ch);
 		}else	{
 			adcx = Get_Adc_Average(ch,times);
 		}			

@@ -39,7 +39,6 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(temp==0)	{
 					sys_status.online_state = DEF_True;
-					//BEEP=1;
 			}else if(temp==1)	{
 					sys_status.online_state = DEF_False;
 			}
@@ -50,9 +49,9 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			*pAck = MSG_SYSTEM_CMD_ACK;
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(temp==1)	{
-					RELAY = 0;
+					IO_RELAY = 0;
 			}else if(temp==0)	{
-					RELAY = 1;
+					IO_RELAY = 1;
 			}else	{
 					*pAck = MSG_SYSTEM_CMD_NAK;
 				}			
@@ -78,9 +77,9 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				*pAck = MSG_SYSTEM_CMD_ACK;
 				temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 				if(temp==1)	{//¹Ø±Õ
-					FOG_CTRL = 0;
+					IO_FOG_CTRL = 0;
 				}else if(temp==0)	{//¿ªÆô
-					FOG_CTRL = 1;
+					IO_FOG_CTRL = 1;
 				}else	{
 					*pAck = MSG_SYSTEM_CMD_NAK;
 				}							

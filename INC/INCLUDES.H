@@ -44,6 +44,8 @@
 #include "protocol.h"
 #include "misc.h"
 #include "ADC.h"
+
+#define BSP_PRINTF		printf
 #endif
 
 
