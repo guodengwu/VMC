@@ -50,9 +50,9 @@ static u8 UploadSysParam(void)
 		msg_pkt_sysmonitor.Src = USART_MSG_RX_TASK;
 		msg_pkt_sysmonitor.Cmd = CMD_ReportParam;
 		data_buf[len++] = IO_IR_CTRL;
-		data_buf[len++] = IO_RELAY;
-		data_buf[len++] = sys_status.inside_temp;//
-		data_buf[len++] = sys_status.outside_temp;//;
+		data_buf[len++] = sys_status.pTempCtrl->flag;//温度控制标志
+		data_buf[len++] = sys_status.pTempCtrl->inside_temp;//
+		data_buf[len++] = sys_status.pTempCtrl->outside_temp;//;
 		data_buf[len++] = IO_LIGHT_CTRL;
 		data_buf[len++] = IO_FOG_CTRL;
 		data_buf[len++] = IO_DOOR_STATE;
@@ -139,10 +139,33 @@ static void CalcInsideTemp(void)
 		temp = (float)Vad/(5000-Vad);
 		Rx = temp*51000;
 		temp = CalculateTemperature(Rx,10000,3950);
-		sys_status.inside_temp = (s8)temp;
+		sys_status.pTempCtrl->inside_temp = (s8)temp;
 		//printf("Vad:%d, T:%bd",Vad,sys_status.inside_temp);
+		if(sys_status.pTempCtrl->flag == DEF_True)	{//温度控制使能，VMC自动调节温度
+			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度不在要求范围内，打开压缩机
+					IO_RELAY = 1;
+			}
+		}
 	}
 }
+
+static void CalcOutsideTemp(void)
+{
+	static u16 count;
+	u16 Vad;
+	float temp,Rx;
+	count++;
+	if(count>=100)	{//5s计算一次温度
+		count=0;
+		temp = Cal_Vol(ADC_CH4,1);
+		Vad = (u16)(temp*1000);
+		temp = (float)Vad/(5000-Vad);
+		Rx = temp*51000;
+		temp = CalculateTemperature(Rx,10000,3950);
+		sys_status.pTempCtrl->outside_temp = (s8)temp;
+	}
+}
+
 static u8 startup_flag=1;
 static void SysMonitorTask(void *parg)
 {
@@ -171,6 +194,7 @@ static void SysMonitorTask(void *parg)
 					}
 				}
 				CalcInsideTemp();
+				CalcOutsideTemp();
 				CheckMotorMoveState();//电机运转状态检测
 		}
 	}

@@ -5,8 +5,9 @@
 
 enum UI_NUM {
 	UI_NONE=0,
-	UI_TEMP=1,
-	UI_MOTORNUM=2,
+	UI_MOTORNUM=1,
+	UI_INSIDETEMP=2,
+	UI_OUTSIDETEMP=3,
 };
 
 typedef struct _display {

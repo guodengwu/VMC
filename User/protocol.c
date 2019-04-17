@@ -15,15 +15,14 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
   {		
 		case CMD_NotifyShip://0x14 通知出货
 		{
-//			u8 row,col;
-		
+//			u8 row,col;		
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//行 货盘
 			motor.row= (temp&0xf0)>>4;//行 货盘
 			motor.col= temp&0x0f;//列 货道
 			//param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//参数
 			//timeout = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)/10;//运行时间 s
 			len = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			if(len>0&&len<IMEI_LEN)	{
+			if((appShip.state == SHIP_STATE_IDLE) && (len>0&&len<IMEI_LEN))	{
 				sys_status.pIMEI->len = len;
 				memcpy(sys_status.pIMEI->dat, pUsart->rx_buf+pUsart->rx_idx, len);//获取订单号
 				msg[0].Src = MSG_START_SHIP;
@@ -46,17 +45,20 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 		}
 		case CMD_ModifyTempParm://16 修改温度参数
 		{
+			s8 targetTemp;
 			*pAck = MSG_SYSTEM_CMD_ACK;
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			if(temp==1)	{
+			if(temp==1)	{//关闭压缩机
 					IO_RELAY = 0;
+					sys_status.pTempCtrl->flag = DEF_False;//关闭温度控制
 			}else if(temp==0)	{
-					IO_RELAY = 1;
+					sys_status.pTempCtrl->flag = DEF_True;//开启温度控制
+					targetTemp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//控制目标温度
+					sys_status.pTempCtrl->tInsideTempL = targetTemp - TEMP_RANGE;//计算控制范围
+					sys_status.pTempCtrl->tInsideTempH = targetTemp + TEMP_RANGE;
 			}else	{
 					*pAck = MSG_SYSTEM_CMD_NAK;
-				}			
-			sys_status.tTemp = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-			
+			}									
 			break;
 		}
 		case CMD_LightOnOff://0x17 灯开关

@@ -20,6 +20,7 @@ static void AppShipInit (void)
 {
 	//appShip.sem          = OSSemCreate(0);
 	appShip.MBox         = OSMboxCreate((void *)0);
+	appShip.state = SHIP_STATE_IDLE;
 	appShip.pMotor = &motor;
 }
 
@@ -43,6 +44,7 @@ static void AppShipTask(void *parg)
 							data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;				
 							data_buf[1] = SHIP_ERROR_INVALID_COL;
 					}else	{
+							appShip.state = SHIP_STATE_BUSY;//出货状态BUSY
 							sys_status.IR_CheckFlag = DEF_False;
 							Ext_Enable(EXT_INT0);//开启货物检测
 							continue;
@@ -69,7 +71,8 @@ static void AppShipTask(void *parg)
 			memcpy(data_buf+2, sys_status.pIMEI->dat, sys_status.pIMEI->len);//拷贝订单号
 			msg_pkt_ship.Data = data_buf;
 			msg_pkt_ship.dLen = 2 + sys_status.pIMEI->len;
-			OSMboxPost(usart.mbox, &msg_pkt_ship);//反馈出货结果			
+			OSMboxPost(usart.mbox, &msg_pkt_ship);//反馈出货结果
+			appShip.state = SHIP_STATE_IDLE;			//出货状态空闲
 		}
 	}
 }

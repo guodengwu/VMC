@@ -11,7 +11,7 @@ void motor_init(void)
 		motor.row = 0;
 		motor.col = 0;
 		motor.timecnt = 0;
-		motor.timeout = 27;//单位100ms
+		motor.timeout = 28;//单位100ms
 }
 
 static void start_motor_timer(_motor_t *pMotor)
@@ -38,10 +38,14 @@ static void motor_choose(_motor_t *pMotor)
 	
 	row_tmp = pMotor->row-1;
 	col_tmp = pMotor->col-1;
-	motor_pnp_l.ubyte = (1<<(row_tmp&0xff));//货盘
-	motor_npn_l.ubyte = (1<<(col_tmp&0xff));//货道
-	motor_pnp_h.ubyte = (1<<(row_tmp>>8));//货盘
-	motor_npn_h.ubyte = (1<<(col_tmp>>8));//货道
+	if(row_tmp>7)
+		motor_pnp_h.ubyte = (1<<(row_tmp-7));//货盘
+	else
+		motor_pnp_l.ubyte = (1<<(row_tmp));//货盘
+	if(col_tmp>7)
+		motor_npn_h.ubyte = (1<<(col_tmp-7));//货道
+	else
+		motor_npn_l.ubyte = (1<<(col_tmp));//货道
 	
 	MOTOR_NPN0 = motor_npn_l.bits.b0;
 	MOTOR_NPN1 = motor_npn_l.bits.b1;

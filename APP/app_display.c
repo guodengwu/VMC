@@ -33,20 +33,23 @@ static void AppDisplayTask(void *parg)
 	OSTimeDlyHMSM(0,0,1,0); 
 	Update_DisInt(15);
 	BEEP=0;
-	Ext_Enable(EXT_INT0);
+	//Ext_Enable(EXT_INT0);
 	
 	while (DEF_True)
 	{
-		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 500, &err);//系統tick 10ms
+		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 300, &err);//系統tick 10ms
 		if(err==OS_NO_ERR)	{
 			
-		}else if(err==OS_TIMEOUT)	{
-			if(display_t.ui_flag==UI_TEMP)	{				
+		}else if(err==OS_TIMEOUT)	{//3s 切换数码管显示内容
+			 if(display_t.ui_flag==UI_MOTORNUM)	{
+				display_t.ui_flag=UI_INSIDETEMP;
+				Update_DisInt(sys_status.pTempCtrl->inside_temp);//显示室内温度
+			}else if(display_t.ui_flag==UI_INSIDETEMP)	{				
+				display_t.ui_flag=UI_OUTSIDETEMP;
+				Update_DisInt(sys_status.pTempCtrl->outside_temp);//显示货道号
+			}else if(display_t.ui_flag==UI_OUTSIDETEMP)	{	
 				display_t.ui_flag=UI_MOTORNUM;
 				Update_DisInt(15);
-			}else if(display_t.ui_flag==UI_MOTORNUM)	{
-				display_t.ui_flag=UI_TEMP;
-				Update_DisInt(sys_status.inside_temp);
 			}
 		}
 	}

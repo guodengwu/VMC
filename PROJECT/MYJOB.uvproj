@@ -459,6 +459,11 @@
               <FileType>1</FileType>
               <FilePath>..\BSP\globalvariable.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_printf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\BSP\bsp_printf.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -31,7 +31,7 @@ static void	GPIO_config(void)
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);	
 	
-	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5/*|GPIO_Pin_7*/;
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1/*|GPIO_Pin_4*/|GPIO_Pin_5/*|GPIO_Pin_7*/;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P1,&GPIO_InitStructure);	
 	
@@ -155,7 +155,7 @@ void	EXTI_config(void)
 void	ADC_config(void)
 {
 	ADC_InitTypeDef		ADC_InitStructure;				//结构定义
-	ADC_InitStructure.ADC_Px        = ADC_P16 | ADC_P17;	//设置要做ADC的IO,	ADC_P10 ~ ADC_P17(或操作),ADC_P1_All
+	ADC_InitStructure.ADC_Px        = ADC_P16 | ADC_P17 | ADC_P14;	//设置要做ADC的IO,	ADC_P10 ~ ADC_P17(或操作),ADC_P1_All
 	ADC_InitStructure.ADC_Speed     = ADC_360T;			//ADC速度			ADC_90T,ADC_180T,ADC_360T,ADC_540T
 	ADC_InitStructure.ADC_Power     = ENABLE;			//ADC功率允许/关闭	ENABLE,DISABLE
 	ADC_InitStructure.ADC_AdjResult = ADC_RES_H8L2;		//ADC结果调整,	ADC_RES_H2L8,ADC_RES_H8L2
