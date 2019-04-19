@@ -655,6 +655,10 @@ INT8U         OSSemPost(OS_EVENT *pevent) reentrant;
 INT8U         OSSemQuery(OS_EVENT *pevent, OS_SEM_DATA *ppdata) reentrant;
 #endif
 
+#if OS_SEM_SET_EN > 0
+void  				OSSemSet (OS_EVENT *pevent, INT16U cnt, INT8U *perr);
+#endif
+
 #endif
 
 /*

@@ -410,4 +410,40 @@ INT8U  OSSemQuery (OS_EVENT *pevent, OS_SEM_DATA *ppdata) reentrant
     return (OS_NO_ERR);
 }
 #endif                                                     /* OS_SEM_QUERY_EN                          */
+
+#if OS_SEM_SET_EN > 0
+void  OSSemSet (OS_EVENT *pevent, INT16U cnt, INT8U *perr)
+{
+#if OS_CRITICAL_METHOD == 3                           /* Allocate storage for CPU status register      */
+    OS_CPU_SR  cpu_sr = 0;
+#endif
+
+#if OS_ARG_CHK_EN > 0
+    if (perr == (INT8U *)0) {                         /* Validate 'perr'                               */
+        return;
+    }
+    if (pevent == (OS_EVENT *)0) {                    /* Validate 'pevent'                             */
+        *perr = OS_ERR_PEVENT_NULL;
+        return;
+    }
+#endif
+    if (pevent->OSEventType != OS_EVENT_TYPE_SEM) {   /* Validate event block type                     */
+        *perr = OS_ERR_EVENT_TYPE;
+        return;
+    }
+    OS_ENTER_CRITICAL();
+    *perr = OS_NO_ERR;
+    if (pevent->OSEventCnt > 0) {                     /* See if semaphore already has a count          */
+        pevent->OSEventCnt = cnt;                     /* Yes, set it to the new value specified.       */
+    } else {                                          /* No                                            */
+        if (pevent->OSEventGrp == 0) {                /*      See if task(s) waiting?                  */
+            pevent->OSEventCnt = cnt;                 /*      No, OK to set the value                  */
+        } else {
+            *perr              = OS_ERR_TASK_WAITING;
+        }
+    }
+    OS_EXIT_CRITICAL();
+}
+#endif
+
 #endif                                                     /* OS_SEM_EN                                */

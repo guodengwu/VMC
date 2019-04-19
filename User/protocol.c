@@ -11,6 +11,7 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 	
   cmd = msg[0].Cmd;
 	*pAck = MSG_SYSTEM_CMD_NONE;
+	sys_status.online_state = DEF_True;
   switch (cmd)
   {		
 		case CMD_NotifyShip://0x14 通知出货
@@ -101,7 +102,8 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				break;
 		}
 		default:
-			//*pAck = MSG_SYSTEM_CMD_NAK;
+			sys_status.online_state = DEF_False;
+			*pAck = MSG_SYSTEM_CMD_NAK;
 			break;
 	}
 	return ret;

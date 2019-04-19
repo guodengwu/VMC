@@ -64,11 +64,21 @@ static u8 UploadSysParam(void)
 	return 0;
 }
 //检测开关门
-static void CheckDoorClosed(void)
+static void CheckDoorState(void)
 {
-	static u8 door_state_bk=DOOR_CLOSE;
+	static u8 door_state_bk=DOOR_OPEN;
+	u8 state;
 	
-	sys_status.door_state = IO_DOOR_STATE;
+	state = IO_DOOR_STATE;//门打开/常开 低电平
+	if(state = DEF_True)	{
+		state = IO_DOOR_STATE;
+		delay_us(1);
+		if(state = DEF_True)	{
+			sys_status.door_state = DOOR_CLOSE;
+		}
+	}else	{
+		sys_status.door_state = DOOR_OPEN;
+	}
 	if(door_state_bk==DOOR_OPEN && sys_status.door_state == DOOR_CLOSE)	{//关门时上报参数信息
 		UploadSysParam();
 	}
@@ -125,7 +135,7 @@ static void ReportSysError30min(void)
 		count = 0;
 	}
 }
-
+	
 static void CalcInsideTemp(void)
 {
 	static u16 count;
@@ -185,7 +195,7 @@ static void SysMonitorTask(void *parg)
 				}
 		}else if(err==OS_TIMEOUT)	{
 				SysCheckOnlineState();//未联网情况下，5s检测一次，联网情况下，30min检测一次
-				CheckDoorClosed();//检测关门动作
+				CheckDoorState();//检测关门动作
 				CheckSysError();//检测到故障变化立刻上报
 				ReportSysError30min();//有故障30min上报一次
 				if(startup_flag==1)	{//开机且连上网络后，上报一次系统参数
@@ -195,7 +205,7 @@ static void SysMonitorTask(void *parg)
 				}
 				CalcInsideTemp();
 				CalcOutsideTemp();
-				CheckMotorMoveState();//电机运转状态检测
+				CheckMotorMoveState();//电机运转状态检测			
 		}
 	}
 }

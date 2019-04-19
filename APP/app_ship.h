@@ -19,7 +19,7 @@ enum SHIP_RESULT {
 };
 
 typedef struct _appship {
-    OS_EVENT           *lock;
+    OS_EVENT           *Sem;
     OS_EVENT           *MBox;
 		volatile u8 state;
 		_motor_t *pMotor;

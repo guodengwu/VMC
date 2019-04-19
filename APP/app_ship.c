@@ -18,7 +18,7 @@ void ShipTaskInit (void)
 
 static void AppShipInit (void)
 {
-	//appShip.sem          = OSSemCreate(0);
+	appShip.Sem          = OSSemCreate(0);
 	appShip.MBox         = OSMboxCreate((void *)0);
 	appShip.state = SHIP_STATE_IDLE;
 	appShip.pMotor = &motor;
@@ -37,20 +37,29 @@ static void AppShipTask(void *parg)
 		msg = (message_pkt_t *)OSMboxPend(appShip.MBox, 0, &err);
 		if(err==OS_NO_ERR)    {
 			if(msg->Src==MSG_START_SHIP)     {
-					ret = start_motor(appShip.pMotor->row, appShip.pMotor->col);			
-					if(ret==0)	{//出货失败--货道号错误
+					if(sys_status.door_state == DOOR_OPEN)	{//门打开状态 不能出货
 							msg_pkt_ship.Src = USART_MSG_RX_TASK;
 							msg_pkt_ship.Cmd = CMD_ReportShipResult;
 							data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;				
-							data_buf[1] = SHIP_ERROR_INVALID_COL;
+							data_buf[1] = SHIP_ERROR_DOOR_OPEN;
 					}else	{
-							appShip.state = SHIP_STATE_BUSY;//出货状态BUSY
-							sys_status.IR_CheckFlag = DEF_False;
-							Ext_Enable(EXT_INT0);//开启货物检测
-							continue;
+							ret = start_motor(appShip.pMotor->row, appShip.pMotor->col);			
+							if(ret==0)	{//出货失败--货道号错误
+									msg_pkt_ship.Src = USART_MSG_RX_TASK;
+									msg_pkt_ship.Cmd = CMD_ReportShipResult;
+									data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;				
+									data_buf[1] = SHIP_ERROR_INVALID_COL;
+							}else	{
+									appShip.state = SHIP_STATE_BUSY;//出货状态BUSY
+									sys_status.IR_CheckFlag = DEF_False;
+									OSSemSet(appShip.Sem, 0, &err);
+									Ext_Enable(EXT_INT0);//开启货物检测
+									continue;
+							}
 					}
 			}else if(msg->Src==MSG_SHIP_MOTOR_NOMAL)	{//出货过程电机运转正常
-					OSTimeDlyHMSM(0,0,3,0);//电机停止后3s货物检测超时 
+					//OSTimeDlyHMSM(0,0,3,0);
+					OSSemPend(appShip.Sem, 300, &err);//电机停止后3s货物检测超时 
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
 					data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;			

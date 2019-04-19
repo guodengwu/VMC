@@ -71,9 +71,9 @@ typedef struct _usart {
     INT8U               rx_state;
     INT32U              rx_idx;
     INT8U              rx_cnt;
-		INT8U              rx_cmd;
-    INT8U              rx_len;
-    INT8U              rx_size;
+		//INT8U              rx_cmd;
+    INT16U              rx_len;
+    INT16U              rx_size;
     INT8U              rx_crc;
     INT16U              rx_err;
     INT8U              *rx_buf;
@@ -81,9 +81,9 @@ typedef struct _usart {
 
     INT8U               tx_state;
     INT8U              tx_idx;
-    INT8U              tx_len;
-		INT8U              tx_cmd;
-    INT8U              tx_size;
+    INT16U              tx_len;
+		//INT8U              tx_cmd;
+    INT16U              tx_size;
     INT8U              tx_crc;
     INT16U              tx_err;
     INT8U              *tx_buf;
