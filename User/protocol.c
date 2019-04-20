@@ -87,7 +87,7 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 					*pAck = MSG_SYSTEM_CMD_NAK;
 				}							
 				break;
-			}
+		}
 		case CMD_SysReset://0x19 ÷ÿ∆Ù
 		{
 				*pAck = MSG_SYSTEM_CMD_ACK;

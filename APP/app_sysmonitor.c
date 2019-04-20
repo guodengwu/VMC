@@ -32,7 +32,8 @@ static void SysCheckOnlineState(void)
 	if(sys_status.online_state == DEF_False)	{//
 		check_timeout=100;//5s上报
 	}else if(sys_status.online_state == DEF_True)	{
-		check_timeout=36000;//30min上报
+		//check_timeout=36000;//30min上报
+		return;
 	}
 	if(check_cnt>=check_timeout)	{
 		check_cnt = 0;
@@ -70,16 +71,12 @@ static void CheckDoorState(void)
 	u8 state;
 	
 	state = IO_DOOR_STATE;//门打开/常开 低电平
-	if(state = DEF_True)	{
-		state = IO_DOOR_STATE;
-		delay_us(1);
-		if(state = DEF_True)	{
-			sys_status.door_state = DOOR_CLOSE;
-		}
+	if(state == DEF_True)	{
+		sys_status.door_state = DOOR_CLOSE;
 	}else	{
 		sys_status.door_state = DOOR_OPEN;
 	}
-	if(door_state_bk==DOOR_OPEN && sys_status.door_state == DOOR_CLOSE)	{//关门时上报参数信息
+	if((door_state_bk == DOOR_OPEN) && (sys_status.door_state == DOOR_CLOSE))	{//关门时上报参数信息
 		UploadSysParam();
 	}
 	door_state_bk = sys_status.door_state;
@@ -176,7 +173,7 @@ static void CalcOutsideTemp(void)
 	}
 }
 
-static u8 startup_flag=1;
+static u8 startup_flag;
 static void SysMonitorTask(void *parg)
 {
 	INT8U err;
@@ -198,9 +195,9 @@ static void SysMonitorTask(void *parg)
 				CheckDoorState();//检测关门动作
 				CheckSysError();//检测到故障变化立刻上报
 				ReportSysError30min();//有故障30min上报一次
-				if(startup_flag==1)	{//开机且连上网络后，上报一次系统参数
+				if(startup_flag==0)	{//开机且连上网络后，上报一次系统参数
 					if(UploadSysParam()==1)	{//参数上报成功
-						startup_flag = 0;
+						startup_flag = 1;
 					}
 				}
 				CalcInsideTemp();

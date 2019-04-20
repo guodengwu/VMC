@@ -15,17 +15,7 @@ typedef enum _message_src{
     MSG_SHIP_MOTOR_NOMAL,        		// 邮箱消息来自Rotating Motor(旋转电机)任务(Mbox From Rotating Motor Task)
     SYSTEM_MONITOR_TASK,        // 邮箱消息来自System Monitor(系统监控)任务(Mbox From System Monitor Task)
     MSG_SHIP_MOTOR_ABORT,//
-    MSG_SYSTEM_RESTART,//阻抗单孔测试
-    IMP_AUTO_TEST,
-    IMP_TEMPERATURE_TEST,//温度电阻阻抗采集
-    IMP_SYS_POWER_TEST,//系统功率采集
-    /* ISR Mbox */
-    USB_DATA_SEND_TO_SLAVE,                // 邮箱消息来自Usart接收中断
-    USB_DATA_SEND_TO_SLAVE_NO_FEEDBACK,
-    MSG96LED_CLOSE,
-    ACC_INT_ENVENT,//加速度传感器中断事件
-    ZMOTOR_RESET_POWERON,
-    REFRESH_DEVICE_AREA
+    MSG_SYSTEM_RESTART,//重启
 } message_src_t;
 
 typedef struct _message_pkt {

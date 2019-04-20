@@ -38,6 +38,7 @@ static void AppShipTask(void *parg)
 		if(err==OS_NO_ERR)    {
 			if(msg->Src==MSG_START_SHIP)     {
 					if(sys_status.door_state == DOOR_OPEN)	{//门打开状态 不能出货
+							OSTimeDlyHMSM(0,0,0,100); 
 							msg_pkt_ship.Src = USART_MSG_RX_TASK;
 							msg_pkt_ship.Cmd = CMD_ReportShipResult;
 							data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;				
@@ -53,12 +54,11 @@ static void AppShipTask(void *parg)
 									appShip.state = SHIP_STATE_BUSY;//出货状态BUSY
 									sys_status.IR_CheckFlag = DEF_False;
 									OSSemSet(appShip.Sem, 0, &err);
-									Ext_Enable(EXT_INT0);//开启货物检测
 									continue;
 							}
 					}
 			}else if(msg->Src==MSG_SHIP_MOTOR_NOMAL)	{//出货过程电机运转正常
-					//OSTimeDlyHMSM(0,0,3,0);
+					stop_motor();
 					OSSemPend(appShip.Sem, 300, &err);//电机停止后3s货物检测超时 
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
@@ -69,9 +69,8 @@ static void AppShipTask(void *parg)
 							data_buf[1] = MOTOR_NOMAL_NOSHIP;//电机正常但是无货物
 							sys_status.pError->IR = 1;//红外传感器异常
 					}
-					Ext_Disable(EXT_INT0);//关闭货物检测
 			}else if(msg->Src==MSG_SHIP_MOTOR_ABORT)	{//出货过程中电机异常停止
-					Ext_Disable(EXT_INT0);//关闭货物检测
+					stop_motor();
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
 					data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;

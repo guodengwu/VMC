@@ -20,7 +20,9 @@
 
 #include	"Exti.h"
 #include "app_ship.h"
+#include "motor.h"
 
+static  message_pkt_t    msg_pkt_ext;
 /********************* INT0中断函数 *************************/
 void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
 {
@@ -35,7 +37,13 @@ void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
 /********************* INT1中断函数 *************************/
 void Ext_INT1 (void) interrupt INT1_VECTOR		//进中断时已经清除标志
 {
-	//P01 = ~P01;
+	OSIntEnter();
+	if(motor.status.is_run == MotorState_Run)	{
+		//stop_motor();
+		msg_pkt_ext.Src = MSG_SHIP_MOTOR_NOMAL;//出货过程电机转到一圈
+		OSMboxPost(appShip.MBox, &msg_pkt_ext);
+	}
+	OSIntExit();
 }
 
 /********************* INT2中断函数 *************************/

@@ -16,9 +16,10 @@ enum eMotorState {
 };
 
 enum eMotorAbortType {
-		MotorAbort_NONE = 0,
-    MotorAbort_Stuck		= 4,	//????
-    MotorAbort_UNDETECTED= 5,	//????
+		MotorAbort_NONE = 0,		
+    MotorAbort_Stuck		= 4,	//堵转
+    MotorAbort_UNDETECTED= 5,	//未检测到电机
+		MotorAbort_TIMEOUT = 6,//电机运行超时
 };
 
 typedef struct {
@@ -36,6 +37,7 @@ typedef struct _motor {
 	u8 col;
 	u8 timeout;
 	volatile u16 timecnt;
+	volatile u8 checkmovedelay;
 }_motor_t;
 
 extern _motor_t motor;

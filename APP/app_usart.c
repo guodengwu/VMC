@@ -252,13 +252,15 @@ static void message_tx_handler(usart_t *pUsart)
 					USART_SendByte(pUsart->Usart, IG_PROTOCOL_TX_END);
 					usart_tx_int_disable(pUsart);       /* No more data to send, disable Tx interrupts     */
 					pUsart->tx_state  = IG_TX_STATE_SD0;
+					pUsart->tx_len    = 0;
 					mutex_unlock(pUsart->lock);
 					break;
       default:
           pUsart->tx_state  = IG_TX_STATE_SD0;
           pUsart->tx_err    = IG_MSG_ERR_NONE;
-					mutex_unlock(pUsart->lock);
-          usart_tx_int_disable(pUsart);
+					pUsart->tx_len    = 0;
+					//mutex_unlock(pUsart->lock);
+          //usart_tx_int_disable(pUsart);
           break;
   }
 }
@@ -379,6 +381,7 @@ void UsartTxTaskInit (void)
 ********************************************************************************************************/
 static void UsartInit (void)
 {
+//	u8 err;
 		usart.Usart 			 = USART1;
     usart.lock         = OSSemCreate(1);
     usart.sem          = OSSemCreate(0);
@@ -435,6 +438,7 @@ static void AppUsartTxTask(void *parg)
     parg = parg;
 
     UsartInit();
+		ES = 1;
 
     while (DEF_True)
     {

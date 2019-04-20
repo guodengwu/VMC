@@ -11,7 +11,7 @@ void motor_init(void)
 		motor.row = 0;
 		motor.col = 0;
 		motor.timecnt = 0;
-		motor.timeout = 28;//单位100ms
+		motor.timeout = 30;//单位100ms
 }
 
 static void start_motor_timer(_motor_t *pMotor)
@@ -46,6 +46,12 @@ static void motor_choose(_motor_t *pMotor)
 		motor_npn_h.ubyte = (1<<(col_tmp-7));//货道
 	else
 		motor_npn_l.ubyte = (1<<(col_tmp));//货道
+	if(10 == pMotor->row)	{
+		GPIO_InitTypeDef	GPIO_InitStructure;
+		GPIO_InitStructure.Pin  = GPIO_Pin_2;
+		GPIO_InitStructure.Mode = GPIO_OUT_PP;//
+		GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
+	}
 	
 	MOTOR_NPN0 = motor_npn_l.bits.b0;
 	MOTOR_NPN1 = motor_npn_l.bits.b1;
@@ -73,14 +79,13 @@ static void motor_choose(_motor_t *pMotor)
 	pMotor->status.abort_type = MotorAbort_NONE;
 }
 //由timer1定时中断调用，电机运动超时
-void motor_timer_handler(void)
+void motor_timeout_handler(void)
 {
-	//motor.status.errCode = MOTORSTATUS_MOVE_TIMEOUT;
 	motor.timecnt ++;
 	if(motor.timecnt >= motor.timeout)	{
-		stop_motor();
-		stop_motor_timer(&motor);
-		msg_pkt_motor.Src = MSG_SHIP_MOTOR_NOMAL;//出货过程电机正常停止
+		//stop_motor();
+		motor.status.abort_type = MotorAbort_TIMEOUT;
+		msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机运转超时
 		OSMboxPost(appShip.MBox, &msg_pkt_motor);
 	}
 }
@@ -91,7 +96,10 @@ u8 start_motor(u8 row, u8 col)
 		motor.timecnt = 0;
 		motor.row = row;
 		motor.col = col;	
+		motor.checkmovedelay = 0;
 		motor_choose(&motor);
+		Ext_Enable(EXT_INT0);//开启货物检测
+		Ext_Enable(EXT_INT1);//开启整圈检测
 		return 1;
 	}else	{
 		return 0;
@@ -100,6 +108,9 @@ u8 start_motor(u8 row, u8 col)
 
 void stop_motor()
 {
+	stop_motor_timer(&motor);
+	Ext_Disable(EXT_INT0);//关闭货物检测
+	Ext_Disable(EXT_INT1);//关闭整圈检测
 	motor.status.is_run = MotorState_Stop;
 	MOTOR_NPN0 = 0;//1货道
 	MOTOR_NPN1 = 0;
@@ -122,6 +133,12 @@ void stop_motor()
 	MOTOR_PNP7 = 0;
 	MOTOR_PNP8 = 0;
 	MOTOR_PNP9 = 0;
+	if(10 == motor.row)	{
+		GPIO_InitTypeDef	GPIO_InitStructure;
+		GPIO_InitStructure.Pin  = GPIO_Pin_2;
+		GPIO_InitStructure.Mode = GPIO_HighZ;//
+		GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
+	}
 }
 
 //检测电机是否运转/卡死 测量MOTOR_AD的反馈电压：小于0.2V--未检测到电机；0.2-1.5V--ok；>1.5V--堵转
@@ -130,32 +147,30 @@ void CheckMotorMoveState(void)
 {
 	u16 Vad;
 	float temp;
-	static u8 movecnt;
+	//static u8 movecnt;
 	//static u8 movecnt1,movecnt2,movecnt3;
 	
 	if(motor.status.is_run == MotorState_Run)	{
-		movecnt++;
-		if(movecnt>=3)	{//移动150ms后，再计算
+		motor.checkmovedelay++;//movecnt++;
+		if(motor.checkmovedelay>=3)	{//移动150ms后，再计算
 				temp = Cal_Vol(ADC_CH6,3);
-				Vad = (u16)(temp*100);//放大100倍								
-				if(Vad<=20)	{//电机未检测到转动
+				Vad = (u16)(temp*100);//放大100倍		
+				if(Vad<=20)	{//电机未检测到转动					
+					stop_motor();
 					motor.status.abort_type = MotorAbort_UNDETECTED;
-					stop_motor();
-					stop_motor_timer(&motor);
-					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机正常停止
+					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机异常停止
 					OSMboxPost(appShip.MBox, &msg_pkt_motor);
-				}else if(Vad>20&&Vad<=150)	{//ok
-					motor.status.abort_type = MotorAbort_NONE;			
-				}else if(Vad>150)	{//
-					motor.status.abort_type = MotorAbort_Stuck;
+				}else if(Vad>20&&Vad<=170)	{//ok
+					//motor.status.abort_type = MotorAbort_NONE;			
+				}else if(Vad>170)	{//					
 					stop_motor();
-					stop_motor_timer(&motor);
-					BEEP=1;
-					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机正常停止
+					//BEEP=1;
+					motor.status.abort_type = MotorAbort_Stuck;
+					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机异常停止
 					OSMboxPost(appShip.MBox, &msg_pkt_motor);
 				}
 		}
 	}else	{
-		movecnt = 0;
+		motor.checkmovedelay = 0;
 	}
 }

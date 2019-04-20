@@ -1,7 +1,7 @@
 #include	"timer.h"
 
 static volatile u16 data timer1_cnt;
-extern void motor_timer_handler(void);
+extern void motor_timeout_handler(void);
 /********************* Timer0ÖÐ¶Ïº¯Êý************************/
 /*void timer0_int (void) interrupt TIMER0_VECTOR
 {
@@ -17,7 +17,7 @@ void timer1_int (void) interrupt TIMER1_VECTOR
 	{
 		timer1_cnt=0;		
 		//BEEP = ~BEEP;
-		motor_timer_handler();
+		motor_timeout_handler();
 	}
   OSIntExit();
 }

@@ -14,7 +14,7 @@ static void	GPIO_config(void)
 	GPIO_InitStructure.Mode = GPIO_HighZ;
 	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);
 	
-	GPIO_InitStructure.Pin  = GPIO_Pin_5;
+	GPIO_InitStructure.Pin  = GPIO_Pin_5|GPIO_Pin_2;
 	GPIO_InitStructure.Mode = GPIO_HighZ;
 	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 	
@@ -59,9 +59,9 @@ static void	GPIO_config(void)
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P7,&GPIO_InitStructure);
 //双向口
-	GPIO_InitStructure.Pin  = GPIO_Pin_2;
-	GPIO_InitStructure.Mode = GPIO_OUT_PP;
-	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
+	/*GPIO_InitStructure.Pin  = GPIO_Pin_2;
+	GPIO_InitStructure.Mode = GPIO_PullUp;////上拉准双向口
+	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);*/
 	
 	BEEP=0;
 	TM1640_SCLK = 0;
@@ -69,7 +69,7 @@ static void	GPIO_config(void)
 
 	IO_LIGHT_CTRL = 0;
 	IO_PUMP = 0;
-	IO_IR_CTRL = 1;//红外货物检测开关控制 
+	IO_IR_CTRL = 0;//红外货物检测开关控制 
 	IO_FOG_CTRL = 1;//默认打开
 	IO_RELAY = 0;
 	//升降机
@@ -109,7 +109,7 @@ static void	UART1_config(void)
 	COMx_InitStructure.UART_BaudRate  = 9600ul;			    //波特率, 一般 110 ~ 115200
 	COMx_InitStructure.UART_RxEnable  = ENABLE;				//接收允许,   ENABLE或DISABLE
 	COMx_InitStructure.BaudRateDouble = DISABLE;			//波特率加倍, ENABLE或DISABLE
-	COMx_InitStructure.UART_Interrupt = ENABLE;				//中断允许,   ENABLE或DISABLE
+	COMx_InitStructure.UART_Interrupt = DISABLE;				//中断允许,   ENABLE或DISABLE
 	COMx_InitStructure.UART_Polity    = PolityLow;			//中断优先级, PolityLow,PolityHigh
 	COMx_InitStructure.UART_P_SW      = UART1_SW_P36_P37;	//切换端口,   UART1_SW_P30_P31,UART1_SW_P36_P37,UART1_SW_P16_P17(必须使用内部时钟)
 	COMx_InitStructure.UART_RXD_TXD_Short = DISABLE;		//内部短路RXD与TXD, 做中继, ENABLE,DISABLE
@@ -151,6 +151,11 @@ void	EXTI_config(void)
 	EXTI_InitStructure.EXTI_Polity    = PolityHigh;			//中断优先级,   PolityLow,PolityHigh
 	EXTI_InitStructure.EXTI_Interrupt = DISABLE;				//中断允许,     ENABLE或DISABLE
 	Ext_Inilize(EXT_INT0,&EXTI_InitStructure);				//初始化INT0	EXT_INT0,EXT_INT1,EXT_INT2,EXT_INT3,EXT_INT4
+	
+	EXTI_InitStructure.EXTI_Mode      = EXT_MODE_Fall;	//中断模式,  	EXT_MODE_RiseFall, EXT_MODE_Fall
+	EXTI_InitStructure.EXTI_Polity    = PolityHigh;			//中断优先级,   PolityLow,PolityHigh
+	EXTI_InitStructure.EXTI_Interrupt = DISABLE;				//中断允许,     ENABLE或DISABLE
+	Ext_Inilize(EXT_INT1,&EXTI_InitStructure);				//初始化INT0	EXT_INT0,EXT_INT1,EXT_INT2,EXT_INT3,EXT_INT4
 }
 void	ADC_config(void)
 {

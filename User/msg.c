@@ -14,11 +14,14 @@ void mutex_lock (OS_EVENT *lock)
     INT8U   err;
 
     OSSemPend(lock, 0, &err);
+	//OSMutexPend(lock, 0, &err);
 }
 
 void mutex_unlock (OS_EVENT *lock)
 {
+	//INT8U   err;
     OSSemPost(lock);
+	//OSMutexPost(lock);
 }
 
 INT8U  UsartRxGetINT8U (u8 *buf,u32 *idx)

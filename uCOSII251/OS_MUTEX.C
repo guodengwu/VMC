@@ -139,7 +139,7 @@ INT8U  OSMutexAccept (OS_EVENT *pevent, INT8U *err)
 *********************************************************************************************************
 */
 
-OS_EVENT  *OSMutexCreate (INT8U prio, INT8U *err)
+OS_EVENT  *OSMutexCreate (INT8U prio, INT8U *err) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                                /* Allocate storage for CPU status register */
     OS_CPU_SR  cpu_sr;
@@ -369,7 +369,7 @@ OS_EVENT  *OSMutexDel (OS_EVENT *pevent, INT8U opt, INT8U *err)
                  不能改变拥有mutex的信号量
 *********************************************************************************************************
 */
-void  OSMutexPend (OS_EVENT *pevent, INT16U timeout, INT8U *err)
+void  OSMutexPend (OS_EVENT *pevent, INT16U timeout, INT8U *err) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                                /* Allocate storage for CPU status register */
     OS_CPU_SR  cpu_sr;
@@ -491,7 +491,7 @@ void  OSMutexPend (OS_EVENT *pevent, INT16U timeout, INT8U *err)
 *********************************************************************************************************
 */
 
-INT8U  OSMutexPost (OS_EVENT *pevent)
+INT8U  OSMutexPost (OS_EVENT *pevent) reentrant
 {
 #if OS_CRITICAL_METHOD == 3                           /* Allocate storage for CPU status register      */
     OS_CPU_SR  cpu_sr;
