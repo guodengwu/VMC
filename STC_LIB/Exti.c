@@ -28,8 +28,11 @@ void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
 {
 	OSIntEnter();
 	if(IO_IR_CHK==1)	{
-		sys_status.IR_CheckFlag = DEF_True;
-		OSSemPost(appShip.Sem);
+		_nop_();
+		if(IO_IR_CHK==1)	{
+			sys_status.IR_CheckFlag = DEF_True;
+			OSSemPost(appShip.Sem);
+		}
 	}	
 	OSIntExit();
 }

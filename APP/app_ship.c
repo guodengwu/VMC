@@ -59,7 +59,7 @@ static void AppShipTask(void *parg)
 					}
 			}else if(msg->Src==MSG_SHIP_MOTOR_NOMAL)	{//出货过程电机运转正常
 					//stop_motor();					
-					appShip.pMotor->plusecnt++;
+					/*appShip.pMotor->plusecnt++;
 					_nop_();
 					if(appShip.pMotor->plusecnt==1)	{
 						OSTimeDlyHMSM(0,0,0,80); 
@@ -68,7 +68,31 @@ static void AppShipTask(void *parg)
 					}else if(appShip.pMotor->plusecnt>=2)	{
 						appShip.pMotor->plusecnt = 0;
 						stop_motor();
-					}
+					}*/
+					u32 PluseTime;
+					appShip.pMotor->plusecnt++;
+					_nop_();
+					if(appShip.pMotor->plusecnt==1)	{
+							appShip.pMotor->PluseStartTime = OSTimeGet();
+							OSTimeDlyHMSM(0,0,0,80); 
+							Ext_Enable(EXT_INT1);
+							continue;
+					}else if(appShip.pMotor->plusecnt>=2)	{							
+							appShip.pMotor->PluseEndTime = OSTimeGet();//one tick 10ms
+							if(appShip.pMotor->PluseEndTime >= appShip.pMotor->PluseStartTime)
+									PluseTime = appShip.pMotor->PluseEndTime - appShip.pMotor->PluseStartTime;
+							else 
+									PluseTime = (0xffffffff - appShip.pMotor->PluseStartTime) + appShip.pMotor->PluseEndTime;
+							if(PluseTime>=120)	{//1s
+									appShip.pMotor->plusecnt = 0;
+									stop_motor();
+							}else	{
+									appShip.pMotor->PluseStartTime = OSTimeGet();
+									OSTimeDlyHMSM(0,0,0,80); 
+									Ext_Enable(EXT_INT1);
+									continue;
+							}
+					}					
 					OSSemPend(appShip.Sem, 300, &err);//电机停止后3s货物检测超时 
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;

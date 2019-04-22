@@ -12,7 +12,7 @@ void motor_init(void)
 		motor.col = 0;
 		motor.timecnt = 0;
 		motor.plusecnt = 0;
-		motor.timeout = 30;//单位100ms
+		motor.timeout = 60;//单位100ms
 }
 
 static void start_motor_timer(_motor_t *pMotor)
@@ -112,7 +112,7 @@ void stop_motor()
 {
 	stop_motor_timer(&motor);
 	///Ext_Disable(EXT_INT0);//关闭货物检测
-	Ext_Disable(EXT_INT1);//关闭整圈检测
+	//Ext_Disable(EXT_INT1);//关闭整圈检测
 	motor.status.is_run = MotorState_Stop;
 	MOTOR_NPN0 = 0;//1货道
 	MOTOR_NPN1 = 0;
