@@ -16,6 +16,7 @@ typedef enum _message_src{
     SYSTEM_MONITOR_TASK,        // 邮箱消息来自System Monitor(系统监控)任务(Mbox From System Monitor Task)
     MSG_SHIP_MOTOR_ABORT,//
     MSG_SYSTEM_RESTART,//重启
+		MSG_SYS_ONLINE,
 } message_src_t;
 
 typedef struct _message_pkt {

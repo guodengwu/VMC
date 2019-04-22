@@ -8,6 +8,7 @@
 /////////////////////////////////
 #define     BEEP    			P31
 #define     IO_IR_CHK    			P32
+#define     IO_MOTOR_PLUSE_CHK    			P33
 #define     IO_LIGHT_CTRL    P10  
 #define     IO_PUMP    			P11  
 #define     IO_IR_CTRL    		P55 

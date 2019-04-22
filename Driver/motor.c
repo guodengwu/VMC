@@ -1,7 +1,7 @@
 #include "motor.h"
 #include "app_ship.h"
 
-_motor_t motor;
+_motor_t data motor;
 static  message_pkt_t    msg_pkt_motor;
 
 void motor_init(void)
@@ -11,6 +11,7 @@ void motor_init(void)
 		motor.row = 0;
 		motor.col = 0;
 		motor.timecnt = 0;
+		motor.plusecnt = 0;
 		motor.timeout = 30;//单位100ms
 }
 
@@ -75,6 +76,7 @@ static void motor_choose(_motor_t *pMotor)
 	MOTOR_PNP8 = motor_pnp_h.bits.b0;
 	MOTOR_PNP9 = motor_pnp_h.bits.b1;
 	start_motor_timer(pMotor);
+	motor.plusecnt = 0;
 	pMotor->status.is_run = MotorState_Run;
 	pMotor->status.abort_type = MotorAbort_NONE;
 }
@@ -109,7 +111,7 @@ u8 start_motor(u8 row, u8 col)
 void stop_motor()
 {
 	stop_motor_timer(&motor);
-	Ext_Disable(EXT_INT0);//关闭货物检测
+	///Ext_Disable(EXT_INT0);//关闭货物检测
 	Ext_Disable(EXT_INT1);//关闭整圈检测
 	motor.status.is_run = MotorState_Stop;
 	MOTOR_NPN0 = 0;//1货道
@@ -160,7 +162,7 @@ void CheckMotorMoveState(void)
 					motor.status.abort_type = MotorAbort_UNDETECTED;
 					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机异常停止
 					OSMboxPost(appShip.MBox, &msg_pkt_motor);
-				}else if(Vad>20&&Vad<=170)	{//ok
+				}/*else if(Vad>20&&Vad<=170)	{//ok
 					//motor.status.abort_type = MotorAbort_NONE;			
 				}else if(Vad>170)	{//					
 					stop_motor();
@@ -168,7 +170,7 @@ void CheckMotorMoveState(void)
 					motor.status.abort_type = MotorAbort_Stuck;
 					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机异常停止
 					OSMboxPost(appShip.MBox, &msg_pkt_motor);
-				}
+				}*/
 		}
 	}else	{
 		motor.checkmovedelay = 0;

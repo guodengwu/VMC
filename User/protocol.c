@@ -39,6 +39,9 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(temp==0)	{
 					sys_status.online_state = DEF_True;
+					msg[0].Src = MSG_SYS_ONLINE;
+					OSMboxPost(sysMonitor.Mbox, &msg[0]);
+					
 			}else if(temp==1)	{
 					sys_status.online_state = DEF_False;
 			}

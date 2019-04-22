@@ -189,17 +189,19 @@ static void SysMonitorTask(void *parg)
 					stop_motor();
 					OSTimeDlyHMSM(0,0,0,500);
 					soft_reset();
+				}else if(msg->Src==MSG_SYS_ONLINE)	{
+						UploadSysParam();
 				}
 		}else if(err==OS_TIMEOUT)	{
 				SysCheckOnlineState();//未联网情况下，5s检测一次，联网情况下，30min检测一次
 				CheckDoorState();//检测关门动作
 				CheckSysError();//检测到故障变化立刻上报
 				ReportSysError30min();//有故障30min上报一次
-				if(startup_flag==0)	{//开机且连上网络后，上报一次系统参数
+				/*if(startup_flag==0)	{//开机且连上网络后，上报一次系统参数
 					if(UploadSysParam()==1)	{//参数上报成功
 						startup_flag = 1;
 					}
-				}
+				}*/
 				CalcInsideTemp();
 				CalcOutsideTemp();
 				CheckMotorMoveState();//电机运转状态检测			

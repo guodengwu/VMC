@@ -58,7 +58,17 @@ static void AppShipTask(void *parg)
 							}
 					}
 			}else if(msg->Src==MSG_SHIP_MOTOR_NOMAL)	{//出货过程电机运转正常
-					stop_motor();
+					//stop_motor();					
+					appShip.pMotor->plusecnt++;
+					_nop_();
+					if(appShip.pMotor->plusecnt==1)	{
+						OSTimeDlyHMSM(0,0,0,80); 
+						Ext_Enable(EXT_INT1);
+						continue;
+					}else if(appShip.pMotor->plusecnt>=2)	{
+						appShip.pMotor->plusecnt = 0;
+						stop_motor();
+					}
 					OSSemPend(appShip.Sem, 300, &err);//电机停止后3s货物检测超时 
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
@@ -81,6 +91,7 @@ static void AppShipTask(void *parg)
 			msg_pkt_ship.dLen = 2 + sys_status.pIMEI->len;
 			OSMboxPost(usart.mbox, &msg_pkt_ship);//反馈出货结果
 			appShip.state = SHIP_STATE_IDLE;			//出货状态空闲
+			Ext_Disable(EXT_INT0);
 		}
 	}
 }
