@@ -34,6 +34,7 @@ C*******************************************************************************
 *********************************************************************************************************
 */
 #define USART_Q_SIZE    10
+#define N_MESSAGES			10
 usart_t      usart;
 
 OS_STK      AppUsartRxStk       [APP_TASK_USART_RX_STK_SIZE];           // Usart接收任务堆栈
@@ -41,7 +42,7 @@ OS_STK      AppUsartTxStk       [APP_TASK_USART_TX_STK_SIZE];           // Usart
 static INT8U       usart_rx_buf        [USART_RX_BUFF_SIZE];
 static INT8U       usart_tx_buf        [USART_TX_BUFF_SIZE];
 static  INT8U       usart_ringbuf       [USART_RX_BUFF_SIZE];
-
+void    *MyArrayOfMsg[N_MESSAGES];//消息队列数组
 static  message_pkt_t    msg_pkt_usart[2];
 //static BIT32 uart_rx_sn;
 u32 uart_tx_sn=0;
@@ -385,7 +386,9 @@ static void UsartInit (void)
 		usart.Usart 			 = USART1;
     usart.lock         = OSSemCreate(1);
     usart.sem          = OSSemCreate(0);
-    usart.mbox         = OSMboxCreate((void *)0);
+    //usart.mbox         = OSMboxCreate((void *)0);
+		usart.Str_Q = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
+		
     usart.rx_state     = IG_RX_STATE_SD0;
     usart.rx_idx       = 0;
     usart.rx_cnt       = 0;
@@ -442,7 +445,7 @@ static void AppUsartTxTask(void *parg)
 
     while (DEF_True)
     {
-        msg = (message_pkt_t *)OSMboxPend(usart.mbox, 0, &err);
+        msg = (message_pkt_t *)OSQPend(usart.Str_Q, 0, &err);
         if(err==OS_NO_ERR)    {
             if(msg->Src==USART_MSG_RX_TASK)     {
                 usart_tx_start(&usart, msg);

@@ -157,7 +157,7 @@ void CheckMotorMoveState(void)
 		if(motor.checkmovedelay>=3)	{//移动150ms后，再计算
 				temp = Cal_Vol(ADC_CH6,3);
 				Vad = (u16)(temp*100);//放大100倍		
-				if(Vad<=20)	{//电机未检测到转动					
+				if((Vad<=20)&&(motor.status.is_run == MotorState_Run))	{//电机未检测到转动					
 					stop_motor();
 					motor.status.abort_type = MotorAbort_UNDETECTED;
 					msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机异常停止

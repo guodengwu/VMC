@@ -66,7 +66,8 @@ typedef struct _usart {
     u8      Usart;
     OS_EVENT           *lock;
     OS_EVENT           *sem;
-    OS_EVENT           *mbox;
+    //OS_EVENT           *mbox;
+		OS_EVENT           *Str_Q;
 
     INT8U               rx_state;
     INT32U              rx_idx;

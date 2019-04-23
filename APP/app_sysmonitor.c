@@ -1,5 +1,6 @@
 #include "app_sysmonitor.h"
 #include "motor.h"
+#include "app_ship.h"
 
 OS_STK      AppSysMonitorStk       [APP_TASK_SYS_MONITOR_STK_SIZE];           // Usart接收任务堆栈
 static void SysMonitorTask();
@@ -32,15 +33,14 @@ static void SysCheckOnlineState(void)
 	if(sys_status.online_state == DEF_False)	{//
 		check_timeout=100;//5s上报
 	}else if(sys_status.online_state == DEF_True)	{
-		//check_timeout=36000;//30min上报
-		return;
+		check_timeout=36000;//30min上报
 	}
-	if(check_cnt>=check_timeout)	{
+	if((check_cnt>=check_timeout)&&(appShip.state == SHIP_STATE_IDLE))	{
 		check_cnt = 0;
 		msg_pkt_sysmonitor.Src = USART_MSG_RX_TASK;
 		msg_pkt_sysmonitor.Cmd = CMD_CheckOnlineStatus;
 		msg_pkt_sysmonitor.dLen = 0;
-		OSMboxPost(usart.mbox, &msg_pkt_sysmonitor);//请求网络检查
+		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor);//请求网络检查
 	}
 }
 //上传系统参数
@@ -59,7 +59,7 @@ static u8 UploadSysParam(void)
 		data_buf[len++] = IO_DOOR_STATE;
 		msg_pkt_sysmonitor.Data = (u8 *)data_buf;
 		msg_pkt_sysmonitor.dLen = len;
-		OSMboxPost(usart.mbox, &msg_pkt_sysmonitor);//请求网络检查
+		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor);//请求网络检查
 		return 1;
 	}
 	return 0;
@@ -94,7 +94,7 @@ static u8 ReportSysError(void)
 		data_buf[len++] = 0;//
 		msg_pkt_sysmonitor.dLen = len;
 		msg_pkt_sysmonitor.Data = (u8 *)data_buf;
-		OSMboxPost(usart.mbox, &msg_pkt_sysmonitor);//请求网络检查
+		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor);//请求网络检查
 		return 1;
 	}else	{
 		return 0;

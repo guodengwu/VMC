@@ -601,7 +601,7 @@ INT8U         OSMutexQuery(OS_EVENT *pevent, OS_MUTEX_DATA *ppdata) reentrant;
 void         *OSQAccept(OS_EVENT *pevent) reentrant;
 #endif
 
-OS_EVENT     *OSQCreate(void **start, INT16U size) reentrant;
+OS_EVENT     *OSQCreate(void **start, INT16U size);
 
 #if OS_Q_DEL_EN > 0
 OS_EVENT     *OSQDel(OS_EVENT *pevent, INT8U opt, INT8U *err) reentrant;
@@ -611,10 +611,10 @@ OS_EVENT     *OSQDel(OS_EVENT *pevent, INT8U opt, INT8U *err) reentrant;
 INT8U         OSQFlush(OS_EVENT *pevent) reentrant;
 #endif
 
-void         *OSQPend(OS_EVENT *pevent, INT16U timeout, INT8U *err) reentrant;
+void         *OSQPend(OS_EVENT *pevent, INT16U timeout, INT8U *err);
 
 #if OS_Q_POST_EN > 0
-INT8U         OSQPost(OS_EVENT *pevent, void *msg) reentrant;
+INT8U         OSQPost(OS_EVENT *pevent, void *msg);
 #endif
 
 #if OS_Q_POST_FRONT_EN > 0
@@ -777,7 +777,7 @@ void          OS_MemInit(void) reentrant;
 #endif
 
 #if OS_Q_EN > 0
-void          OS_QInit(void) reentrant;
+void          OS_QInit(void);
 #endif
 
 void          OS_Sched(void) reentrant;
