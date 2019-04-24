@@ -160,7 +160,7 @@ void	EXTI_config(void)
 void	ADC_config(void)
 {
 	ADC_InitTypeDef		ADC_InitStructure;				//结构定义
-	ADC_InitStructure.ADC_Px        = ADC_P16 | ADC_P17 | ADC_P14;	//设置要做ADC的IO,	ADC_P10 ~ ADC_P17(或操作),ADC_P1_All
+	ADC_InitStructure.ADC_Px        = ADC_P16 | ADC_P17 | ADC_P14 | ADC_P13;	//设置要做ADC的IO,	ADC_P10 ~ ADC_P17(或操作),ADC_P1_All
 	ADC_InitStructure.ADC_Speed     = ADC_360T;			//ADC速度			ADC_90T,ADC_180T,ADC_360T,ADC_540T
 	ADC_InitStructure.ADC_Power     = ENABLE;			//ADC功率允许/关闭	ENABLE,DISABLE
 	ADC_InitStructure.ADC_AdjResult = ADC_RES_H8L2;		//ADC结果调整,	ADC_RES_H2L8,ADC_RES_H8L2

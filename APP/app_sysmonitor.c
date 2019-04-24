@@ -172,8 +172,41 @@ static void CalcOutsideTemp(void)
 		sys_status.pTempCtrl->outside_temp = (s8)temp;
 	}
 }
-
-static u8 startup_flag;
+//计算光敏电阻阻值，判断白天/夜晚，控制灯on/off
+#define LIGTH_SENSOR_Rmin			5//单位k
+#define LIGTH_SENSOR_Rmax			10
+static void CalLightSensor(void)
+{
+	static u16 count,testcnt;
+	u16 Vad,Rx;
+	float temp;
+	
+	if(sys_status.light_ctrl_enable)	{//灯控制使能
+			count++;
+			if(count>=20)	{//1s计算一次光敏电阻
+				count=0;
+				temp = Cal_Vol(ADC_CH3,1);
+				Vad = (u16)(temp*1000);
+				temp = (float)(5000-Vad)/Vad;
+				Rx = (u16)(temp*10);//单位k
+				if(Rx>LIGTH_SENSOR_Rmin && Rx<LIGTH_SENSOR_Rmax)	{//亮电阻
+						testcnt++;
+						if(testcnt>=3)	{//连续3次都是亮电阻 灯灭掉
+								IO_LIGHT_CTRL = 0;
+						}
+				}else {
+						IO_LIGHT_CTRL = 1;
+						testcnt = 0;
+				}
+			}
+	}else 	{
+			IO_LIGHT_CTRL = 0;
+			count=0;
+			testcnt = 0;
+	}
+}
+	
+//static u8 startup_flag;
 static void SysMonitorTask(void *parg)
 {
 	INT8U err;
@@ -204,7 +237,8 @@ static void SysMonitorTask(void *parg)
 				}*/
 				CalcInsideTemp();
 				CalcOutsideTemp();
-				CheckMotorMoveState();//电机运转状态检测			
+				CalLightSensor();
+				//CheckMotorMoveState();//电机运转状态检测			
 		}
 	}
 }

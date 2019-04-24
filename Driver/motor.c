@@ -39,12 +39,12 @@ static void motor_choose(_motor_t *pMotor)
 	
 	row_tmp = pMotor->row-1;
 	col_tmp = pMotor->col-1;
-	if(row_tmp>7)
-		motor_pnp_h.ubyte = (1<<(row_tmp-7));//货盘
+	if(row_tmp>=8)
+		motor_pnp_h.ubyte = (1<<(row_tmp-8));//货盘
 	else
 		motor_pnp_l.ubyte = (1<<(row_tmp));//货盘
-	if(col_tmp>7)
-		motor_npn_h.ubyte = (1<<(col_tmp-7));//货道
+	if(col_tmp>=8)
+		motor_npn_h.ubyte = (1<<(col_tmp-8));//货道
 	else
 		motor_npn_l.ubyte = (1<<(col_tmp));//货道
 	if(10 == pMotor->row)	{
