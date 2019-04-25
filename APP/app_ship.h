@@ -15,7 +15,7 @@ enum SHIP_RESULT {
 	MOTOR_NOMAL_NOSHIP = 1,
 	SHIP_ERROR_INVALID_COL = 2,
 	SHIP_ERROR_DOOR_OPEN = 3,
-	SHIP_MOTOR_STUCK = 4,
+	//SHIP_MOTOR_STUCK = 4,
 };
 
 typedef struct _appship {

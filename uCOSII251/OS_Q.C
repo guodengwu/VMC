@@ -96,7 +96,7 @@ void  *OSQAccept (OS_EVENT *pevent)
 *********************************************************************************************************
 */
 
-OS_EVENT  *OSQCreate (void **start, INT16U size)
+OS_EVENT  *OSQCreate (void **start, INT16U size) 	reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;//分配名为cpu_sr 的局部变量，用于支持OS_CRITICAL_METHOD方法3
@@ -388,7 +388,7 @@ INT8U  OSQFlush (OS_EVENT *pevent)
 *********************************************************************************************************
 */
 
-void  *OSQPend (OS_EVENT *pevent, INT16U timeout, INT8U *err)
+void  *OSQPend (OS_EVENT *pevent, INT16U timeout, INT8U *err)		reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;
@@ -489,7 +489,7 @@ void  *OSQPend (OS_EVENT *pevent, INT16U timeout, INT8U *err)
 */
 
 #if OS_Q_POST_EN > 0
-INT8U  OSQPost (OS_EVENT *pevent, void *msg)
+INT8U  OSQPost (OS_EVENT *pevent, void *msg)		reentrant
 {
 #if OS_CRITICAL_METHOD == 3                      /* Allocate storage for CPU status register           */
     OS_CPU_SR  cpu_sr;
@@ -858,7 +858,7 @@ INT8U  OSQQuery (OS_EVENT *pevent, OS_Q_DATA *pdata)
 *********************************************************************************************************
 */
 
-void  OS_QInit (void)
+void  OS_QInit (void)		reentrant
 {
 #if OS_MAX_QS == 1//如果只有一个队列
     OSQFreeList         = &OSQTbl[0];            /* Only ONE queue!     */

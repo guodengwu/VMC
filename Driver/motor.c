@@ -142,7 +142,7 @@ void stop_motor()
 		GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 	}
 }
-
+#if 0
 //检测电机是否运转/卡死 测量MOTOR_AD的反馈电压：小于0.2V--未检测到电机；0.2-1.5V--ok；>1.5V--堵转
 //被系统监控任务调用，50ms执行一次
 void CheckMotorMoveState(void)
@@ -176,3 +176,4 @@ void CheckMotorMoveState(void)
 		motor.checkmovedelay = 0;
 	}
 }
+#endif

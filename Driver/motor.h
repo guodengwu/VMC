@@ -18,8 +18,8 @@ enum eMotorState {
 enum eMotorAbortType {
 		MotorAbort_NONE = 0,		
     //MotorAbort_Stuck		= 4,	//堵转
-    MotorAbort_UNDETECTED= 4,	//未检测到电机
-		MotorAbort_TIMEOUT = 5,//电机运行超时
+    //MotorAbort_UNDETECTED= 4,	//未检测到电机
+		MotorAbort_TIMEOUT = 4,//电机运行超时
 };
 
 typedef struct {

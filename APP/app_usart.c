@@ -346,9 +346,9 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
     }
 		ret = protocol_process(pUsart,msg_pkt_usart,&ACK);//Ð­Òé½âÎö
 		UsartSendAck(&msg_pkt_usart[1], ACK);
-		if(ret==MSG_FEEDBACK_ENABLE)	{
+		//if(ret==MSG_FEEDBACK_ENABLE)	{
 			//OSMboxPost(pUsart->mbox, &msg_pkt_usart[1]);
-		}
+		//}
 }
 
 /*******************************************************************************************************
@@ -387,7 +387,7 @@ static void UsartInit (void)
     usart.lock         = OSSemCreate(1);
     usart.sem          = OSSemCreate(0);
     //usart.mbox         = OSMboxCreate((void *)0);
-		usart.Str_Q = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
+		usart.Str_Q 			 = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
 		
     usart.rx_state     = IG_RX_STATE_SD0;
     usart.rx_idx       = 0;
