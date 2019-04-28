@@ -43,7 +43,7 @@ typedef struct _motor {
 	u32 PluseEndTime;
 }_motor_t;
 
-extern _motor_t data motor;
+extern _motor_t motor;
 
 void motor_init(void);
 u8 start_motor(u8 row, u8 col);

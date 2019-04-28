@@ -1,7 +1,7 @@
 #include "motor.h"
 #include "app_ship.h"
 
-_motor_t data motor;
+_motor_t motor;
 static  message_pkt_t    msg_pkt_motor;
 
 void motor_init(void)

@@ -34,6 +34,7 @@ static void AppDisplayTask(void *parg)
 	Update_DisInt(15);
 	BEEP=0;
 	//Ext_Enable(EXT_INT0);
+	BSP_PRINTF("SYS Startup...\r\n");
 	
 	while (DEF_True)
 	{

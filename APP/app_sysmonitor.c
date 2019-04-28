@@ -219,6 +219,7 @@ static void SysMonitorTask(void *parg)
 		msg = (message_pkt_t *)OSMboxPend(sysMonitor.Mbox, 5, &err);//50msÖ´ÐÐ
 		if(err==OS_NO_ERR)    {
 				if(msg->Src==MSG_SYSTEM_RESTART)     {
+					BSP_PRINTF("cmd reset\r\n");
 					stop_motor();
 					OSTimeDlyHMSM(0,0,0,500);
 					soft_reset();

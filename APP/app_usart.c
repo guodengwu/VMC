@@ -49,6 +49,7 @@ u32 uart_tx_sn=0;
 struct uart_rx_sn_t	{
 	u8 ubyte[4];
 }uart_rx_sn;
+static u32 uartrx_starttime,uartrx_endtime;
 /*
 *********************************************************************************************************
 *                                        LOCAL FUNCTION PROTOTYPES
@@ -90,6 +91,7 @@ static u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
               //pUsart->rx_crc	 = rx_dat;
               pUsart->rx_idx   = 0;
               pUsart->rx_cnt   = 0;
+							uartrx_starttime = OSTimeGet();
           }
           break;
 			case IG_RX_STATE_LEN0:                    /* waiting for 'len' low byte                      */
@@ -142,7 +144,7 @@ static u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
           }
           break;
       case IG_RX_STATE_CHKSUM:                 /* waiting for checksum                            */
-           if ((pUsart->rx_crc & 0xff) == rx_dat) {
+          if ((pUsart->rx_crc & 0xff) == rx_dat) {
 							pUsart->rx_state = IG_RX_STATE_END;//
           } else {
               pUsart->rx_state = IG_RX_STATE_SD0;
@@ -294,6 +296,7 @@ static void UsartSendAck (message_pkt_t *pMsg, INT8U ack)
 		usart_t *pUsart = &usart;
 	
 		if(ack==MSG_SYSTEM_CMD_NONE)	{//不需要回复ACK
+			BSP_PRINTF("ack none\r\n");
 			return;
 		}
 		
@@ -341,6 +344,7 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
         msg_pkt_usart[0].Cmd = cmd;
         msg_pkt_usart[1].Cmd = cmd;
     } else {
+				BSP_PRINTF("rx err %d\r\n",pUsart->rx_err);
         pUsart->rx_err = IG_MSG_ERR_NONE;        // clear rx error
         return;
     }
@@ -416,13 +420,23 @@ extern RINGBUFF_T uart1_rxring;
 static void AppUsartRxTask(void *parg)
 {
     INT8U err,rxdat;
+		u32 time_diff;
     parg = parg;
 	   		
     while (DEF_True)
     {
         OSSemPend(usart.sem, 0, &err);
         if(err==OS_NO_ERR)    {
-          if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    {			
+          if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    {		
+						uartrx_endtime = OSTimeGet();
+						if(uartrx_endtime >= uartrx_starttime)
+									time_diff = uartrx_endtime - uartrx_starttime;
+						else
+									time_diff = (0xffffffff - uartrx_starttime) + uartrx_endtime;
+						if(time_diff>50)	{//接收超时300ms
+							usart.rx_state = IG_RX_STATE_SD0;
+							BSP_PRINTF("rx timeout\r\n");
+						}
             if(message_rx_handler(&usart, rxdat))  {
               UsartCmdParsePkt(&usart);       
             }
