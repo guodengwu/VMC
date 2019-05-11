@@ -6,5 +6,6 @@
 void delay_us(u32 us);
 void DecToBCD(u16 Dec, u8 *pBCD, u8 len);
 float CalculateTemperature(float dat,const u16 Rp,const u16 Bx);
+INT8U crc8(INT8U *dat, INT8U len);
 
 #endif

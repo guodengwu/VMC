@@ -18,7 +18,6 @@ typedef enum _message_src{
     MSG_SHIP_MOTOR_ABORT,//
     MSG_SYSTEM_RESTART,//÷ÿ∆Ù
 		MSG_SYS_ONLINE,
-	MSG_SYS_SAVE_SHIPRESULT,
 } message_src_t;
 
 typedef struct _message_pkt {

@@ -5,7 +5,7 @@ _imei_t IMEI;
 _syserror_t SysError;
 _systempctrl_t TempCtrl;
 
-struct _SaveShipData_t SaveShipDat;
+_SaveShipData_t SaveShipDat;
 
 //////////////////////////////////////////////////////////////////
 //用户应用程序全局变量初始化
@@ -28,6 +28,7 @@ void globalvariable (void)
 		TempCtrl.flag = DEF_False;//默认VMC不自动调节温度
 		sys_status.pTempCtrl = &TempCtrl;
 		SaveShipDat.flag = DEF_False;
+		flash_savedat.type = SAVE_NONE;
 }
 
 

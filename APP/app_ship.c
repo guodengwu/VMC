@@ -93,7 +93,7 @@ static void AppShipTask(void *parg)
 									continue;
 							}
 					}					
-					OSSemPend(appShip.Sem, 300, &err);//电机停止后3s货物检测超时 
+					OSSemPend(appShip.Sem, 3000, &err);//电机停止后3s货物检测超时 
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
 					data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;			

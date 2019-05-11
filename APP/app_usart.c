@@ -364,6 +364,7 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
 				if(SaveShipDat.flag == DEF_True)	{
 					SaveShipDat.flag = DEF_False;
 					SaveShipDat.len = 0;					
+					flash_savedat.type |= SAVE_SHIP_RESULT;
 				}
 				OSSemPost(usart.ack_sem);
 				return;
@@ -493,8 +494,9 @@ static void SendDataToServer(message_pkt_t *pmsg)
 			if(uart_tx_cmd_bk == CMD_ReportShipResult)	{//出貨結果上報失敗 保存結果
 				//msg_pkt_usart[0].Src = MSG_SYS_SAVE_SHIPRESULT;
 				SaveShipDat.flag = DEF_True;
-				SaveShipDat.len = uart_tx_len_bk - IG_CMDANDSN_LEN;BSP_PRINTF("save_len %d",SaveShipDat.len);
+				SaveShipDat.len = uart_tx_len_bk - IG_CMDANDSN_LEN;
 				memcpy(SaveShipDat.buf, usart.tx_buf + IG_CMDANDSN_LEN, SaveShipDat.len);
+				flash_savedat.type |= SAVE_SHIP_RESULT;
 			}
 		}
 	}else if(pmsg->Src==USART_MSG_ACK_TASK)	{

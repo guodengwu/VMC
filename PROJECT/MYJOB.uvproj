@@ -507,6 +507,11 @@
               <FileType>1</FileType>
               <FilePath>..\STC_LIB\ADC.c</FilePath>
             </File>
+            <File>
+              <FileName>EEPROM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STC_LIB\EEPROM.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -596,6 +601,11 @@
               <FileName>misc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>save_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\save_data.c</FilePath>
             </File>
           </Files>
         </Group>

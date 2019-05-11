@@ -9,7 +9,7 @@
 #include "includes.h"
 
 extern OS_STK  TASK_LED_STK[MaxStkSize+1];
-extern void TaskLed(void * ppdata) reentrant;
+extern void TaskLed(void * ppdata);
 
 
 #endif

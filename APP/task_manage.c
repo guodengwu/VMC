@@ -35,7 +35,7 @@ void TaskStart(void * ppdata) reentrant
 void TaskCreateOther(void) reentrant
 {
     //OSTaskCreate(TaskTest, (void * )0, (OS_STK *)&TASK_TEST_STK[0], TEST_TASK_Prio);                  //TESTÈÎÎññ
-    //OSTaskCreate(TaskLed,  (void * )0, (OS_STK *)&TASK_LED_STK[0], LED_TASK_Prio);                     //LEDÏÔÊ¾ÈÎÎññ		
+    //OSTaskCreate(TaskLed,  (void * )0, (OS_STK *)&TASK_LED_STK[0], 8);                     //LEDÏÔÊ¾ÈÎÎññ		
 		UsartTxTaskInit();
 		UsartRxTaskInit();
 		DisplayTaskInit();

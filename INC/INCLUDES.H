@@ -44,6 +44,8 @@
 #include "protocol.h"
 #include "misc.h"
 #include "ADC.h"
+#include "eeprom.h"
+#include "save_data.h"
 
 #define BSP_PRINTF		printf
 #endif

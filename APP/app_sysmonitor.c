@@ -217,6 +217,35 @@ static void UploadShipResult(void)
 			OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[1]);//反馈出货结果
 	}
 }
+static u8 CopyShipResultFromEEPROM(void)	
+{
+	u8 tempbuf[60];
+	u8 calcCRC=0;
+	_SaveShipData_t  *pSaveShipDat;
+	
+	pSaveShipDat = (_SaveShipData_t *)tempbuf;
+	//检查是否有未上传的出货结果
+	EEPROM_read_n(ShipRes_EEPROMAddr,tempbuf,sizeof(SaveShipDat));
+	if((pSaveShipDat->flag)&&pSaveShipDat->len<50)	{
+		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc8(pSaveShipDat->buf,pSaveShipDat->len);
+		if(calcCRC == pSaveShipDat->crc8)	{//校验数据
+				memcpy((u8 *)&SaveShipDat,(u8 *)pSaveShipDat,sizeof(SaveShipDat));
+				BSP_PRINTF("copy data ok\r\n");
+				return 1;
+		}
+	}
+	//检查备份区是否有数据
+	EEPROM_read_n(ShipResBK_EEPROMAddr,tempbuf,sizeof(SaveShipDat));
+	if((pSaveShipDat->flag)&&pSaveShipDat->len<50)	{
+		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc8(pSaveShipDat->buf,pSaveShipDat->len);
+		if(calcCRC == pSaveShipDat->crc8)	{
+				memcpy((u8 *)&SaveShipDat,(u8 *)pSaveShipDat,sizeof(SaveShipDat));
+			BSP_PRINTF("copy backup data ok\r\n");
+				return 1;
+		}
+	}
+	return 0;
+}
 //static u8 startup_flag;
 static void SysMonitorTask(void *parg)
 {
@@ -225,6 +254,8 @@ static void SysMonitorTask(void *parg)
 	parg = parg;
 	
 	SysMonitorInit();
+	CopyShipResultFromEEPROM();
+	
 	while (DEF_True)
 	{
 		msg = (message_pkt_t *)OSMboxPend(sysMonitor.Mbox, 50, &err);//50ms执行
@@ -238,23 +269,17 @@ static void SysMonitorTask(void *parg)
 						UploadSysParam();//剛連上server 上報系統參數
 						ReportSysError();//上報故障
 						UploadShipResult();//檢查是否有未上傳成功的出貨結果
-				}else if(msg->Src==MSG_SYS_SAVE_SHIPRESULT)	{//保存出貨結果
-					
 				}
 		}else if(err==OS_TIMEOUT)	{
 				SysCheckOnlineState();//未联网情况下，5s检测一次，联网情况下，30min检测一次
 				CheckDoorState();//检测关门动作
 				CheckSysError();//检测到故障变化立刻上报
 				ReportSysError30min();//有故障30min上报一次
-				/*if(startup_flag==0)	{//开机且连上网络后，上报一次系统参数
-					if(UploadSysParam()==1)	{//参数上报成功
-						startup_flag = 1;
-					}
-				}*/
 				CalcInsideTemp();
 				CalcOutsideTemp();
 				CalLightSensor();
 				//CheckMotorMoveState();//电机运转状态检测			
+				save_data();
 		}
 	}
 }
