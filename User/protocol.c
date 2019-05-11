@@ -23,7 +23,7 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			//param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//参数
 			//timeout = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)/10;//运行时间 s
 			len = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			if((appShip.state == SHIP_STATE_IDLE) && (len>0&&len<IMEI_LEN))	{
+			if((appShip.state == SHIP_STATE_IDLE) && (len>0&&len<IMEI_LEN))	{BSP_PRINTF("S STATE:%x\r\n",appShip.state);
 				sys_status.pIMEI->len = len;
 				memcpy(sys_status.pIMEI->dat, pUsart->rx_buf+pUsart->rx_idx, len);//获取订单号
 				msg[0].Src = MSG_START_SHIP;
@@ -37,7 +37,8 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 		case CMD_ReplyOnlineStatus://15 回复联网状态
 		{
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			if(temp==0)	{
+			BSP_PRINTF("t:%x idx:%x \r\n",temp,pUsart->rx_idx);
+			if(temp==0)	{BSP_PRINTF("online\r\n");
 					sys_status.online_state = DEF_True;
 					msg[0].Src = MSG_SYS_ONLINE;
 					OSMboxPost(sysMonitor.Mbox, &msg[0]);

@@ -83,9 +83,11 @@ static void motor_choose(_motor_t *pMotor)
 //由timer1定时中断调用，电机运动超时
 void motor_timeout_handler(void)
 {
+	if(motor.status.is_run != MotorState_Run)
+		return;
 	motor.timecnt ++;
 	if(motor.timecnt >= motor.timeout)	{
-		//stop_motor();
+		motor.status.is_run = MotorState_Stop;
 		motor.status.abort_type = MotorAbort_TIMEOUT;
 		msg_pkt_motor.Src = MSG_SHIP_MOTOR_ABORT;//出货过程电机运转超时
 		OSMboxPost(appShip.MBox, &msg_pkt_motor);
@@ -110,7 +112,7 @@ u8 start_motor(u8 row, u8 col)
 
 void stop_motor()
 {
-	stop_motor_timer(&motor);
+	//stop_motor_timer(&motor);
 	///Ext_Disable(EXT_INT0);//关闭货物检测
 	//Ext_Disable(EXT_INT1);//关闭整圈检测
 	motor.status.is_run = MotorState_Stop;

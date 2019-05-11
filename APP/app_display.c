@@ -38,7 +38,7 @@ static void AppDisplayTask(void *parg)
 	
 	while (DEF_True)
 	{
-		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 300, &err);//系統tick 10ms
+		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 3000, &err);//系統tick 10ms
 		if(err==OS_NO_ERR)	{
 			
 		}else if(err==OS_TIMEOUT)	{//3s 切换数码管显示内容

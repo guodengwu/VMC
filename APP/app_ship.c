@@ -112,10 +112,10 @@ static void AppShipTask(void *parg)
 			}
 			memcpy(data_buf+2, sys_status.pIMEI->dat, sys_status.pIMEI->len);//拷贝订单号
 			msg_pkt_ship.Data = data_buf;
-			msg_pkt_ship.dLen = 2 + sys_status.pIMEI->len;
-			OSQPost(usart.Str_Q, &msg_pkt_ship);//反馈出货结果
+			msg_pkt_ship.dLen = 2 + sys_status.pIMEI->len;			
 			appShip.state = SHIP_STATE_IDLE;			//出货状态空闲
 			Ext_Disable(EXT_INT0);
+			OSQPost(usart.Str_Q, &msg_pkt_ship);//反馈出货结果
 		}
 	}
 }

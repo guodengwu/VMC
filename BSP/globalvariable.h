@@ -39,7 +39,13 @@ typedef struct _sys_status	{
 	_systempctrl_t  *pTempCtrl;
 }_sys_status_t;
 
+struct _SaveShipData_t	{
+	u8 flag;
+	u16 len;
+	u8 buf[50];
+};
 extern _sys_status_t sys_status;
+extern struct _SaveShipData_t SaveShipDat;
 void globalvariable(void);//用户应用程序全局变量初始化
 
 #endif

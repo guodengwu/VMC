@@ -11,12 +11,14 @@
 typedef enum _message_src{
     /* Task Mbox */
     USART_MSG_RX_TASK = 0,      // 邮箱消息来自Usart Rx(串口接收)任务(Mbox From Usart Message Receive Task)
+	USART_MSG_ACK_TASK,
     MSG_START_SHIP,          		// 邮箱消息来自Slider Motor(滑动电机)任务(Mbox From Slider Motor Task)
     MSG_SHIP_MOTOR_NOMAL,        		// 邮箱消息来自Rotating Motor(旋转电机)任务(Mbox From Rotating Motor Task)
     SYSTEM_MONITOR_TASK,        // 邮箱消息来自System Monitor(系统监控)任务(Mbox From System Monitor Task)
     MSG_SHIP_MOTOR_ABORT,//
     MSG_SYSTEM_RESTART,//重启
 		MSG_SYS_ONLINE,
+	MSG_SYS_SAVE_SHIPRESULT,
 } message_src_t;
 
 typedef struct _message_pkt {

@@ -66,7 +66,7 @@ typedef struct _usart {
     u8      Usart;
     OS_EVENT           *lock;
     OS_EVENT           *sem;
-    //OS_EVENT           *mbox;
+    OS_EVENT           *ack_sem;
 		OS_EVENT           *Str_Q;
 
     INT8U               rx_state;
@@ -127,7 +127,7 @@ extern   usart_t      usart;
 *                                           FUNCTION PROTOTYPES
 *********************************************************************************************************
 */
-void    usart_tx_start           (usart_t *pUsart, message_pkt_t *pmsg);
+//void    usart_tx_start           (usart_t *pUsart, message_pkt_t *pmsg);
 void    usart_set_rx_indicate    (usart_t *pUsart, void (*rx_ind)(usart_t *pUsart, INT8U rx_dat));
 void    usart_set_tx_complete    (usart_t *pUsart, void (*tx_com)(usart_t *pUsart));
 //void    usart_printf             (const INT8U *fmt, ...);

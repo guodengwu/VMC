@@ -6,7 +6,8 @@ OS_STK      AppSysMonitorStk       [APP_TASK_SYS_MONITOR_STK_SIZE];           //
 static void SysMonitorTask();
 _sysMonitor_t sysMonitor;
 static s8 data_buf[15];
-static  message_pkt_t    msg_pkt_sysmonitor;
+static s8 data_buf_2[15];//故障緩存
+static  message_pkt_t    msg_pkt_sysmonitor[3];
 
 void SysMonitorTaskInit (void)
 {
@@ -27,20 +28,20 @@ static void SysMonitorInit (void)
 //检测联网状态
 static void SysCheckOnlineState(void)
 {
-	static u16 check_cnt,check_timeout=100;
+	static u16 check_cnt,check_timeout=200;
 	
 	check_cnt++;
 	if(sys_status.online_state == DEF_False)	{//
-		check_timeout=100;//5s上报
+		check_timeout=200;//10s上报
 	}else if(sys_status.online_state == DEF_True)	{
 		check_timeout=36000;//30min上报
 	}
 	if((check_cnt>=check_timeout)&&(appShip.state == SHIP_STATE_IDLE))	{
 		check_cnt = 0;
-		msg_pkt_sysmonitor.Src = USART_MSG_RX_TASK;
-		msg_pkt_sysmonitor.Cmd = CMD_CheckOnlineStatus;
-		msg_pkt_sysmonitor.dLen = 0;
-		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor);//请求网络检查
+		msg_pkt_sysmonitor[0].Src = USART_MSG_RX_TASK;
+		msg_pkt_sysmonitor[0].Cmd = CMD_CheckOnlineStatus;
+		msg_pkt_sysmonitor[0].dLen = 0;
+		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查
 	}
 }
 //上传系统参数
@@ -48,8 +49,8 @@ static u8 UploadSysParam(void)
 {
 	u8 len=0;
 	if(sys_status.online_state == DEF_True)	{
-		msg_pkt_sysmonitor.Src = USART_MSG_RX_TASK;
-		msg_pkt_sysmonitor.Cmd = CMD_ReportParam;
+		msg_pkt_sysmonitor[0].Src = USART_MSG_RX_TASK;
+		msg_pkt_sysmonitor[0].Cmd = CMD_ReportParam;
 		data_buf[len++] = IO_IR_CTRL;
 		data_buf[len++] = sys_status.pTempCtrl->flag;//温度控制标志
 		data_buf[len++] = sys_status.pTempCtrl->inside_temp;//
@@ -57,9 +58,9 @@ static u8 UploadSysParam(void)
 		data_buf[len++] = IO_LIGHT_CTRL;
 		data_buf[len++] = IO_FOG_CTRL;
 		data_buf[len++] = IO_DOOR_STATE;
-		msg_pkt_sysmonitor.Data = (u8 *)data_buf;
-		msg_pkt_sysmonitor.dLen = len;
-		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor);//请求网络检查
+		msg_pkt_sysmonitor[0].Data = (u8 *)data_buf;
+		msg_pkt_sysmonitor[0].dLen = len;
+		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查
 		return 1;
 	}
 	return 0;
@@ -86,15 +87,15 @@ static u8 ReportSysError(void)
 {
 	u8 len=0;
 	if(sys_status.online_state == DEF_True)	{
-		msg_pkt_sysmonitor.Src = USART_MSG_RX_TASK;
-		msg_pkt_sysmonitor.Cmd = CMD_ReportError;
-		data_buf[len++] = sys_status.pError->IR;
-		data_buf[len++] = sys_status.pError->Compressor;
-		data_buf[len++] = sys_status.pError->TempSensor;//
-		data_buf[len++] = 0;//
-		msg_pkt_sysmonitor.dLen = len;
-		msg_pkt_sysmonitor.Data = (u8 *)data_buf;
-		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor);//请求网络检查
+		msg_pkt_sysmonitor[2].Src = USART_MSG_RX_TASK;
+		msg_pkt_sysmonitor[2].Cmd = CMD_ReportError;
+		data_buf_2[len++] = sys_status.pError->IR;
+		data_buf_2[len++] = sys_status.pError->Compressor;
+		data_buf_2[len++] = sys_status.pError->TempSensor;//
+		data_buf_2[len++] = 0;//
+		msg_pkt_sysmonitor[2].dLen = len;
+		msg_pkt_sysmonitor[2].Data = (u8 *)data_buf_2;
+		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[2]);//请求网络检查
 		return 1;
 	}else	{
 		return 0;
@@ -205,7 +206,17 @@ static void CalLightSensor(void)
 			testcnt = 0;
 	}
 }
-	
+
+static void UploadShipResult(void)
+{
+	if(SaveShipDat.flag == DEF_True)	{
+			msg_pkt_sysmonitor[1].Src = USART_MSG_RX_TASK;
+			msg_pkt_sysmonitor[1].Cmd = CMD_ReportShipResult;
+			msg_pkt_sysmonitor[1].Data = SaveShipDat.buf;
+			msg_pkt_sysmonitor[1].dLen = SaveShipDat.len;
+			OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[1]);//反馈出货结果
+	}
+}
 //static u8 startup_flag;
 static void SysMonitorTask(void *parg)
 {
@@ -216,15 +227,19 @@ static void SysMonitorTask(void *parg)
 	SysMonitorInit();
 	while (DEF_True)
 	{
-		msg = (message_pkt_t *)OSMboxPend(sysMonitor.Mbox, 5, &err);//50ms执行
+		msg = (message_pkt_t *)OSMboxPend(sysMonitor.Mbox, 50, &err);//50ms执行
 		if(err==OS_NO_ERR)    {
 				if(msg->Src==MSG_SYSTEM_RESTART)     {
-					BSP_PRINTF("cmd reset\r\n");
+//					BSP_PRINTF("cmd reset\r\n");
 					stop_motor();
 					OSTimeDlyHMSM(0,0,0,500);
 					soft_reset();
 				}else if(msg->Src==MSG_SYS_ONLINE)	{
-						UploadSysParam();
+						UploadSysParam();//剛連上server 上報系統參數
+						ReportSysError();//上報故障
+						UploadShipResult();//檢查是否有未上傳成功的出貨結果
+				}else if(msg->Src==MSG_SYS_SAVE_SHIPRESULT)	{//保存出貨結果
+					
 				}
 		}else if(err==OS_TIMEOUT)	{
 				SysCheckOnlineState();//未联网情况下，5s检测一次，联网情况下，30min检测一次

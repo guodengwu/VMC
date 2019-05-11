@@ -8,6 +8,7 @@ extern void motor_timeout_handler(void);
    P25 = ~P25;
 }
 */
+extern void ack_timeout_handler(void);
 /********************* Timer1ÖÐ¶Ïº¯Êý************************/
 void timer1_int (void) interrupt TIMER1_VECTOR
 {
@@ -18,6 +19,7 @@ void timer1_int (void) interrupt TIMER1_VECTOR
 		timer1_cnt=0;		
 		//BEEP = ~BEEP;
 		motor_timeout_handler();
+		//ack_timeout_handler();
 	}
   OSIntExit();
 }
