@@ -457,7 +457,7 @@ static void AppUsartRxTask(void *parg)
 									time_diff = uartrx_endtime - uartrx_starttime;
 						else
 									time_diff = (0xffffffff - uartrx_starttime) + uartrx_endtime;
-						if(time_diff>50)	{//接收超时300ms
+						if(time_diff>500)	{//接收超时500ms
 							usart.rx_state = IG_RX_STATE_SD0;
 							//BSP_PRINTF("rx timeout\r\n");
 						}
@@ -468,11 +468,10 @@ static void AppUsartRxTask(void *parg)
 				}
     }
 }
-#define RESEND_CNT_MAX 		2
+
 static void SendDataToServer(message_pkt_t *pmsg)
 {
 	INT8U err;
-	//static u8 resend_cnt;
 	
 	mutex_lock(usart.lock);
 	OSSemSet(usart.ack_sem, 0, &err);//清空信号量//OSSemAccept(usart.ack_sem);
@@ -488,11 +487,9 @@ static void SendDataToServer(message_pkt_t *pmsg)
 		uart_tx_sn++;
 		OSSemPend(usart.ack_sem, 6000, &err);//等待从板回复1s
 		if(err==OS_TIMEOUT)    {//回复超时，重发3次
-			//resend_cnt++;
 			sys_status.online_state = DEF_False;
 			//OSQFlush(usart.Str_Q);
 			if(uart_tx_cmd_bk == CMD_ReportShipResult)	{//出貨結果上報失敗 保存結果
-				//msg_pkt_usart[0].Src = MSG_SYS_SAVE_SHIPRESULT;
 				SaveShipDat.flag = DEF_True;
 				SaveShipDat.len = uart_tx_len_bk - IG_CMDANDSN_LEN;
 				memcpy(SaveShipDat.buf, usart.tx_buf + IG_CMDANDSN_LEN, SaveShipDat.len);
@@ -503,7 +500,6 @@ static void SendDataToServer(message_pkt_t *pmsg)
 		usart_tx_start(pmsg,uart_rx_sn.ubyte);
 		OSTimeDlyHMSM(0,0,0,120); 
 	}
-//_end:
 	mutex_unlock(usart.lock);
 }
 /*******************************************************************************************************
