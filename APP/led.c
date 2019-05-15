@@ -1,9 +1,8 @@
-
-
 //////////////////////////////////
 //头文件
 #include "includes.h"
 #include "led.h"
+#if 0
 //////////////////////////////////
 //堆栈
 OS_STK  TASK_LED_STK[MaxStkSize+1]; //任务堆栈声明
@@ -37,5 +36,5 @@ void TaskLed(void * ppdata)
 			EEPROM_read_n();
     }*/
 }
-
+#endif
 

@@ -4,7 +4,7 @@
 
 #include "includes.h"
 
-#define IMEI_LEN		100
+#define IMEI_LEN		50
 #define DOOR_OPEN			DEF_True
 #define DOOR_CLOSE		DEF_False
 #define TEMP_RANGE		3//ÎÂ¶ÈÎó²î

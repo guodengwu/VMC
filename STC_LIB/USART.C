@@ -1,16 +1,15 @@
-
 #include "includes.h"
 #include "app_usart.h"
 
 COMx_Define	COM1,COM2,COM3,COM4;
 u8	xdata TX1_Buffer[COM_TX1_Lenth];	//发送缓冲
 u8 	xdata RX1_Buffer[COM_RX1_Lenth];	//接收缓冲
-u8	xdata TX2_Buffer[COM_TX2_Lenth];	//发送缓冲
-u8 	xdata RX2_Buffer[COM_RX2_Lenth];	//接收缓冲
+//u8	xdata TX2_Buffer[COM_TX2_Lenth];	//发送缓冲
+//u8 	xdata RX2_Buffer[COM_RX2_Lenth];	//接收缓冲
 char	xdata TX3_Buffer[COM_TX3_Lenth];	//发送缓冲
 u8 	xdata RX3_Buffer[COM_RX3_Lenth];	//接收缓冲
-u8	xdata TX4_Buffer[COM_TX4_Lenth];	//发送缓冲
-u8 	xdata RX4_Buffer[COM_RX4_Lenth];	//接收缓冲
+//u8	xdata TX4_Buffer[COM_TX4_Lenth];	//发送缓冲
+//u8 	xdata RX4_Buffer[COM_RX4_Lenth];	//接收缓冲
 RINGBUFF_T uart1_rxring;
 RINGBUFF_T uart3_rxring;
 
@@ -100,7 +99,7 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 		return	0;
 	}
 
-	else if(UARTx == USART2)
+	/*else if(UARTx == USART2)
 	{
 		COM2.id = 2;
 		COM2.TX_read    = 0;
@@ -135,7 +134,7 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 		if(COMx->UART_RxEnable == ENABLE)	S2CON |=  (1<<4);	//允许接收
 		else								S2CON &= ~(1<<4);	//禁止接收
 		P_SW2 = (P_SW2 & ~1) | (COMx->UART_P_SW & 0x01);	//切换IO		
-	}
+	}*/
 	else if(UARTx == USART3)
 	{
 		COM3.id = 3;
@@ -173,7 +172,7 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 		else								S3CON &= ~(1<<4);	//禁止接收
 		P_SW2 = (P_SW2 & ~(1<<1)) | COMx->UART_P_SW;	//切换IO
 	}
-	else if(UARTx == USART4)
+	/*else if(UARTx == USART4)
 	{
 		COM4.id = 4;
 		COM4.TX_read    = 0;
@@ -208,10 +207,10 @@ u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
 		if(COMx->UART_RxEnable == ENABLE)	S4CON |=  (1<<4);	//允许接收
 		else								S4CON &= ~(1<<4);	//禁止接收
 		P_SW2 = (P_SW2 & ~(1<<2)) | COMx->UART_P_SW;	//切换IO		
-	}
+	}*/
 	return 0;
 }
-#if 1
+#if 0
 /*************** 装载串口发送缓冲 *******************************/
 void TX1_write2buff(u8 dat)	reentrant//写入发送缓冲，指针+1
 {
@@ -247,11 +246,6 @@ void TX3_write2buff(char dat) reentrant	//写入发送缓冲，指针+1
 		COM3.B_TX_busy = 1;		//标志忙
 		SET_TI3();				//触发发送中断
 	}
-}
-
-void PrintString(u8 *puts) reentrant
-{
-    for (; *puts != 0;	puts++)  TX3_write2buff(*puts); 	//遇到停止符0结束
 }
 
 /*void PrintString2(u8 *puts) reentrant
@@ -316,7 +310,7 @@ void UART1_int (void) interrupt UART1_VECTOR
 	}
   OSIntExit();					// Must be called finally at every hardware interupt exit point 
 }
-
+#if 0
 /********************* UART2中断函数************************/
 void UART2_int (void) interrupt UART2_VECTOR
 {
@@ -344,6 +338,7 @@ void UART2_int (void) interrupt UART2_VECTOR
 	}
   OSIntExit();					// Must be called finally at every hardware interupt exit point 
 }
+#endif
 #if 0
 /********************* UART3中断函数************************/
 void UART3_int (void) interrupt UART3_VECTOR

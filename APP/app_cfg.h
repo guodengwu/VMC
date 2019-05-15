@@ -10,11 +10,11 @@
 #define  	APP_SYSMONITOR_TASK_PRIO 																		6
 #define  	APP_SHIP_TASK_PRIO 																		7
 
-#define  APP_TASK_STK_SIZE                              MaxStkSize
-#define  APP_TASK_SYS_MONITOR_STK_SIZE                 APP_TASK_STK_SIZE
-#define  APP_TASK_USART_RX_STK_SIZE                     (APP_TASK_STK_SIZE)
-#define  APP_TASK_USART_TX_STK_SIZE                     (APP_TASK_STK_SIZE)
-#define  APP_TASK_DISPLAY_STK_SIZE                     APP_TASK_STK_SIZE
-#define  APP_TASK_SHIP_STK_SIZE                     APP_TASK_STK_SIZE
+#define  APP_TASK_STK_SIZE                              (MaxStkSize)
+#define  APP_TASK_SYS_MONITOR_STK_SIZE                 (APP_TASK_STK_SIZE*2)
+#define  APP_TASK_USART_RX_STK_SIZE                     (APP_TASK_STK_SIZE*2)
+#define  APP_TASK_USART_TX_STK_SIZE                     (APP_TASK_STK_SIZE*2)
+#define  APP_TASK_DISPLAY_STK_SIZE                     (APP_TASK_STK_SIZE*2)
+#define  APP_TASK_SHIP_STK_SIZE                     (APP_TASK_STK_SIZE*2)
 
 #endif
