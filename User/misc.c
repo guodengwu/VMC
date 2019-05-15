@@ -62,9 +62,9 @@ float CalculateTemperature(float dat,const u16 Rp,const u16 Bx)
 	return temp;
 }
 
-INT8U crc8(INT8U *dat, INT8U len)
+INT16U crc16(INT8U *dat, INT8U len)
 {
-	INT8U crc=0,j;
+	INT16U crc=0,j;
 	for(j=0; j<len; j++)
 	{
 		crc = crc + dat[j];

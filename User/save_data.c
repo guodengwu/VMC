@@ -34,16 +34,20 @@ void SaveLedBrt(u8 *buf,u16 len,u8 flag)
 }*/
 
 //根据情况保存数据，在idle任务中运行
+u16 ShipResCRC16_bk=0;
 void save_data(void)
 {
 	if(flash_savedat.type==SAVE_NONE)	{
 		return;
 	}
-	else if(flash_savedat.type&SAVE_SHIP_RESULT)	{
-		BSP_PRINTF("save ship data\r\n");
+	else if(flash_savedat.type&SAVE_SHIP_RESULT)	{		
 		flash_savedat.type &= ~SAVE_SHIP_RESULT;
-		SaveShipDat.crc8 = SaveShipDat.flag + SaveShipDat.len + crc8(SaveShipDat.buf,SaveShipDat.len);
-		SaveShipResult((u8 *)&SaveShipDat,sizeof(SaveShipDat),WRITE_BOTH);
+		SaveShipDat.crc16 = SaveShipDat.flag + SaveShipDat.len + crc16(SaveShipDat.buf,SaveShipDat.len);//计算CRC16
+		if(ShipResCRC16_bk != SaveShipDat.crc16)	{
+			BSP_PRINTF("save ship data\r\n");			
+			ShipResCRC16_bk = SaveShipDat.crc16;
+			SaveShipResult((u8 *)&SaveShipDat,sizeof(SaveShipDat),WRITE_BOTH);
+		}		
 	}
 }
 

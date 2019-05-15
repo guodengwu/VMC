@@ -37,10 +37,10 @@ C*******************************************************************************
 #define N_MESSAGES			10
 usart_t      usart;
 
-OS_STK      AppUsartRxStk       [APP_TASK_USART_RX_STK_SIZE];           // Usart接收任务堆栈
-OS_STK      AppUsartTxStk       [APP_TASK_USART_TX_STK_SIZE];           // Usart发送任务堆栈
-static INT8U       usart_rx_buf        [USART_RX_BUFF_SIZE];
-static INT8U       usart_tx_buf        [USART_TX_BUFF_SIZE];
+OS_STK   xdata   AppUsartRxStk       [APP_TASK_USART_RX_STK_SIZE+1];           // Usart接收任务堆栈
+OS_STK   xdata   AppUsartTxStk       [APP_TASK_USART_TX_STK_SIZE+1];           // Usart发送任务堆栈
+ INT8U  xdata     usart_rx_buf        [USART_RX_BUFF_SIZE];
+ INT8U  xdata     usart_tx_buf        [USART_TX_BUFF_SIZE];
 static  INT8U       data_buf       [USART_RX_BUFF_SIZE];
 void    *MyArrayOfMsg[N_MESSAGES];//消息队列数组
 static  message_pkt_t    msg_pkt_usart[2];
@@ -56,8 +56,8 @@ static u32 uartrx_starttime,uartrx_endtime;
 *********************************************************************************************************
 */
 
-static u8 message_rx_handler  (usart_t *pUsart, INT8U rx_dat);
-static void message_tx_handler  (usart_t *pUsart);
+u8 message_rx_handler  (usart_t *pUsart, INT8U rx_dat);
+void message_tx_handler  (usart_t *pUsart);
 static void UsartCmdParsePkt    (usart_t *pUsart);
 static void AppUsartRxTask      (void *parg);
 static void AppUsartTxTask      (void *parg);
@@ -80,7 +80,7 @@ void USART_SendBuf(USART_TypeDef *handle,INT8U *buf,INT8U len)
 /*******************************************************************************************************
 *
 ********************************************************************************************************/
-static u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
+u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
 { 
   u8 ret=FALSE;
   
@@ -167,7 +167,7 @@ static u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
   return ret;
 }
 //单字节发送数据，被uart中断调用
-static void message_tx_handler(usart_t *pUsart)
+void message_tx_handler(usart_t *pUsart)
 {
   INT8U  tx_dat;
 
@@ -233,11 +233,12 @@ static void message_tx_handler(usart_t *pUsart)
           pUsart->tx_crc    += tx_dat;
           break;
       case IG_TX_STATE_DATA:
-					if (pUsart->tx_len >= IG_CMDANDSN_LEN) {
+			{
+					if ((pUsart->tx_len >= IG_CMDANDSN_LEN)&&(pUsart->tx_idx<USART_TX_BUFF_SIZE)) {
 						tx_dat = pUsart->tx_buf[pUsart->tx_idx++];
 						USART_SendByte(pUsart->Usart, tx_dat);
 						pUsart->tx_crc   += tx_dat;
-						if (pUsart->tx_idx >= pUsart->tx_len) {   /* See if we are done sending the packet           */
+						if ((pUsart->tx_idx >= pUsart->tx_len)) {   /* See if we are done sending the packet           */
 								pUsart->tx_state  = IG_TX_STATE_CHKSUM;
 								pUsart->tx_len    = 0;
 						}
@@ -247,6 +248,7 @@ static void message_tx_handler(usart_t *pUsart)
 						//mutex_unlock(pUsart->lock);
 					}
           break;
+			}
       case IG_TX_STATE_CHKSUM:  //发送校验和
           USART_SendByte(pUsart->Usart, pUsart->tx_crc&0xff);
           pUsart->tx_state  = IG_TX_STATE_END;					

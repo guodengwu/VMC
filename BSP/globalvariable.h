@@ -44,7 +44,7 @@ typedef struct _SaveShipData	{
 	u8 flag;
 	u16 len;
 	u8 buf[50];
-	u8 crc8;
+	u16 crc16;
 }_SaveShipData_t;
 extern _sys_status_t sys_status;
 extern _SaveShipData_t SaveShipDat;

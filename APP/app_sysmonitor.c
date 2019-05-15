@@ -2,7 +2,7 @@
 #include "motor.h"
 #include "app_ship.h"
 
-OS_STK      AppSysMonitorStk       [APP_TASK_SYS_MONITOR_STK_SIZE];           // Usart接收任务堆栈
+OS_STK   xdata   AppSysMonitorStk       [APP_TASK_SYS_MONITOR_STK_SIZE+1];           // Usart接收任务堆栈
 static void SysMonitorTask();
 _sysMonitor_t sysMonitor;
 static s8 data_buf[15];
@@ -220,15 +220,15 @@ static void UploadShipResult(void)
 static u8 CopyShipResultFromEEPROM(void)	
 {
 	u8 tempbuf[60];
-	u8 calcCRC=0;
+	u16 calcCRC=0;
 	_SaveShipData_t  *pSaveShipDat;
 	
 	pSaveShipDat = (_SaveShipData_t *)tempbuf;
 	//检查是否有未上传的出货结果
 	EEPROM_read_n(ShipRes_EEPROMAddr,tempbuf,sizeof(SaveShipDat));
 	if((pSaveShipDat->flag)&&pSaveShipDat->len<50)	{
-		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc8(pSaveShipDat->buf,pSaveShipDat->len);
-		if(calcCRC == pSaveShipDat->crc8)	{//校验数据
+		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc16(pSaveShipDat->buf,pSaveShipDat->len);
+		if(calcCRC == pSaveShipDat->crc16)	{//校验数据
 				memcpy((u8 *)&SaveShipDat,(u8 *)pSaveShipDat,sizeof(SaveShipDat));
 				BSP_PRINTF("copy data ok\r\n");
 				return 1;
@@ -237,8 +237,8 @@ static u8 CopyShipResultFromEEPROM(void)
 	//检查备份区是否有数据
 	EEPROM_read_n(ShipResBK_EEPROMAddr,tempbuf,sizeof(SaveShipDat));
 	if((pSaveShipDat->flag)&&pSaveShipDat->len<50)	{
-		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc8(pSaveShipDat->buf,pSaveShipDat->len);
-		if(calcCRC == pSaveShipDat->crc8)	{
+		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc16(pSaveShipDat->buf,pSaveShipDat->len);
+		if(calcCRC == pSaveShipDat->crc16)	{
 				memcpy((u8 *)&SaveShipDat,(u8 *)pSaveShipDat,sizeof(SaveShipDat));
 			BSP_PRINTF("copy backup data ok\r\n");
 				return 1;
