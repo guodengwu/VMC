@@ -36,7 +36,7 @@ typedef struct _motor {
 	u8 row;
 	u8 col;
 	u8 timeout;
-	volatile u8 plusecnt;
+//	volatile u8 plusecnt;
 	volatile u16 timecnt;
 	volatile u8 checkmovedelay;	
 	u32 PluseStartTime;

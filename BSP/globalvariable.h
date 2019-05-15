@@ -34,6 +34,7 @@ typedef struct _sys_status	{
 	volatile u8 light_ctrl_enable;
 	volatile u8 online_state;//ÁªÍø×´Ì¬
 	volatile u8 door_state;	
+	volatile u8 ShipStuckFlag;
 	_imei_t *pIMEI;
 	_syserror_t *pError;
 	_systempctrl_t  *pTempCtrl;

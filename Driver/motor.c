@@ -11,7 +11,7 @@ void motor_init(void)
 		motor.row = 0;
 		motor.col = 0;
 		motor.timecnt = 0;
-		motor.plusecnt = 0;
+//		motor.plusecnt = 0;
 		motor.timeout = 60;//单位100ms
 }
 
@@ -76,7 +76,7 @@ static void motor_choose(_motor_t *pMotor)
 	MOTOR_PNP8 = motor_pnp_h.bits.b0;
 	MOTOR_PNP9 = motor_pnp_h.bits.b1;
 	start_motor_timer(pMotor);
-	motor.plusecnt = 0;
+//	motor.plusecnt = 0;
 	pMotor->status.is_run = MotorState_Run;
 	pMotor->status.abort_type = MotorAbort_NONE;
 }
@@ -103,7 +103,7 @@ u8 start_motor(u8 row, u8 col)
 		motor.checkmovedelay = 0;
 		motor_choose(&motor);
 		Ext_Enable(EXT_INT0);//开启货物检测
-		Ext_Enable(EXT_INT1);//开启整圈检测
+		//Ext_Enable(EXT_INT1);//开启整圈检测
 		return 1;
 	}else	{
 		return 0;

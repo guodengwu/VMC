@@ -53,12 +53,36 @@ static void AppShipTask(void *parg)
 							}else	{
 									appShip.state = SHIP_STATE_BUSY;//出货状态BUSY
 									sys_status.IR_CheckFlag = DEF_False;
+									sys_status.ShipStuckFlag = 0;
 									OSSemSet(appShip.Sem, 0, &err);
+									OSTimeDlyHMSM(0,0,0,200); 
+									Ext_Enable(EXT_INT1);
+									appShip.pMotor->PluseStartTime = OSTimeGet();
 									continue;
 							}
 					}
 			}else if(msg->Src==MSG_SHIP_MOTOR_NOMAL)	{//出货过程电机运转正常
 					u32 PluseTime;
+					appShip.pMotor->PluseEndTime = OSTimeGet();//one tick 1ms
+					if(appShip.pMotor->PluseEndTime >= appShip.pMotor->PluseStartTime)
+							PluseTime = appShip.pMotor->PluseEndTime - appShip.pMotor->PluseStartTime;
+					else 
+							PluseTime = (0xffffffff - appShip.pMotor->PluseStartTime) + appShip.pMotor->PluseEndTime;
+					appShip.pMotor->PluseStartTime = OSTimeGet();
+					if(PluseTime<1300)	{// 1/4圈
+						if(sys_status.ShipStuckFlag==1)	{//多走1/4圈 防卡货
+								//appShip.pMotor->plusecnt = 0;
+								stop_motor();
+						}else	{// 1/4圈 继续走
+							Ext_Enable(EXT_INT1);
+							continue;
+						}
+					}
+					else	if(PluseTime<4000){// 3/4圈 停止
+							//appShip.pMotor->plusecnt = 0;
+							stop_motor();
+					}
+					/*u32 PluseTime;
 					appShip.pMotor->plusecnt++;
 					_nop_();
 					if(appShip.pMotor->plusecnt==1)	{
@@ -67,7 +91,7 @@ static void AppShipTask(void *parg)
 							Ext_Enable(EXT_INT1);
 							continue;
 					}else if(appShip.pMotor->plusecnt>=2)	{							
-							appShip.pMotor->PluseEndTime = OSTimeGet();//one tick 10ms
+							appShip.pMotor->PluseEndTime = OSTimeGet();//one tick 1ms
 							if(appShip.pMotor->PluseEndTime >= appShip.pMotor->PluseStartTime)
 									PluseTime = appShip.pMotor->PluseEndTime - appShip.pMotor->PluseStartTime;
 							else 
@@ -81,16 +105,25 @@ static void AppShipTask(void *parg)
 									Ext_Enable(EXT_INT1);
 									continue;
 							}
-					}					
-					OSSemPend(appShip.Sem, 3000, &err);//电机停止后3s货物检测超时 
+					}*/
+					OSSemPend(appShip.Sem, 2000, &err);//电机停止后3s货物检测超时 
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
 					data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;			
 					if(sys_status.IR_CheckFlag == DEF_True)	{//检测到货物掉下					
 							data_buf[1] = SHIP_NOMAL;//出货正常					
 					}else {//未检测到货物掉下
-							data_buf[1] = MOTOR_NOMAL_NOSHIP;//电机正常但是无货物
-							sys_status.pError->IR = 1;//红外传感器异常
+							sys_status.ShipStuckFlag++;
+							if(sys_status.ShipStuckFlag>=2)	{
+								data_buf[1] = MOTOR_NOMAL_NOSHIP;//电机正常但是无货物
+								sys_status.pError->IR = 1;//红外传感器异常
+							}else if(sys_status.ShipStuckFlag==1)	{
+								start_motor(appShip.pMotor->row, appShip.pMotor->col);
+								OSTimeDlyHMSM(0,0,0,200); 
+								Ext_Enable(EXT_INT1);
+								appShip.pMotor->PluseStartTime = OSTimeGet();
+								continue;
+							}
 					}
 			}else if(msg->Src==MSG_SHIP_MOTOR_ABORT)	{//出货过程中电机异常停止
 					stop_motor();

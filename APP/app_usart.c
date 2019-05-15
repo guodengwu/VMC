@@ -485,7 +485,7 @@ static void SendDataToServer(message_pkt_t *pmsg)
 		usart_tx_start(pmsg,BCD);
 		uart_tx_sn_bk = uart_tx_sn;
 		uart_tx_sn++;
-		OSSemPend(usart.ack_sem, 6000, &err);//等待从板回复1s
+		OSSemPend(usart.ack_sem, 3000, &err);//等待从板回复1s
 		if(err==OS_TIMEOUT)    {//回复超时，重发3次
 			sys_status.online_state = DEF_False;
 			//OSQFlush(usart.Str_Q);
