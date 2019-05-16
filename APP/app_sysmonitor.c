@@ -263,7 +263,7 @@ static void SysMonitorTask(void *parg)
 				if(msg->Src==MSG_SYSTEM_RESTART)     {
 //					BSP_PRINTF("cmd reset\r\n");
 					stop_motor();
-					OSTimeDlyHMSM(0,0,0,500);
+					OSTimeDlyHMSM(0,0,0,120);
 					soft_reset();
 				}else if(msg->Src==MSG_SYS_ONLINE)	{
 						UploadSysParam();//„‚ßBÉÏserver ÉÏˆóÏµ½y…¢”µ

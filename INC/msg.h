@@ -23,8 +23,8 @@ typedef enum _message_src{
 typedef struct _message_pkt {
     message_src_t   Src;        // 消息来源
     u8           Cmd;        // 命令
-    u16 			 pLen;		//参数长度
-    u16          dLen;    // 消息长度
+    u8 			 pLen;		//参数长度
+    u8          dLen;    // 消息长度
     u8         *Data;       // 消息参数
 } message_pkt_t;
 

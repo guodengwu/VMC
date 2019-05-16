@@ -101,7 +101,7 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				}else if(temp==1)	{
 				}else	{
 					*pAck = MSG_SYSTEM_CMD_NAK;
-				}			
+				}
 				break;
 		}
 		default:

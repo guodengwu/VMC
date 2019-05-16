@@ -42,7 +42,7 @@ typedef struct _sys_status	{
 
 typedef struct _SaveShipData	{
 	u8 flag;
-	u16 len;
+	u8 len;
 	u8 buf[50];
 	u16 crc16;
 }_SaveShipData_t;

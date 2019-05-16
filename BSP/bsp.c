@@ -193,5 +193,6 @@ void bsp(void)
 
 void soft_reset(void)
 {
-		((void (code *) (void)) 0x0000) ();
+		//((void (code *) (void)) 0x0000) ();
+	 IAP_CONTR = 0x60;
 }

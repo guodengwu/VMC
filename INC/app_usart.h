@@ -28,9 +28,9 @@ H*******************************************************************************
 *                                          INCLUDE HEADER FILES
 *********************************************************************************************************
 */
-#define USART_BUFF_SIZE                      128u
-#define USART_TX_BUFF_SIZE        COM_TX1_Lenth
-#define USART_RX_BUFF_SIZE        COM_RX1_Lenth
+#define USART_BUFF_SIZE                      80u
+#define USART_TX_BUFF_SIZE        USART_BUFF_SIZE
+#define USART_RX_BUFF_SIZE        USART_BUFF_SIZE
 #define USART_BAUDRATE                      115200uL	
 
 

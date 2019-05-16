@@ -270,12 +270,12 @@ void message_tx_handler(usart_t *pUsart)
   }
 }
 u8 uart_tx_cmd_bk;
-u16 uart_tx_len_bk;
+u8 uart_tx_len_bk;
 u32 uart_tx_sn_bk;
 //数据打包，并启动发送
 void usart_tx_start(/*usart_t *pUsart, */message_pkt_t *pmsg, u8 *SN)
 {
-    INT16U len;
+    INT8U len=0;
 		//u8 BCD[4]={0};
 		usart_t *pUsart = &usart;
 
@@ -290,7 +290,7 @@ void usart_tx_start(/*usart_t *pUsart, */message_pkt_t *pmsg, u8 *SN)
 		//uart_tx_sn_bk = uart_tx_sn;
 		//uart_tx_sn++;
 		memcpy(pUsart->tx_buf+1, SN, 4);
-    if (len) {
+    if ((len>0)&&(len<USART_TX_BUFF_SIZE-IG_CMDANDSN_LEN)) {
         memcpy(pUsart->tx_buf + IG_CMDANDSN_LEN, pmsg->Data, len);
     }
     pUsart->tx_len = len + IG_CMDANDSN_LEN;
@@ -362,12 +362,13 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
         return;
     }
 		//OSSemPost(usart.ack_sem);BSP_PRINTF("cmd:%x ",cmd);
-		if((cmd == uart_tx_cmd_bk)/* && UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)==MSG_SYSTEM_CMD_ACK*/)	{//server ack package				
+		if((cmd == CMD_ReportParam||cmd == CMD_ReportError||cmd == CMD_ReportShipResult)/* && UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)==MSG_SYSTEM_CMD_ACK*/)	{//server ack package				
 				if(SaveShipDat.flag == DEF_True)	{
 					SaveShipDat.flag = DEF_False;
 					SaveShipDat.len = 0;					
 					flash_savedat.type |= SAVE_SHIP_RESULT;
 				}
+				//BSP_PRINTF("rx ack\r\n");
 				OSSemPost(usart.ack_sem);
 				return;
 		}else	{
