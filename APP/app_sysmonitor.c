@@ -86,7 +86,7 @@ static void CheckDoorState(void)
 static u8 ReportSysError(void)
 {
 	u8 len=0;
-	if(sys_status.online_state == DEF_True)	{
+	if(sys_status.online_state == DEF_True && appShip.state == SHIP_STATE_IDLE)	{
 		msg_pkt_sysmonitor[2].Src = USART_MSG_RX_TASK;
 		msg_pkt_sysmonitor[2].Cmd = CMD_ReportError;
 		data_buf_2[len++] = sys_status.pError->IR;
@@ -274,7 +274,7 @@ static void SysMonitorTask(void *parg)
 				SysCheckOnlineState();//未联网情况下，5s检测一次，联网情况下，30min检测一次
 				CheckDoorState();//检测关门动作
 				CheckSysError();//检测到故障变化立刻上报
-				ReportSysError30min();//有故障30min上报一次
+				//ReportSysError30min();//有故障30min上报一次
 				CalcInsideTemp();
 				CalcOutsideTemp();
 				CalLightSensor();
