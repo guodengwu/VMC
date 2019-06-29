@@ -117,6 +117,7 @@ static void AppShipTask(void *parg)
 			msg_pkt_ship.dLen = 2 + sys_status.pIMEI->len;			
 			appShip.state = SHIP_STATE_IDLE;			//出货状态空闲
 			Ext_Disable(EXT_INT0);
+			stop_motor();
 			OSQPost(usart.Str_Q, &msg_pkt_ship);//反馈出货结果
 		}
 	}
