@@ -3,7 +3,7 @@
 #include "app_ship.h"
 #include "app_sysmonitor.h"
 
-static u8 data_buf[10];
+static u8 data_buf[100];
 u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 {
 	u8 cmd,len=0,temp;
@@ -23,13 +23,29 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			//param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//参数
 			//timeout = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)/10;//运行时间 s
 			len = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-			if((appShip.state == SHIP_STATE_IDLE) && (len>0&&len<IMEI_LEN))	{
-				sys_status.pIMEI->len = len;
-				memcpy(sys_status.pIMEI->dat, pUsart->rx_buf+pUsart->rx_idx, len);//获取订单号
-				msg[0].Src = MSG_START_SHIP;
-				OSMboxPost(appShip.MBox, &msg[0]);//启动出货控制任务
-				*pAck = MSG_SYSTEM_CMD_ACK;
-			}else	{
+			if(len>0&&len<IMEI_LEN)	{	//订单号长度正确 			
+				if(memcmp(sys_status.pIMEI->dat, pUsart->rx_buf+pUsart->rx_idx, len)==0)	{//本次订单号与上次相同 拒绝出货	
+					*pAck = MSG_SYSTEM_CMD_NAK;					
+				}else	{
+						if(appShip.state == SHIP_STATE_IDLE)	{//空闲 同意出货
+								memcpy(sys_status.pIMEI->dat, pUsart->rx_buf+pUsart->rx_idx, len);//获取订单号
+								sys_status.pIMEI->len = len;
+								msg[0].Src = MSG_START_SHIP;
+								OSMboxPost(appShip.MBox, &msg[0]);//启动出货控制任务
+								*pAck = MSG_SYSTEM_CMD_ACK;
+								break;
+						}else	{//当前忙 通知出货结果 忙								
+								data_buf[0] = (motor.row<<4)|motor.col;	
+								data_buf[1] = SHIP_BUSY;
+								memcpy(data_buf+2, sys_status.pIMEI->dat, sys_status.pIMEI->len);//拷贝订单号
+								msg[0].Src = USART_MSG_RX_TASK;
+								msg[0].Data = data_buf;
+								msg[0].dLen = 2 + sys_status.pIMEI->len;
+								OSQPost(usart.Str_Q, &msg[0]);
+						}
+				}
+			}
+			else	{//订单号长度不对 拒绝
 				*pAck = MSG_SYSTEM_CMD_NAK;
 			}
 			break;
@@ -89,6 +105,38 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				}else	{
 					*pAck = MSG_SYSTEM_CMD_NAK;
 				}							
+				break;
+		}
+		case CMD_MOTOR_CTRL_TYPE://0x12 电机停止控制方式切换
+		{
+			*pAck = MSG_SYSTEM_CMD_ACK;
+			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			if(temp==1)	{//霍尔控制电机停止
+				motor.CtrlType = MOTOR_CTRL_TYPE_HOLE;
+			}else if(temp==0)	{//红外控制电机停止
+				motor.CtrlType = MOTOR_CTRL_TYPE_IR;
+			}else	{
+				*pAck = MSG_SYSTEM_CMD_NAK;
+			}
+				break;
+		}
+		case CMD_HUASHUANG_CTRL://0x13 化霜使能控制
+		{
+			*pAck = MSG_SYSTEM_CMD_ACK;
+			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+			if(temp==1)	{//关闭化霜
+				HuaShuangCtrl.enable = DEF_False;
+				HuaShuangCtrl.run_time = 0;
+				HuaShuangCtrl.run_interval = 0;
+			}else if(temp==0)	{//使能化霜
+				HuaShuangCtrl.enable = DEF_Enable;
+				HuaShuangCtrl.run_time = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				HuaShuangCtrl.run_interval = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+				HuaShuangCtrl.run_timecnt = 0;
+				HuaShuangCtrl.run_intercnt = 0;
+			}else	{
+				*pAck = MSG_SYSTEM_CMD_NAK;
+			}
 				break;
 		}
 		case CMD_SysReset://0x19 重启

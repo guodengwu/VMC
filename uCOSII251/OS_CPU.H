@@ -34,10 +34,10 @@
 typedef unsigned char  BOOLEAN;       //注意：不要使用bit定义，因为在结构体里无法使用
 typedef unsigned char  INT8U;         //无符号8位数
 typedef signed   char  INT8S;         //有符号8位数
-typedef unsigned int   INT16U;        //无符号16位数
-typedef signed   int   INT16S;        //有符号16位数
-typedef unsigned long  INT32U;        //无符号32位数
-typedef signed   long  INT32S;        //有符号32位数
+typedef unsigned short   INT16U;        //无符号16位数
+typedef signed   short   INT16S;        //有符号16位数
+typedef unsigned int  INT32U;        //无符号32位数
+typedef signed   int  INT32S;        //有符号32位数
 typedef float          FP32;          //单精度浮点数
 typedef double         FP64;          //双精度浮点数
 

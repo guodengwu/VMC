@@ -13,6 +13,7 @@ void motor_init(void)
 		motor.timecnt = 0;
 //		motor.plusecnt = 0;
 		motor.timeout = 60;//µ¥Î»100ms
+		motor.CtrlType = MOTOR_CTRL_TYPE_HOLE;
 }
 
 static void start_motor_timer(_motor_t *pMotor)

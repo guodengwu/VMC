@@ -30,8 +30,13 @@ void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
 	if(IO_IR_CHK==1)	{
 		_nop_();
 		if(IO_IR_CHK==1)	{
-			sys_status.IR_CheckFlag = DEF_True;
-			OSSemPost(appShip.Sem);
+			sys_status.IR_CheckFlag = DEF_True;//检测到货物
+			if(motor.CtrlType == MOTOR_CTRL_TYPE_HOLE)	{//霍尔控制电机
+				OSSemPost(appShip.Sem);
+			}else if(motor.CtrlType == MOTOR_CTRL_TYPE_IR)	{//红外控制电机
+					msg_pkt_ext.Src = MSG_SHIP_MOTOR_NOMAL;//出货过程电机转到一圈
+					OSMboxPost(appShip.MBox, &msg_pkt_ext);
+			}
 		}
 	}	
 	OSIntExit();

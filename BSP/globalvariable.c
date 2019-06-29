@@ -4,7 +4,7 @@ _sys_status_t sys_status;
 _imei_t IMEI;
 _syserror_t SysError;
 _systempctrl_t TempCtrl;
-
+_HuaShuangCtrl_t HuaShuangCtrl;
 _SaveShipData_t SaveShipDat;
 
 //////////////////////////////////////////////////////////////////
@@ -29,6 +29,9 @@ void globalvariable (void)
 		sys_status.pTempCtrl = &TempCtrl;
 		SaveShipDat.flag = DEF_False;
 		flash_savedat.type = SAVE_NONE;
+	
+		HuaShuangCtrl.enable = DEF_False;
+		HuaShuangCtrl.runflag = DEF_False;
 }
 
 

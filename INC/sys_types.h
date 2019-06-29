@@ -189,12 +189,12 @@ typedef          CPU_UBASE_T    CPU_SIZE_T;
 
 typedef         signed  char    cpu_int8s_t;
 typedef         signed short    cpu_int16s_t;
-typedef         signed  long    cpu_int32s_t;
+typedef         signed  int    cpu_int32s_t;
 //typedef     signed long long    cpu_int64s_t;
 typedef       unsigned  char    cpu_bool_t;
 typedef       unsigned  char    cpu_int8u_t;
 typedef       unsigned short    cpu_int16u_t;
-typedef       unsigned  long    cpu_int32u_t;
+typedef       unsigned  int    cpu_int32u_t;
 //typedef   unsigned long long    cpu_int64u_t;
 typedef                float    cpu_fp32_t;
 typedef               double    cpu_fp64_t;
@@ -213,8 +213,8 @@ typedef         signed  char    int8s_t;    /*            Signed  8 bit Quantity
 typedef       unsigned  char    int8u_t;    /*          Unsigned  8 bit Quantity          */
 typedef         signed short    int16s_t;   /*            Signed 16 bit Quantity          */
 typedef       unsigned short    int16u_t;   /*          Unsigned 16 bit Quantity          */
-typedef         signed  long    int32s_t;   /*            Signed 32 bit Quantity          */
-typedef       unsigned  long    int32u_t;   /*          Unsigned 32 bit Quantity          */
+typedef         signed  int    int32s_t;   /*            Signed 32 bit Quantity          */
+typedef       unsigned  int    int32u_t;   /*          Unsigned 32 bit Quantity          */
 //typedef    signed long  long    int64s_t;   /*            Signed 64 bit Quantity          */
 //typedef  unsigned long  long    int64u_t;   /*          Unsigned 64 bit Quantity          */
 typedef                float    float32_t;  /* Single precision floating point            */
@@ -224,15 +224,15 @@ typedef        signed  char     S8;
 typedef      unsigned  char     U8;
 typedef        signed short     S16;
 typedef      unsigned short     U16;
-typedef        signed  long     S32;
-typedef      unsigned  long     U32;
+typedef        signed  int     S32;
+typedef      unsigned  int     U32;
 
 typedef        signed  char     s8;
 typedef      unsigned  char     u8;
 typedef        signed short     s16;
 typedef      unsigned short     u16;
-typedef        signed  long     s32;
-typedef      unsigned  long     u32;
+typedef        signed  int     s32;
+typedef      unsigned  int     u32;
 
 typedef int (*cmd_call_t)(void *context);
 

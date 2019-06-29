@@ -76,12 +76,15 @@ static void CheckDoorState(void)
 		sys_status.door_state = DOOR_CLOSE;
 	}else	{
 		sys_status.door_state = DOOR_OPEN;
+		IO_RELAY = 0;
 	}
 	if((door_state_bk == DOOR_OPEN) && (sys_status.door_state == DOOR_CLOSE))	{//关门时上报参数信息
 		UploadSysParam();
 	}
 	door_state_bk = sys_status.door_state;
 }
+//////////////////去掉故障检测和上报/////////////////////////////////////////////
+#if 0 
 //上报系统故障
 static u8 ReportSysError(void)
 {
@@ -127,13 +130,68 @@ static void ReportSysError30min(void)
 			count++;
 			if(count>=36000)	{
 				count = 0;
-				ReportSysError();	
+				//ReportSysError();	
 			}
 	}else	{
 		count = 0;
 	}
 }
+#endif
+/////////////////////////////////////////////////////////////////////////
+//化霜控制
+static void SysHuaShuangIOCtrl(u8 onoff)
+{
+	if(HuaShuangCtrl.enable == DEF_False)	{//未开启化霜控制
+		return;
+	}
+	if(onoff)	{//打开化霜
+		IO_HUASHUANG_CTRL = 1;
+		HuaShuangCtrl.runflag = DEF_Enable;		
+	}else	{//关闭化霜
+		IO_HUASHUANG_CTRL = 0;
+		HuaShuangCtrl.runflag = DEF_False;
+	}
+}
+
+static void SysHuaShuangTimeCtrl(void)
+{
+	if(HuaShuangCtrl.enable == DEF_False)	{//未开启化霜控制
+		return;
+	}
+	HuaShuangCtrl.run_timecnt ++;
+	HuaShuangCtrl.run_intercnt ++;
+	if(HuaShuangCtrl.run_timecnt>=HuaShuangCtrl.run_time)	{
+		SysHuaShuangIOCtrl(DEF_OFF);
+		HuaShuangCtrl.run_timecnt = 0;
+		HuaShuangCtrl.run_intercnt = 0;
+	}else {
+		if(HuaShuangCtrl.run_intercnt>=HuaShuangCtrl.run_interval)	{//运行时间间隔控制 停run_interval 运行run_interval
+			if(HuaShuangCtrl.runflag==DEF_Enable)	{
+				SysHuaShuangIOCtrl(DEF_OFF);
+			}else if(HuaShuangCtrl.runflag==DEF_False)	{
+				SysHuaShuangIOCtrl(DEF_ON);
+			}
+			HuaShuangCtrl.run_intercnt = 0;
+		}
+	}
+}
+//1min事件
+static void SysMinEvent(void)
+{
+	static u16 count;
+	static u16 _1min_cnt;
 	
+	count++;
+	if(count>=1200)	{//1min
+		count = 0;
+		_1min_cnt ++;
+		SysHuaShuangTimeCtrl();//化霜运行时间控制
+	}
+	if(_1min_cnt%30)	{//30min
+		UploadSysParam();//上传系统参数
+	}
+}
+
 static void CalcInsideTemp(void)
 {
 	static u16 count;
@@ -149,9 +207,12 @@ static void CalcInsideTemp(void)
 		temp = CalculateTemperature(Rx,10000,3950);
 		sys_status.pTempCtrl->inside_temp = (s8)temp;
 		//printf("Vad:%d, T:%bd",Vad,sys_status.inside_temp);
-		if(sys_status.pTempCtrl->flag == DEF_True)	{//温度控制使能，VMC自动调节温度
-			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度不在要求范围内，打开压缩机
+		if((sys_status.pTempCtrl->flag == DEF_True)&&(sys_status.door_state == DOOR_CLOSE))	{//温度控制使能，VMC自动调节温度
+			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度不在要求范围内，打开压缩机			
 					IO_RELAY = 1;
+					SysHuaShuangIOCtrl(DEF_ON);
+			}else	{//已经在温度范围内 关闭压缩机
+					IO_RELAY = 0;
 			}
 		}
 	}
@@ -267,14 +328,14 @@ static void SysMonitorTask(void *parg)
 					soft_reset();
 				}else if(msg->Src==MSG_SYS_ONLINE)	{
 						UploadSysParam();//剛連上server 上報系統參數
-						ReportSysError();//上報故障
+						//ReportSysError();//上報故障
 						UploadShipResult();//檢查是否有未上傳成功的出貨結果
 				}
 		}else if(err==OS_TIMEOUT)	{
 				SysCheckOnlineState();//未联网情况下，5s检测一次，联网情况下，30min检测一次
 				CheckDoorState();//检测关门动作
-				CheckSysError();//检测到故障变化立刻上报
-				//ReportSysError30min();//有故障30min上报一次
+//				CheckSysError();//检测到故障变化立刻上报
+				SysMinEvent();//所有需要30min上报的事件
 				CalcInsideTemp();
 				CalcOutsideTemp();
 				CalLightSensor();

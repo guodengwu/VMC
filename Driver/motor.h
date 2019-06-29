@@ -3,6 +3,9 @@
 
 #include "includes.h"
 
+#define MOTOR_CTRL_TYPE_IR		0
+#define MOTOR_CTRL_TYPE_HOLE		1
+
 enum {
 	MOTORSTATUS_NO_ERR = 0,//无故障
 	MOTORSTATUS_NO_MOTOR = 1,//电机未接入或者霍尔板有问题
@@ -41,6 +44,7 @@ typedef struct _motor {
 	volatile u8 checkmovedelay;	
 	u32 PluseStartTime;
 	u32 PluseEndTime;
+	u8 CtrlType;
 }_motor_t;
 
 extern _motor_t motor;

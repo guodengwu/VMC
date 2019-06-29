@@ -39,7 +39,7 @@ static void	GPIO_config(void)
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P2,&GPIO_InitStructure);	
 	
-	GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_5|GPIO_Pin_7;    //4 5 管脚
+	GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_7;    //4 5 管脚
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	        //初始化 P3
 	
@@ -72,6 +72,7 @@ static void	GPIO_config(void)
 	IO_IR_CTRL = 0;//红外货物检测开关控制 
 	IO_FOG_CTRL = 1;//默认打开
 	IO_RELAY = 0;
+	IO_HUASHUANG_CTRL = 0;
 	//升降机
 	UP_DOWN_BI = 0;//后退
 	UP_DOWN_FI = 0;//前进

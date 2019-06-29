@@ -362,7 +362,7 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
         return;
     }
 		//OSSemPost(usart.ack_sem);BSP_PRINTF("cmd:%x ",cmd);
-		if((cmd == CMD_ReportParam||cmd == CMD_ReportError||cmd == CMD_ReportShipResult)/* && UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)==MSG_SYSTEM_CMD_ACK*/)	{//server ack package				
+		if((cmd == CMD_ReportParam/*||cmd == CMD_ReportError*/||cmd == CMD_ReportShipResult)/* && UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)==MSG_SYSTEM_CMD_ACK*/)	{//server ack package				
 				if(SaveShipDat.flag == DEF_True)	{
 					SaveShipDat.flag = DEF_False;
 					SaveShipDat.len = 0;					

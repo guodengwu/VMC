@@ -50,63 +50,43 @@ static void AppShipTask(void *parg)
 									msg_pkt_ship.Cmd = CMD_ReportShipResult;
 									data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;				
 									data_buf[1] = SHIP_ERROR_INVALID_COL;
-							}else	{
+							}else	{//开启出货流程
 									appShip.state = SHIP_STATE_BUSY;//出货状态BUSY
 									sys_status.IR_CheckFlag = DEF_False;
 									sys_status.ShipStuckFlag = 0;
 									OSSemSet(appShip.Sem, 0, &err);
 									OSTimeDlyHMSM(0,0,0,200); 
-									Ext_Enable(EXT_INT1);
+									if(motor.CtrlType == MOTOR_CTRL_TYPE_HOLE)	{
+										Ext_Enable(EXT_INT1);//开启霍尔检测
+									}
 									appShip.pMotor->PluseStartTime = OSTimeGet();
 									continue;
 							}
 					}
 			}else if(msg->Src==MSG_SHIP_MOTOR_NOMAL)	{//出货过程电机运转正常
-					u32 PluseTime;
-					appShip.pMotor->PluseEndTime = OSTimeGet();//one tick 1ms
-					if(appShip.pMotor->PluseEndTime >= appShip.pMotor->PluseStartTime)
-							PluseTime = appShip.pMotor->PluseEndTime - appShip.pMotor->PluseStartTime;
-					else 
-							PluseTime = (0xffffffff - appShip.pMotor->PluseStartTime) + appShip.pMotor->PluseEndTime;
-					appShip.pMotor->PluseStartTime = OSTimeGet();
-					if(PluseTime<1300)	{// 1/4圈
-						if(sys_status.ShipStuckFlag==1)	{//多走1/4圈 防卡货
-								//appShip.pMotor->plusecnt = 0;
-								stop_motor();
-						}else	{// 1/4圈 继续走
-							Ext_Enable(EXT_INT1);
-							continue;
-						}
-					}
-					else	if(PluseTime<4000){// 3/4圈 停止
-							//appShip.pMotor->plusecnt = 0;
-							stop_motor();
-					}
-					/*u32 PluseTime;
-					appShip.pMotor->plusecnt++;
-					_nop_();
-					if(appShip.pMotor->plusecnt==1)	{
-							appShip.pMotor->PluseStartTime = OSTimeGet();
-							OSTimeDlyHMSM(0,0,0,80); 
-							Ext_Enable(EXT_INT1);
-							continue;
-					}else if(appShip.pMotor->plusecnt>=2)	{							
+					if(motor.CtrlType == MOTOR_CTRL_TYPE_HOLE)	{
+							u32 PluseTime;
 							appShip.pMotor->PluseEndTime = OSTimeGet();//one tick 1ms
 							if(appShip.pMotor->PluseEndTime >= appShip.pMotor->PluseStartTime)
 									PluseTime = appShip.pMotor->PluseEndTime - appShip.pMotor->PluseStartTime;
-							else 
+							else
 									PluseTime = (0xffffffff - appShip.pMotor->PluseStartTime) + appShip.pMotor->PluseEndTime;
-							if(PluseTime>=1200)	{//1.2s
-									appShip.pMotor->plusecnt = 0;
-									stop_motor();
-							}else	{
-									appShip.pMotor->PluseStartTime = OSTimeGet();
-									OSTimeDlyHMSM(0,0,0,80); 
+							appShip.pMotor->PluseStartTime = OSTimeGet();
+							if(PluseTime<1300)	{// 1/4圈
+								if(sys_status.ShipStuckFlag==1)	{//多走1/4圈 防卡货
+										//appShip.pMotor->plusecnt = 0;
+										stop_motor();
+								}else	{// 1/4圈 继续走
 									Ext_Enable(EXT_INT1);
 									continue;
+								}
 							}
-					}*/
-					OSSemPend(appShip.Sem, 2000, &err);//电机停止后3s货物检测超时 
+							else	if(PluseTime<4000){// 3/4圈 停止
+									//appShip.pMotor->plusecnt = 0;
+									stop_motor();
+							}
+							OSSemPend(appShip.Sem, 2000, &err);//电机停止后3s货物检测超时 
+					}
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
 					data_buf[0] = (appShip.pMotor->row<<4)|appShip.pMotor->col;			

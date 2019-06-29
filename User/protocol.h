@@ -75,6 +75,8 @@ typedef enum {
 		CMD_ReportShipResult	  = 0x04,//VMC出货结果上报
 		CMD_CheckOnlineStatus			= 0x05,//VMC获取联网状态
 	
+		CMD_MOTOR_CTRL_TYPE			= 0X12,//电机控制类型 霍尔控制或者时间控制
+		CMD_HUASHUANG_CTRL			= 0X13,
     CMD_NotifyShip					=	0x14,//通知出货
     CMD_ReplyOnlineStatus		=	0x15,//回复联网状态
 		CMD_ModifyTempParm			=	0x16,//修改温控参数

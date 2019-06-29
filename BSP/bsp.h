@@ -12,8 +12,9 @@
 #define     IO_LIGHT_CTRL    P10  
 #define     IO_PUMP    			P11  
 #define     IO_IR_CTRL    		P55 
+#define     IO_HUASHUANG_CTRL    	P34 //化霜控制
 #define     IO_FOG_CTRL    	P35
-#define     IO_RELAY    			P40
+#define     IO_RELAY    			P40 //温度压缩机控制
 //LED控制器
 #define 		TM1640_SCLK    P66
 #define			TM1640_DIO     P67

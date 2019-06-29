@@ -7,7 +7,7 @@
 #define IMEI_LEN		50
 #define DOOR_OPEN			DEF_True
 #define DOOR_CLOSE		DEF_False
-#define TEMP_RANGE		3//温度误差
+#define TEMP_RANGE		5//温度误差
 
 typedef struct _imei	{
 	char dat[IMEI_LEN];
@@ -29,12 +29,22 @@ typedef struct _systempctrl	{
 	u8 flag;
 }_systempctrl_t;
 
+typedef struct _HuaShuangCtrl	{
+	volatile u8 enable;
+	volatile u8 runflag;
+	u16 run_timecnt;//运行总时间min
+	u16 run_intercnt;//运行间隔时间 min
+	u16 run_time;//运行总时间min
+	u16 run_interval;//运行间隔时间 min
+}_HuaShuangCtrl_t;
+
 typedef struct _sys_status	{
 	volatile u8 IR_CheckFlag;
 	volatile u8 light_ctrl_enable;
 	volatile u8 online_state;//联网状态
 	volatile u8 door_state;	
 	volatile u8 ShipStuckFlag;
+	volatile u8 MotorCtrlType;
 	_imei_t *pIMEI;
 	_syserror_t *pError;
 	_systempctrl_t  *pTempCtrl;
@@ -48,6 +58,7 @@ typedef struct _SaveShipData	{
 }_SaveShipData_t;
 extern _sys_status_t sys_status;
 extern _SaveShipData_t SaveShipDat;
+extern _HuaShuangCtrl_t HuaShuangCtrl;
 void globalvariable(void);//用户应用程序全局变量初始化
 
 #endif
