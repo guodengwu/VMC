@@ -187,7 +187,7 @@ static void SysMinEvent(void)
 		_1min_cnt ++;
 		SysHuaShuangTimeCtrl();//化霜运行时间控制
 	}
-	if(_1min_cnt%30)	{//30min
+	if((_1min_cnt%30) == 0)	{//30min
 		UploadSysParam();//上传系统参数
 	}
 }
