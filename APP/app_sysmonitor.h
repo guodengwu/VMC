@@ -10,5 +10,6 @@ typedef struct _sysMonitor {
 }_sysMonitor_t;
 
 void SysMonitorTaskInit (void);
+void SysHuaShuangIOCtrl(u8 onoff);
 extern _sysMonitor_t sysMonitor;
 #endif

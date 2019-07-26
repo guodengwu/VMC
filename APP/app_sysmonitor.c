@@ -139,9 +139,11 @@ static void ReportSysError30min(void)
 #endif
 /////////////////////////////////////////////////////////////////////////
 //化霜控制
-static void SysHuaShuangIOCtrl(u8 onoff)
+void SysHuaShuangIOCtrl(u8 onoff)
 {
 	if(HuaShuangCtrl.enable == DEF_False)	{//未开启化霜控制
+		IO_HUASHUANG_CTRL = 0;
+		HuaShuangCtrl.runflag = DEF_False;
 		return;
 	}
 	if(onoff)	{//打开化霜
@@ -156,6 +158,7 @@ static void SysHuaShuangIOCtrl(u8 onoff)
 static void SysHuaShuangTimeCtrl(void)
 {
 	if(HuaShuangCtrl.enable == DEF_False)	{//未开启化霜控制
+		IO_HUASHUANG_CTRL = 0;
 		return;
 	}
 	HuaShuangCtrl.run_timecnt ++;
@@ -186,9 +189,10 @@ static void SysMinEvent(void)
 		count = 0;
 		_1min_cnt ++;
 		SysHuaShuangTimeCtrl();//化霜运行时间控制
-	}
-	if((_1min_cnt%30) == 0)	{//30min
-		UploadSysParam();//上传系统参数
+
+		if((_1min_cnt%30) == 0)	{//30min
+			UploadSysParam();//上传系统参数
+		}
 	}
 }
 
@@ -209,10 +213,10 @@ static void CalcInsideTemp(void)
 		//printf("Vad:%d, T:%bd",Vad,sys_status.inside_temp);
 		if((sys_status.pTempCtrl->flag == DEF_True)&&(sys_status.door_state == DOOR_CLOSE))	{//温度控制使能，VMC自动调节温度
 			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度不在要求范围内，打开压缩机			
-					IO_RELAY = 1;
-					SysHuaShuangIOCtrl(DEF_ON);
+				IO_RELAY = 1;
+				SysHuaShuangIOCtrl(DEF_ON);
 			}else	{//已经在温度范围内 关闭压缩机
-					IO_RELAY = 0;
+				IO_RELAY = 0;
 			}
 		}
 	}

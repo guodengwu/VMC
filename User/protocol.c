@@ -118,7 +118,7 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			}else	{
 				*pAck = MSG_SYSTEM_CMD_NAK;
 			}
-				break;
+			break;
 		}
 		case CMD_HUASHUANG_CTRL://0x13 化霜使能控制
 		{
@@ -128,16 +128,18 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				HuaShuangCtrl.enable = DEF_False;
 				HuaShuangCtrl.run_time = 0;
 				HuaShuangCtrl.run_interval = 0;
+				SysHuaShuangIOCtrl(DEF_OFF);//立即关闭化霜
 			}else if(temp==0)	{//使能化霜
 				HuaShuangCtrl.enable = DEF_Enable;
 				HuaShuangCtrl.run_time = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				HuaShuangCtrl.run_interval = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				HuaShuangCtrl.run_timecnt = 0;
 				HuaShuangCtrl.run_intercnt = 0;
+				SysHuaShuangIOCtrl(DEF_ON);//立即启动化霜
 			}else	{
 				*pAck = MSG_SYSTEM_CMD_NAK;
 			}
-				break;
+			break;
 		}
 		case CMD_SysReset://0x19 重启
 		{
