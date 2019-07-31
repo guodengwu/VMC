@@ -18,7 +18,7 @@ void DisplayTaskInit (void)
 static void DisDataInit(void)
 {
 	display_t.mbox = OSMboxCreate((void *)0);
-	display_t.ui_flag = UI_MOTORNUM;
+	display_t.ui_flag = UI_OUTSIDETEMP;
 }
 
 static void AppDisplayTask(void *parg)
@@ -31,7 +31,7 @@ static void AppDisplayTask(void *parg)
 	Update_DisString("----");
 	BEEP=1;
 	OSTimeDlyHMSM(0,0,1,0); 
-	Update_DisInt(15);
+	//Update_DisInt(15);
 	BEEP=0;
 	//Ext_Enable(EXT_INT0);
 	BSP_PRINTF("SYS Startup...\r\n");
@@ -42,15 +42,17 @@ static void AppDisplayTask(void *parg)
 		if(err==OS_NO_ERR)	{
 			
 		}else if(err==OS_TIMEOUT)	{//3s 切换数码管显示内容
-			 if(display_t.ui_flag==UI_MOTORNUM)	{
+			 /*if(display_t.ui_flag==UI_MOTORNUM)	{
 				display_t.ui_flag=UI_INSIDETEMP;
-				Update_DisInt(sys_status.pTempCtrl->inside_temp);//显示室内温度
-			}else if(display_t.ui_flag==UI_INSIDETEMP)	{				
+				Update_DisInt(sys_status.pTempCtrl->inside_temp);
+			}else */if(display_t.ui_flag==UI_INSIDETEMP)	{//显示室内温度	
 				display_t.ui_flag=UI_OUTSIDETEMP;
-				Update_DisInt(sys_status.pTempCtrl->outside_temp);//显示货道号
-			}else if(display_t.ui_flag==UI_OUTSIDETEMP)	{	
-				display_t.ui_flag=UI_MOTORNUM;
-				Update_DisInt(15);
+				Update_DisInt(sys_status.pTempCtrl->outside_temp);
+			}else if(display_t.ui_flag==UI_OUTSIDETEMP)	{//显示室外温度
+				/*display_t.ui_flag=UI_MOTORNUM;
+				Update_DisInt(15);*/
+				display_t.ui_flag=UI_INSIDETEMP;
+				Update_DisInt(sys_status.pTempCtrl->inside_temp);
 			}
 		}
 	}

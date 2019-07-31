@@ -212,10 +212,10 @@ static void CalcInsideTemp(void)
 		sys_status.pTempCtrl->inside_temp = (s8)temp;
 		//printf("Vad:%d, T:%bd",Vad,sys_status.inside_temp);
 		if((sys_status.pTempCtrl->flag == DEF_True)&&(sys_status.door_state == DOOR_CLOSE))	{//温度控制使能，VMC自动调节温度
-			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度不在要求范围内，打开压缩机			
+			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度大于目标温度最大值，打开压缩机			
 				IO_RELAY = 1;
 				SysHuaShuangIOCtrl(DEF_ON);
-			}else	{//已经在温度范围内 关闭压缩机
+			}else if(sys_status.pTempCtrl->inside_temp < sys_status.pTempCtrl->tInsideTempL)	{//小于目标温度最小值 关闭压缩机
 				IO_RELAY = 0;
 			}
 		}

@@ -74,7 +74,7 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			}else if(temp==0)	{
 					sys_status.pTempCtrl->flag = DEF_True;//开启温度控制
 					targetTemp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//控制目标温度
-					sys_status.pTempCtrl->tInsideTempL = targetTemp - TEMP_RANGE;//计算控制范围
+					sys_status.pTempCtrl->tInsideTempL = targetTemp;// - TEMP_RANGE;//计算控制范围
 					sys_status.pTempCtrl->tInsideTempH = targetTemp + TEMP_RANGE;
 			}else	{
 					*pAck = MSG_SYSTEM_CMD_NAK;
