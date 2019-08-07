@@ -34,8 +34,8 @@ INT16U  UsartRxGetINT16U (u8 *buf,u32 *idx)
     INT16U  lowbyte;
     INT16U  highbyte;
 
-    lowbyte  = UsartRxGetINT8U(buf,idx);
-    highbyte = UsartRxGetINT8U(buf,idx);
+    highbyte  = UsartRxGetINT8U(buf,idx);
+    lowbyte = UsartRxGetINT8U(buf,idx);
     return ((highbyte << 8) | lowbyte);
 }
 
@@ -44,8 +44,8 @@ INT32U  UsartRxGetINT32U (u8 *buf,u32 *idx)
     INT32U  highword;
     INT32U  lowword;
 
-    lowword = UsartRxGetINT16U(buf,idx);
     highword = UsartRxGetINT16U(buf,idx);
+    lowword = UsartRxGetINT16U(buf,idx);
     return ((highword << 16) | lowword);
 }
 

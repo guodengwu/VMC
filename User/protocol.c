@@ -69,15 +69,16 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			*pAck = MSG_SYSTEM_CMD_ACK;
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(temp==1)	{//关闭压缩机
-					IO_RELAY = 0;
-					sys_status.pTempCtrl->flag = DEF_False;//关闭温度控制
+				IO_RELAY = 0;
+				//IO_HUASHUANG_CTRL = 0;
+				sys_status.pTempCtrl->flag = DEF_False;//关闭温度控制
 			}else if(temp==0)	{
-					sys_status.pTempCtrl->flag = DEF_True;//开启温度控制
-					targetTemp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//控制目标温度
-					sys_status.pTempCtrl->tInsideTempL = targetTemp;// - TEMP_RANGE;//计算控制范围
-					sys_status.pTempCtrl->tInsideTempH = targetTemp + TEMP_RANGE;
+				sys_status.pTempCtrl->flag = DEF_True;//开启温度控制
+				targetTemp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//控制目标温度
+				sys_status.pTempCtrl->tInsideTempL = targetTemp;// - TEMP_RANGE;//计算控制范围
+				sys_status.pTempCtrl->tInsideTempH = targetTemp + TEMP_RANGE;
 			}else	{
-					*pAck = MSG_SYSTEM_CMD_NAK;
+				*pAck = MSG_SYSTEM_CMD_NAK;
 			}									
 			break;
 		}
@@ -134,8 +135,8 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				HuaShuangCtrl.run_time = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				HuaShuangCtrl.run_interval = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 				HuaShuangCtrl.run_timecnt = 0;
-				HuaShuangCtrl.run_intercnt = 0;
-				SysHuaShuangIOCtrl(DEF_ON);//立即启动化霜
+				HuaShuangCtrl.stop_timecnt = 0;
+				//SysHuaShuangIOCtrl(DEF_ON);//立即启动化霜
 			}else	{
 				*pAck = MSG_SYSTEM_CMD_NAK;
 			}

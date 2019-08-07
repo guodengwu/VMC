@@ -122,7 +122,7 @@ void	UART3_config(void)
 {
 	COMx_InitDefine		COMx_InitStructure;					//结构定义
 	COMx_InitStructure.UART_Mode      = UART_8bit_BRTx;		//模式,       UART_ShiftRight,UART_8bit_BRTx,UART_9bit,UART_9bit_BRTx
-	COMx_InitStructure.UART_BaudRate  = 115200ul;			//波特率,     110 ~ 115200
+	COMx_InitStructure.UART_BaudRate  = 57600;//115200ul;			//波特率,     110 ~ 115200
 	COMx_InitStructure.UART_RxEnable  = ENABLE;				//接收允许,   ENABLE或DISABLE
 	COMx_InitStructure.UART_Interrupt = ENABLE;				//中断允许,   ENABLE或DISABLE
 	COMx_InitStructure.UART_Polity    = PolityLow;			//中断优先级, PolityLow,PolityHigh

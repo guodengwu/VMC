@@ -138,21 +138,29 @@ static void ReportSysError30min(void)
 	}
 }
 #endif
+u8 temp_over_flag=0;
 /////////////////////////////////////////////////////////////////////////
 //化霜控制
 void SysHuaShuangIOCtrl(u8 onoff)
 {
 	if(HuaShuangCtrl.enable == DEF_False)	{//未开启化霜控制
-		IO_HUASHUANG_CTRL = 0;
+		//IO_HUASHUANG_CTRL = 0;
 		HuaShuangCtrl.runflag = DEF_False;
 		return;
 	}
-	if(onoff)	{//打开化霜
+	if(onoff)	{//打开化霜 即关闭压缩机
 		IO_HUASHUANG_CTRL = 1;
-		HuaShuangCtrl.runflag = DEF_Enable;		
-	}else	{//关闭化霜
-		IO_HUASHUANG_CTRL = 0;
+		HuaShuangCtrl.runflag = DEF_Enable;	
+		IO_RELAY = 0;
+//		printf("start huashuang.\r\n");
+	}else	{//关闭化霜 即启动压缩机		
 		HuaShuangCtrl.runflag = DEF_False;
+//		printf("stop huashuang.");
+		if(temp_over_flag)	{
+			IO_RELAY = 1;
+			IO_HUASHUANG_CTRL = 1;
+//			printf("open relay.\r\n");
+		}
 	}
 }
 
@@ -162,7 +170,23 @@ static void SysHuaShuangTimeCtrl(void)
 		IO_HUASHUANG_CTRL = 0;
 		return;
 	}
-	HuaShuangCtrl.run_timecnt ++;
+	
+	if(HuaShuangCtrl.runflag == DEF_Enable)	{//开启化霜时间控制
+		HuaShuangCtrl.run_timecnt ++;
+		SysHuaShuangIOCtrl(DEF_ON);
+		if(HuaShuangCtrl.run_timecnt>=HuaShuangCtrl.run_time)	{
+			SysHuaShuangIOCtrl(DEF_OFF);
+			HuaShuangCtrl.run_timecnt = 0;
+		}
+	}else if(HuaShuangCtrl.runflag == DEF_False)	{//停止化霜时间控制
+		HuaShuangCtrl.stop_timecnt++;
+		SysHuaShuangIOCtrl(DEF_OFF);
+		if(HuaShuangCtrl.stop_timecnt>=HuaShuangCtrl.run_interval)	{
+			SysHuaShuangIOCtrl(DEF_ON);
+			HuaShuangCtrl.stop_timecnt = 0;
+		}
+	}
+	/*HuaShuangCtrl.run_timecnt ++;
 	HuaShuangCtrl.run_intercnt ++;
 	if(HuaShuangCtrl.run_timecnt>=HuaShuangCtrl.run_time)	{
 		SysHuaShuangIOCtrl(DEF_OFF);
@@ -177,7 +201,7 @@ static void SysHuaShuangTimeCtrl(void)
 			}
 			HuaShuangCtrl.run_intercnt = 0;
 		}
-	}
+	}*/
 }
 //1min事件
 static void SysMinEvent(void)
@@ -196,7 +220,7 @@ static void SysMinEvent(void)
 		}
 	}
 }
-
+u8 close_relay_cnt=0;
 static void CalcInsideTemp(void)
 {
 	static u16 count;
@@ -213,12 +237,29 @@ static void CalcInsideTemp(void)
 		sys_status.pTempCtrl->inside_temp = (s8)temp;
 		//printf("Vad:%d, T:%bd",Vad,sys_status.inside_temp);
 		if((sys_status.pTempCtrl->flag == DEF_True)&&(sys_status.door_state == DOOR_CLOSE))	{//温度控制使能，VMC自动调节温度
-			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度大于目标温度最大值，打开压缩机			
-				IO_RELAY = 1;
-				SysHuaShuangIOCtrl(DEF_ON);
+			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度大于目标温度最大值，打开压缩机	
+				if(HuaShuangCtrl.runflag == DEF_False)		{//化霜开启时 压缩机不能开启			
+					IO_RELAY = 1;
+					//printf("open relay.\r\n");
+				}
+				//SysHuaShuangIOCtrl(DEF_ON);
+				IO_HUASHUANG_CTRL = 1;
+				temp_over_flag = 1;
+				close_relay_cnt = 0;
 			}else if(sys_status.pTempCtrl->inside_temp < sys_status.pTempCtrl->tInsideTempL)	{//小于目标温度最小值 关闭压缩机
-				IO_RELAY = 0;
+				close_relay_cnt ++;
+				if(close_relay_cnt>6)	{//连续30s内 检测到低于目标温度 关闭压缩机
+					close_relay_cnt = 0;
+					IO_RELAY = 0;
+					//IO_HUASHUANG_CTRL = 0;
+					temp_over_flag = 0;
+				}
 			}
+		}
+		else /*if(sys_status.door_state == DOOR_OPEN)*/	{
+			IO_RELAY = 0;
+			IO_HUASHUANG_CTRL = 0;
+			temp_over_flag = 0;
 		}
 	}
 }
@@ -321,7 +362,7 @@ static void SysMonitorTask(void *parg)
 	
 	SysMonitorInit();
 	CopyShipResultFromEEPROM();
-	
+//	printf("sys startup.\r\n");
 	while (DEF_True)
 	{
 		msg = (message_pkt_t *)OSMboxPend(sysMonitor.Mbox, 50, &err);//50ms执行

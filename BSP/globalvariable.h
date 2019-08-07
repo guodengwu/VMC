@@ -33,7 +33,7 @@ typedef struct _HuaShuangCtrl	{
 	volatile u8 enable;
 	volatile u8 runflag;
 	u16 run_timecnt;//运行总时间min
-	u16 run_intercnt;//运行间隔时间 min
+	u16 stop_timecnt;//运行间隔时间 min
 	u16 run_time;//运行总时间min
 	u16 run_interval;//运行间隔时间 min
 }_HuaShuangCtrl_t;
