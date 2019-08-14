@@ -52,13 +52,13 @@ static u8 UploadSysParam(void)
 		msg_pkt_sysmonitor[0].Src = USART_MSG_RX_TASK;
 		msg_pkt_sysmonitor[0].Cmd = CMD_ReportParam;
 		data_buf[len++] = IO_IR_CTRL;
-		data_buf[len++] = sys_status.pTempCtrl->flag;//温度控制标志
+		data_buf[len++] = !sys_status.pTempCtrl->flag;//温度控制标志
 		data_buf[len++] = sys_status.pTempCtrl->inside_temp;//
 		data_buf[len++] = sys_status.pTempCtrl->outside_temp;//;
 		data_buf[len++] = !IO_LIGHT_CTRL;
 		data_buf[len++] = !IO_FOG_CTRL;
 		data_buf[len++] = IO_DOOR_STATE;
-		data_buf[len++] = HuaShuangCtrl.enable;//化霜设置开关
+		data_buf[len++] = !HuaShuangCtrl.enable;//化霜设置开关
 		msg_pkt_sysmonitor[0].Data = (u8 *)data_buf;
 		msg_pkt_sysmonitor[0].dLen = len;
 		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查

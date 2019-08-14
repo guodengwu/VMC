@@ -67,7 +67,7 @@ static void	GPIO_config(void)
 	TM1640_SCLK = 0;
 	TM1640_DIO = 0;/////////////////////////////////
 
-	IO_LIGHT_CTRL = 0;
+	IO_LIGHT_CTRL = 1;
 	IO_PUMP = 0;
 	IO_IR_CTRL = 0;//红外货物检测开关控制 
 	IO_FOG_CTRL = 1;//默认打开
