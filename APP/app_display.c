@@ -21,6 +21,40 @@ static void DisDataInit(void)
 	display_t.ui_flag = UI_OUTSIDETEMP;
 }
 
+static void WatchDogEnable(void)
+{
+//  WDT_CONTR = 0x23;                           //使能看门狗,溢出时间约为0.5s
+    WDT_CONTR = 0x25;                           //使能看门狗,溢出时间约为1s
+//  WDT_CONTR = 0x27;                           //使能看门狗,溢出时间约为8s
+}
+
+static void WatchDogFeed(void)
+{
+	 WDT_CONTR |= 0x10; //清看门狗,否则系统复位
+}
+
+void	DisplayUI(void)
+{
+	static u8 count=0;
+	
+	count++;
+	if(count>=100)	{
+		count = 0;
+		 /*if(display_t.ui_flag==UI_MOTORNUM)	{
+			display_t.ui_flag=UI_INSIDETEMP;
+			Update_DisInt(sys_status.pTempCtrl->inside_temp);
+		}else */if(display_t.ui_flag==UI_INSIDETEMP)	{//显示室内温度	
+			display_t.ui_flag=UI_OUTSIDETEMP;
+			Update_DisInt(sys_status.pTempCtrl->outside_temp);
+		}else if(display_t.ui_flag==UI_OUTSIDETEMP)	{//显示室外温度
+			/*display_t.ui_flag=UI_MOTORNUM;
+			Update_DisInt(15);*/
+			display_t.ui_flag=UI_INSIDETEMP;
+			Update_DisInt(sys_status.pTempCtrl->inside_temp);
+		}
+	}
+}
+
 static void AppDisplayTask(void *parg)
 {
 	u8 err;
@@ -38,22 +72,12 @@ static void AppDisplayTask(void *parg)
 	
 	while (DEF_True)
 	{
-		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 3000, &err);//系統tick 10ms
+		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 30, &err);//系統tick 10ms
 		if(err==OS_NO_ERR)	{
 			
 		}else if(err==OS_TIMEOUT)	{//3s 切换数码管显示内容
-			 /*if(display_t.ui_flag==UI_MOTORNUM)	{
-				display_t.ui_flag=UI_INSIDETEMP;
-				Update_DisInt(sys_status.pTempCtrl->inside_temp);
-			}else */if(display_t.ui_flag==UI_INSIDETEMP)	{//显示室内温度	
-				display_t.ui_flag=UI_OUTSIDETEMP;
-				Update_DisInt(sys_status.pTempCtrl->outside_temp);
-			}else if(display_t.ui_flag==UI_OUTSIDETEMP)	{//显示室外温度
-				/*display_t.ui_flag=UI_MOTORNUM;
-				Update_DisInt(15);*/
-				display_t.ui_flag=UI_INSIDETEMP;
-				Update_DisInt(sys_status.pTempCtrl->inside_temp);
-			}
+			DisplayUI();
+			WatchDogFeed();
 		}
 	}
 }

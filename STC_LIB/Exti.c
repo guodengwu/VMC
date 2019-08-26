@@ -47,7 +47,8 @@ void Ext_INT1 (void) interrupt INT1_VECTOR		//进中断时已经清除标志
 {
 	OSIntEnter();	
 	if((motor.status.is_run == MotorState_Run)&&(IO_MOTOR_PLUSE_CHK==0))	{
-			Ext_Disable(EXT_INT1);
+			//Ext_Disable(EXT_INT1);
+			Ext1_Disable();
 			msg_pkt_ext.Src = MSG_SHIP_MOTOR_NOMAL;//出货过程电机转到一圈
 			OSMboxPost(appShip.MBox, &msg_pkt_ext);
 		/*motor.plusecnt++;
@@ -146,6 +147,16 @@ void	Ext_Enable(u8 EXT)
 	}
 }
 
+void	Ext0_Disable(void)
+{
+	EX0 = 0;
+}
+
+void	Ext1_Disable(void)
+{
+	EX1 = 0;
+}
+/*
 void	Ext_Disable(u8 EXT)
 {
 	if(EXT == EXT_INT0)	//外中断0
@@ -154,4 +165,4 @@ void	Ext_Disable(u8 EXT)
 	}else if(EXT == EXT_INT1)	{
 		EX1 = 0;
 	}
-}
+}*/

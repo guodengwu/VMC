@@ -35,6 +35,7 @@ typedef struct
 
 u8	Ext_Inilize(u8 EXT, EXTI_InitTypeDef *INTx);
 void	Ext_Enable(u8 EXT);
-void	Ext_Disable(u8 EXT);
+void	Ext0_Disable(void);
+void	Ext1_Disable(void);
 
 #endif

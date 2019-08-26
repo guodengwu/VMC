@@ -28,7 +28,7 @@ static void SysMonitorInit (void)
 //检测联网状态
 static void SysCheckOnlineState(void)
 {
-	static u16 check_cnt,check_timeout=200;
+	static u16 check_cnt=0,check_timeout=200;
 	
 	check_cnt++;
 	if(sys_status.online_state == DEF_False)	{//
@@ -64,6 +64,11 @@ static u8 UploadSysParam(void)
 		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查
 		return 1;
 	}
+	else if(sys_status.online_state == DEF_False)	{
+	}
+	else
+		sys_status.online_state = DEF_False;
+		
 	return 0;
 }
 //检测开关门
@@ -108,7 +113,7 @@ static u8 ReportSysError(void)
 //检测系统故障
 static void CheckSysError(void)
 {
-	static u8 IR_bk,Compressor_bk,TempSensor_bk;
+	static u8 IR_bk=0,Compressor_bk=0,TempSensor_bk=0;
 	//故障标志发生变化立刻上传
 	if(IR_bk!=sys_status.pError->IR || Compressor_bk!=sys_status.pError->Compressor || TempSensor_bk!= sys_status.pError->TempSensor)	{
 			if(ReportSysError())	{//上传ok，
@@ -126,7 +131,7 @@ static void CheckSysError(void)
 //有故障情况下，30min上报一次
 static void ReportSysError30min(void)
 {
-	static u16 count;
+	static u16 count=0;
 	if(sys_status.pError->flag)	{
 			count++;
 			if(count>=36000)	{
@@ -206,8 +211,8 @@ static void SysHuaShuangTimeCtrl(void)
 //1min事件
 static void SysMinEvent(void)
 {
-	static u16 count;
-	static u16 _1min_cnt;
+	static u16 count=0;
+	static u16 _1min_cnt=0;
 	
 	count++;
 	if(count>=1200)	{//1min
@@ -223,7 +228,7 @@ static void SysMinEvent(void)
 u8 close_relay_cnt=0;
 static void CalcInsideTemp(void)
 {
-	static u16 count;
+	static u16 count=0;
 	u16 Vad;
 	float temp,Rx;
 	count++;
@@ -266,7 +271,7 @@ static void CalcInsideTemp(void)
 
 static void CalcOutsideTemp(void)
 {
-	static u16 count;
+	static u16 count=0;
 	u16 Vad;
 	float temp,Rx;
 	count++;
@@ -285,7 +290,7 @@ static void CalcOutsideTemp(void)
 #define LIGTH_SENSOR_Rmax			10
 static void CalLightSensor(void)
 {
-	static u16 count,testcnt;
+	static u16 count=0,testcnt=0;
 	u16 Vad,Rx;
 	float temp;
 	

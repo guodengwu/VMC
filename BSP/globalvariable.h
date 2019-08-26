@@ -22,8 +22,8 @@ typedef struct _syserror	{
 }_syserror_t;
 
 typedef struct _systempctrl	{
-	volatile s8 inside_temp;
-	volatile s8 outside_temp;
+	s8 inside_temp;
+	s8 outside_temp;
 	s8 tInsideTempL;//目标温度-最低
 	s8 tInsideTempH;//目标温度-最高
 	u8 flag;
