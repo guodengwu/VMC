@@ -594,6 +594,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\save_data.c</FilePath>
             </File>
+            <File>
+              <FileName>CalcTemp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\CalcTemp.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

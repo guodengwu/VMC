@@ -225,22 +225,25 @@ static void SysMinEvent(void)
 		}
 	}
 }
+#include "CalcTemp.h"
 u8 close_relay_cnt=0;
 static void CalcInsideTemp(void)
 {
 	static u16 count=0;
-	u16 Vad;
-	float temp,Rx;
+	u32 Vad,Rx;
+	s32 temp;
 	count++;
 	if(count>=100)	{//5s计算一次温度
 		count=0;
-		temp = Cal_Vol(ADC_CH7,1);
-		Vad = (u16)(temp*1000);
-		temp = (float)Vad/(5000-Vad);
-		Rx = temp*51000;
-		temp = CalculateTemperature(Rx,10000,3950);
+		Vad = Cal_Vol(ADC_CH7,1);//mV
+		//temp = Vad/(5000-Vad);
+		temp = 5000 - Vad;
+		Rx = Vad*51000/temp;
+		//temp = CalculateTemperature(Rx,10000,3950);		
+		//sys_status.pTempCtrl->inside_temp = (s8)temp;
+		temp = CalcTemperature(Rx)/100;
 		sys_status.pTempCtrl->inside_temp = (s8)temp;
-		//printf("Vad:%d, T:%bd",Vad,sys_status.inside_temp);
+		printf("Vad:%d, Rx:%d\r\n",Vad,Rx);
 		if((sys_status.pTempCtrl->flag == DEF_True)&&(sys_status.door_state == DOOR_CLOSE))	{//温度控制使能，VMC自动调节温度
 			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度大于目标温度最大值，打开压缩机	
 				if(HuaShuangCtrl.runflag == DEF_False)		{//化霜开启时 压缩机不能开启			
@@ -272,16 +275,18 @@ static void CalcInsideTemp(void)
 static void CalcOutsideTemp(void)
 {
 	static u16 count=0;
-	u16 Vad;
-	float temp,Rx;
+	u32 Vad,Rx;
+	s32 temp;
 	count++;
 	if(count>=100)	{//5s计算一次温度
 		count=0;
-		temp = Cal_Vol(ADC_CH4,1);
-		Vad = (u16)(temp*1000);
-		temp = (float)Vad/(5000-Vad);
-		Rx = temp*51000;
-		temp = CalculateTemperature(Rx,10000,3950);
+		Vad = Cal_Vol(ADC_CH4,1);
+		//temp = Vad/(5000-Vad);
+		temp = 5000-Vad;
+		Rx = Vad*51000/temp;
+//		temp = CalculateTemperature(Rx,10000,3950);
+//		sys_status.pTempCtrl->outside_temp = (s8)temp;
+		temp = CalcTemperature(Rx)/100;
 		sys_status.pTempCtrl->outside_temp = (s8)temp;
 	}
 }
@@ -291,17 +296,18 @@ static void CalcOutsideTemp(void)
 static void CalLightSensor(void)
 {
 	static u16 count=0,testcnt=0;
-	u16 Vad,Rx;
-	float temp;
+	u32 Vad,Rx;
+	u32 temp;
 	
 	if(sys_status.light_ctrl_enable)	{//灯控制使能
 			count++;
 			if(count>=20)	{//1s计算一次光敏电阻
 				count=0;
-				temp = Cal_Vol(ADC_CH3,1);
-				Vad = (u16)(temp*1000);
-				temp = (float)(5000-Vad)/Vad;
-				Rx = (u16)(temp*10);//单位k
+				Vad = Cal_Vol(ADC_CH3,1);
+				//Vad = (u16)(temp);
+				temp = (5000-Vad)*10;
+				temp /= Vad;
+				Rx = (u16)(temp);//单位k
 				if(Rx>LIGTH_SENSOR_Rmin && Rx<LIGTH_SENSOR_Rmax)	{//亮电阻
 						testcnt++;
 						if(testcnt>=3)	{//连续3次都是亮电阻 灯灭掉

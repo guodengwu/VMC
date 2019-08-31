@@ -24,7 +24,7 @@ void DecToBCD(u16 Dec, u8 *pBCD, u8 len)
 	}
 	return;
 }
-
+#if 0
 //自己写的log函数
 float MYLOG(float a)
 {
@@ -61,7 +61,7 @@ float CalculateTemperature(float dat,const u16 Rp,const u16 Bx)
 
 	return temp;
 }
-
+#endif
 INT16U crc16(INT8U *dat, INT8U len)
 {
 	INT16U crc=0,j;
