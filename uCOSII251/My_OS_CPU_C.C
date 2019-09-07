@@ -299,7 +299,7 @@ void SystickInitOfTmer0(void) reentrant
 {   
     AUXR&=0X7F;
     TMOD &= 0xF0;
-    TH0  = 0xF8;   //定义Tick=100次/秒(即0.01秒/次),TH,TL值与CPU的频率有关(24M)!!!!!gai!!!!!!
+    TH0  = 0xF8;   //定义Tick=1000次/秒(即0.001秒/次),TH,TL值与CPU的频率有关(24M)!!!!!gai!!!!!!
     TL0  = 0x30;   //OS_CPU_C.C中定时器中断响应UserTickTimer也要设置，OS_CFG.H中OS_TICKS_PER_SEC也有关系
     //ET0  = 1;    //允许T0中断(在第一个任务开始执行时才开时钟中断,否则万一中断系统进入不可知状态)
     TR0  = 1;

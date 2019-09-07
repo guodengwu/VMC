@@ -156,7 +156,7 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				break;
 		}
 		default:
-			sys_status.online_state = DEF_False;
+			//sys_status.online_state = DEF_False;
 			*pAck = MSG_SYSTEM_CMD_NAK;
 			break;
 	}

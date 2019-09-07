@@ -44,7 +44,7 @@ void save_data(void)
 		flash_savedat.type &= ~SAVE_SHIP_RESULT;
 		SaveShipDat.crc16 = SaveShipDat.flag + SaveShipDat.len + crc16(SaveShipDat.buf,SaveShipDat.len);//º∆À„CRC16
 		if(ShipResCRC16_bk != SaveShipDat.crc16)	{
-			BSP_PRINTF("save ship data\r\n");			
+			//BSP_PRINTF("save ship data\r\n");			
 			ShipResCRC16_bk = SaveShipDat.crc16;
 			SaveShipResult((u8 *)&SaveShipDat,sizeof(SaveShipDat),WRITE_BOTH);
 		}		

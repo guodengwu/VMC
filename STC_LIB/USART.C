@@ -25,7 +25,7 @@ void	UART3_Init(COMx_InitDefine *COMx)
 	RingBuffer_Init(&uart3_rxring, RX3_Buffer, 1, COM_RX3_Lenth);
 	//PrintString2("STC15F2K60S2 UART2 Test Prgramme!\r\n");	//SUART2·¢ËÍÒ»¸ö×Ö·û´®
 }
-u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) reentrant
+u8 USART_Configuration(u8 UARTx, COMx_InitDefine *COMx) 
 {
 	u8	i;
 	u32	j;

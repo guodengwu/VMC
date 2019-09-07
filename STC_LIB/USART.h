@@ -4,8 +4,8 @@
 
 #include	"config.h"
 
-#define	COM_TX1_Lenth	20
-#define	COM_RX1_Lenth	20
+#define	COM_TX1_Lenth	40
+#define	COM_RX1_Lenth	40
 #define	COM_TX2_Lenth	30
 #define	COM_RX2_Lenth	30
 #define	COM_TX3_Lenth	60
@@ -73,7 +73,7 @@ extern	u8 	xdata RX1_Buffer[COM_RX1_Lenth];	//接收缓冲
 extern	u8	xdata TX2_Buffer[COM_TX2_Lenth];	//发送缓冲
 extern	u8 	xdata RX2_Buffer[COM_RX2_Lenth];	//接收缓冲
 
-u8	USART_Configuration(u8 UARTx, COMx_InitDefine *COMx)reentrant;
+u8	USART_Configuration(u8 UARTx, COMx_InitDefine *COMx);
 void TX1_write2buff(u8 dat)reentrant;	//写入发送缓冲，指针+1
 void TX2_write2buff(u8 dat)reentrant;	//写入发送缓冲，指针+1
 void TX3_write2buff(char dat) reentrant;

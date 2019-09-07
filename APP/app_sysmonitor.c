@@ -29,19 +29,21 @@ static void SysMonitorInit (void)
 static void SysCheckOnlineState(void)
 {
 	static u16 check_cnt=0,check_timeout=200;
-	
+	u16 asdf;
 	check_cnt++;
 	if(sys_status.online_state == DEF_False)	{//
-		check_timeout=200;//10s上报
+		check_timeout=200;//10s上报		
 	}else if(sys_status.online_state == DEF_True)	{
 		check_timeout=36000;//30min上报
 	}
 	if((check_cnt>=check_timeout)&&(appShip.state == SHIP_STATE_IDLE))	{
 		check_cnt = 0;
+		asdf = sys_status.pTempCtrl->flag;
+		printf("T Ctrl:%d\r\n",asdf);
 		msg_pkt_sysmonitor[0].Src = USART_MSG_RX_TASK;
 		msg_pkt_sysmonitor[0].Cmd = CMD_CheckOnlineStatus;
 		msg_pkt_sysmonitor[0].dLen = 0;
-		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查
+		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查		
 	}
 }
 //上传系统参数
@@ -243,7 +245,7 @@ static void CalcInsideTemp(void)
 		//sys_status.pTempCtrl->inside_temp = (s8)temp;
 		temp = CalcTemperature(Rx)/100;
 		sys_status.pTempCtrl->inside_temp = (s8)temp;
-		printf("Vad:%d, Rx:%d\r\n",Vad,Rx);
+		//printf("Vad:%d, Rx:%d\r\n",Vad,Rx);
 		if((sys_status.pTempCtrl->flag == DEF_True)&&(sys_status.door_state == DOOR_CLOSE))	{//温度控制使能，VMC自动调节温度
 			if(sys_status.pTempCtrl->inside_temp > sys_status.pTempCtrl->tInsideTempH)	{//室内温度大于目标温度最大值，打开压缩机	
 				if(HuaShuangCtrl.runflag == DEF_False)		{//化霜开启时 压缩机不能开启			
@@ -348,7 +350,7 @@ static u8 CopyShipResultFromEEPROM(void)
 		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc16(pSaveShipDat->buf,pSaveShipDat->len);
 		if(calcCRC == pSaveShipDat->crc16)	{//校验数据
 				memcpy((u8 *)&SaveShipDat,(u8 *)pSaveShipDat,sizeof(SaveShipDat));
-				BSP_PRINTF("copy data ok\r\n");
+//				BSP_PRINTF("copy data ok\r\n");
 				return 1;
 		}
 	}
@@ -358,7 +360,7 @@ static u8 CopyShipResultFromEEPROM(void)
 		calcCRC = pSaveShipDat->flag + pSaveShipDat->len + crc16(pSaveShipDat->buf,pSaveShipDat->len);
 		if(calcCRC == pSaveShipDat->crc16)	{
 				memcpy((u8 *)&SaveShipDat,(u8 *)pSaveShipDat,sizeof(SaveShipDat));
-			BSP_PRINTF("copy backup data ok\r\n");
+//			BSP_PRINTF("copy backup data ok\r\n");
 				return 1;
 		}
 	}

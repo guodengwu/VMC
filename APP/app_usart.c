@@ -91,7 +91,7 @@ u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
               //pUsart->rx_crc	 = rx_dat;
               pUsart->rx_idx   = 0;
               pUsart->rx_cnt   = 0;
-							uartrx_starttime = OSTimeGet();
+			  //uartrx_starttime = OSTimeGet();
           }
           break;
 			case IG_RX_STATE_LEN0:                    /* waiting for 'len' low byte                      */
@@ -99,9 +99,9 @@ u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
           pUsart->rx_crc       = rx_dat;
           pUsart->rx_state     = IG_RX_STATE_LEN1;
           break;
-			case IG_RX_STATE_LEN1:   //接收数据包长度信息
+		case IG_RX_STATE_LEN1:   //接收数据包长度信息
           pUsart->rx_len       |= rx_dat;
-					if ((pUsart->rx_len < IG_CMDANDSN_LEN) || (pUsart->rx_len > pUsart->rx_size)) {
+		  if ((pUsart->rx_len < IG_CMDANDSN_LEN) || (pUsart->rx_len > pUsart->rx_size)) {
               pUsart->rx_state = IG_RX_STATE_SD0;/* Can not handle this size ...                    */
               pUsart->rx_err   = IG_MSG_ERR_LENGTH;
           } else {
@@ -137,7 +137,8 @@ u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
       case IG_RX_STATE_DATA: //接收数据包内容
           if (pUsart->rx_cnt < pUsart->rx_size) {
               pUsart->rx_buf[pUsart->rx_cnt++] = rx_dat;
-          }
+          }else
+				usart.rx_state = IG_RX_STATE_SD0;
           pUsart->rx_crc += rx_dat;
           if (pUsart->rx_len <= pUsart->rx_cnt) {//接收数据包完成
               pUsart->rx_state = IG_RX_STATE_CHKSUM;
@@ -145,18 +146,18 @@ u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
           break;
       case IG_RX_STATE_CHKSUM:                 /* waiting for checksum                            */
           if ((pUsart->rx_crc & 0xff) == rx_dat) {
-							pUsart->rx_state = IG_RX_STATE_END;//
+			  pUsart->rx_state = IG_RX_STATE_END;//
           } else {
               pUsart->rx_state = IG_RX_STATE_SD0;
               pUsart->rx_err   = IG_MSG_ERR_CHECKSUM;
           }
           break;
-			case IG_RX_STATE_END:
+	  case IG_RX_STATE_END:
           if (rx_dat != IG_PROTOCOL_RX_END) {   /* End delimiter ?                                 */
               pUsart->rx_err = IG_MSG_ERR_ETX_WORD;             
           }
-          //usart_rx_int_disable(pUsart);
-          ret=TRUE;
+          else
+			ret=TRUE;
           pUsart->rx_state = IG_RX_STATE_SD0;
           break;
       default:
@@ -181,12 +182,12 @@ void message_tx_handler(usart_t *pUsart)
               //SysCommStateLed(LED_ON);
           } else {                                /* If there is nothing to do end transmission      */
               usart_tx_int_disable(pUsart);       /* No more data to send, disable Tx interrupts     */
-             // mutex_unlock(pUsart->lock);
+              mutex_unlock(pUsart->lock);
               //break;
           }
           break;
-			case IG_TX_STATE_LEN0:                    /* Include the packet length in the packet         */
-					tx_dat = (pUsart->tx_len>>8)&0xff;
+	  case IG_TX_STATE_LEN0:                    /* Include the packet length in the packet         */
+		  tx_dat = (pUsart->tx_len>>8)&0xff;
           USART_SendByte(pUsart->Usart, tx_dat);
           pUsart->tx_state  = IG_TX_STATE_LEN1;
           pUsart->tx_crc    = tx_dat;
@@ -245,7 +246,7 @@ void message_tx_handler(usart_t *pUsart)
 					}else	{
 						usart_tx_int_disable(pUsart);       /* No more data to send, disable Tx interrupts     */
 						pUsart->tx_state  = IG_TX_STATE_SD0;
-						//mutex_unlock(pUsart->lock);
+						mutex_unlock(pUsart->lock);
 					}
           break;
 			}
@@ -253,31 +254,31 @@ void message_tx_handler(usart_t *pUsart)
           USART_SendByte(pUsart->Usart, pUsart->tx_crc&0xff);
           pUsart->tx_state  = IG_TX_STATE_END;					
           break;
-			case IG_TX_STATE_END:  //发送校验和
-					USART_SendByte(pUsart->Usart, IG_PROTOCOL_TX_END);
-					usart_tx_int_disable(pUsart);       /* No more data to send, disable Tx interrupts     */
-					pUsart->tx_state  = IG_TX_STATE_SD0;
-					pUsart->tx_len    = 0;
-					//mutex_unlock(pUsart->lock);
-					break;
+		case IG_TX_STATE_END:  //发送校验和
+			USART_SendByte(pUsart->Usart, IG_PROTOCOL_TX_END);
+			usart_tx_int_disable(pUsart);       /* No more data to send, disable Tx interrupts     */
+			pUsart->tx_state  = IG_TX_STATE_SD0;
+			pUsart->tx_len    = 0;
+			mutex_unlock(pUsart->lock);
+			break;
       default:
           pUsart->tx_state  = IG_TX_STATE_SD0;
           pUsart->tx_err    = IG_MSG_ERR_NONE;
 					pUsart->tx_len    = 0;
-					//mutex_unlock(pUsart->lock);
+					mutex_unlock(pUsart->lock);
           //usart_tx_int_disable(pUsart);
           break;
   }
 }
-u8 uart_tx_cmd_bk;
-u8 uart_tx_len_bk;
-u32 uart_tx_sn_bk;
+u8 uart_tx_cmd_bk=0;
+u8 uart_tx_len_bk=0;
+u32 uart_tx_sn_bk=0;
 //数据打包，并启动发送
 void usart_tx_start(/*usart_t *pUsart, */message_pkt_t *pmsg, u8 *SN)
 {
     INT8U len=0;
-		//u8 BCD[4]={0};
-		usart_t *pUsart = &usart;
+	//u8 BCD[4]={0};
+	usart_t *pUsart = &usart;
 
     //mutex_lock(pUsart->lock);
     pUsart->tx_buf[0] = pmsg->Cmd;//返回码
@@ -289,29 +290,29 @@ void usart_tx_start(/*usart_t *pUsart, */message_pkt_t *pmsg, u8 *SN)
 		BCD[0] = (uart_tx_sn>>24)&0xff;*/
 		//uart_tx_sn_bk = uart_tx_sn;
 		//uart_tx_sn++;
-		memcpy(pUsart->tx_buf+1, SN, 4);
+	memcpy(pUsart->tx_buf+1, SN, 4);
     if ((len>0)&&(len<USART_TX_BUFF_SIZE-IG_CMDANDSN_LEN)) {
         memcpy(pUsart->tx_buf + IG_CMDANDSN_LEN, pmsg->Data, len);
     }
     pUsart->tx_len = len + IG_CMDANDSN_LEN;
-		uart_tx_len_bk = pUsart->tx_len;
+	uart_tx_len_bk = pUsart->tx_len;
     usart_tx_int_enable(pUsart);//enable uart tx
 }
 //ACK
 static void UsartSendAck (message_pkt_t *pMsg, INT8U ack)
 {
-		static u8 ack_code;
-		usart_t *pUsart = &usart;
+	static u8 ack_code;
+	usart_t *pUsart = &usart;
 	
-		if(ack==MSG_SYSTEM_CMD_NONE)	{//不需要回复ACK
-			BSP_PRINTF("ack none\r\n");
-			return;
-		}
-		ack_code = ack;
-		pMsg->Src = USART_MSG_ACK_TASK;
-		pMsg->Data   = &ack_code;
+	if(ack==MSG_SYSTEM_CMD_NONE)	{//不需要回复ACK
+		BSP_PRINTF("ack none\r\n");
+		return;
+	}
+	ack_code = ack;
+	pMsg->Src = USART_MSG_ACK_TASK;
+	pMsg->Data   = &ack_code;
     pMsg->dLen= 1;
-		OSQPost(usart.Str_Q, pMsg);
+	OSQPost(usart.Str_Q, pMsg);
 		//mutex_lock(pUsart->lock);
     /*pUsart->tx_buf[0] = pMsg->Cmd;//返回码
     len = 1;
@@ -343,39 +344,38 @@ static void UsartSendError (message_pkt_t *pMsg, INT16U err)
 static  void  UsartCmdParsePkt (usart_t *pUsart)
 {
     INT8U cmd,ACK,ret = MSG_FEEDBACK_DISABLE;   
-    
-    msg_pkt_usart[0].Src = USART_MSG_RX_TASK;
-    msg_pkt_usart[1].Src = USART_MSG_RX_TASK;
-    cmd = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);           /* First byte contains command      */
-		uart_rx_sn.ubyte[0] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-		uart_rx_sn.ubyte[1] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-		uart_rx_sn.ubyte[2] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-		uart_rx_sn.ubyte[3] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 
     if (pUsart->rx_err == IG_MSG_ERR_NONE) {
         msg_pkt_usart[0].Cmd = cmd;
         msg_pkt_usart[1].Cmd = cmd;
     } else {
-				BSP_PRINTF("rx err %d\r\n",pUsart->rx_err);
+		BSP_PRINTF("rx err %d\r\n",pUsart->rx_err);
         pUsart->rx_err = IG_MSG_ERR_NONE;        // clear rx error
-				UsartSendAck(&msg_pkt_usart[1], MSG_SYSTEM_CMD_NAK);//数据解析错误 反馈NAK
+		//UsartSendAck(&msg_pkt_usart[1], MSG_SYSTEM_CMD_NAK);//数据解析错误 反馈NAK
         return;
     }
-		//OSSemPost(usart.ack_sem);BSP_PRINTF("cmd:%x ",cmd);
-		if((cmd == CMD_ReportParam/*||cmd == CMD_ReportError*/||cmd == CMD_ReportShipResult)/* && UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)==MSG_SYSTEM_CMD_ACK*/)	{//server ack package				
-				if(SaveShipDat.flag == DEF_True)	{
-					SaveShipDat.flag = DEF_False;
-					SaveShipDat.len = 0;					
-					flash_savedat.type |= SAVE_SHIP_RESULT;
-				}
-				//BSP_PRINTF("rx ack\r\n");
-				OSSemPost(usart.ack_sem);
-				return;
-		}else	{
-			ret = protocol_process(pUsart,msg_pkt_usart,&ACK);//协议解析
-			OSSemPost(usart.ack_sem);
-			UsartSendAck(&msg_pkt_usart[1], ACK);		
+	msg_pkt_usart[0].Src = USART_MSG_RX_TASK;
+    msg_pkt_usart[1].Src = USART_MSG_RX_TASK;
+    cmd = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);           /* First byte contains command      */
+	uart_rx_sn.ubyte[0] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+	uart_rx_sn.ubyte[1] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+	uart_rx_sn.ubyte[2] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+	uart_rx_sn.ubyte[3] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+	//OSSemPost(usart.ack_sem);BSP_PRINTF("cmd:%x ",cmd);
+	if((cmd == CMD_ReportParam/*||cmd == CMD_ReportError*/||cmd == CMD_ReportShipResult)/* && UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx)==MSG_SYSTEM_CMD_ACK*/)	{//server ack package				
+		if(SaveShipDat.flag == DEF_True)	{
+			SaveShipDat.flag = DEF_False;
+			SaveShipDat.len = 0;					
+			flash_savedat.type |= SAVE_SHIP_RESULT;
 		}
+		//BSP_PRINTF("rx ack\r\n");
+		OSSemPost(usart.ack_sem);
+		return;
+	}else	{
+		ret = protocol_process(pUsart,msg_pkt_usart,&ACK);//协议解析
+		OSSemPost(usart.ack_sem);
+		UsartSendAck(&msg_pkt_usart[1], ACK);		
+	}
 		//if(ret==MSG_FEEDBACK_ENABLE)	{
 			//OSMboxPost(pUsart->mbox, &msg_pkt_usart[1]);
 		//}
@@ -416,9 +416,9 @@ static void UsartInit (void)
 		usart.Usart 			 = USART1;
     usart.lock         = OSSemCreate(1);
     usart.sem          = OSSemCreate(0);
-		usart.ack_sem			 = OSSemCreate(0);
+	usart.ack_sem			 = OSSemCreate(0);
     //usart.mbox         = OSMboxCreate((void *)0);
-		usart.Str_Q 			 = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
+	usart.Str_Q 			 = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
 		
     usart.rx_state     = IG_RX_STATE_SD0;
     usart.rx_idx       = 0;
@@ -429,7 +429,7 @@ static void UsartInit (void)
     usart.rx_err       = IG_MSG_ERR_NONE;
     usart.rx_buf       = usart_rx_buf;
   
-		usart.tx_state     = IG_TX_STATE_SD0;
+	usart.tx_state     = IG_TX_STATE_SD0;
     usart.tx_idx       = 0;
     usart.tx_len       = 0;
     usart.tx_size      = USART_TX_BUFF_SIZE;
@@ -447,7 +447,7 @@ extern RINGBUFF_T uart1_rxring;
 static void AppUsartRxTask(void *parg)
 {
     INT8U err,rxdat;
-		u32 time_diff;
+	//u32 time_diff;
     parg = parg;
 	   		
     while (DEF_True)
@@ -455,23 +455,23 @@ static void AppUsartRxTask(void *parg)
         OSSemPend(usart.sem, 0, &err);
         if(err==OS_NO_ERR)    {
           if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    {		
-						uartrx_endtime = OSTimeGet();
-						if(uartrx_endtime >= uartrx_starttime)
-									time_diff = uartrx_endtime - uartrx_starttime;
-						else
-									time_diff = (0xffffffff - uartrx_starttime) + uartrx_endtime;
-						if(time_diff>500)	{//接收超时500ms
-							usart.rx_state = IG_RX_STATE_SD0;
-							//BSP_PRINTF("rx timeout\r\n");
-						}
-            if(message_rx_handler(&usart, rxdat))  {
-              UsartCmdParsePkt(&usart);       
-            }
-          }
+				/*uartrx_endtime = OSTimeGet();
+				if(uartrx_endtime >= uartrx_starttime)
+					time_diff = uartrx_endtime - uartrx_starttime;
+				else
+					time_diff = (0xffffffff - uartrx_starttime) + uartrx_endtime;
+				if(time_diff>500)	{//接收超时500ms
+					usart.rx_state = IG_RX_STATE_SD0;
+					//BSP_PRINTF("rx timeout\r\n");
+				}*/
+				if(message_rx_handler(&usart, rxdat))  {
+					UsartCmdParsePkt(&usart);       
 				}
+			}
+		}
     }
 }
-
+u8 BCD[4];
 static void SendDataToServer(message_pkt_t *pmsg)
 {
 	INT8U err;
@@ -479,8 +479,7 @@ static void SendDataToServer(message_pkt_t *pmsg)
 	mutex_lock(usart.lock);
 	OSSemSet(usart.ack_sem, 0, &err);//清空信号量//OSSemAccept(usart.ack_sem);
 	uart_tx_cmd_bk = pmsg->Cmd;
-	if(pmsg->Src==USART_MSG_RX_TASK)	{
-		u8 BCD[4];
+	if(pmsg->Src==USART_MSG_RX_TASK)	{	
 		BCD[3] = uart_tx_sn&0xff;
 		BCD[2] = (uart_tx_sn>>8)&0xff;
 		BCD[1] = (uart_tx_sn>>16)&0xff;
@@ -488,7 +487,7 @@ static void SendDataToServer(message_pkt_t *pmsg)
 		usart_tx_start(pmsg,BCD);
 		uart_tx_sn_bk = uart_tx_sn;
 		uart_tx_sn++;
-		OSSemPend(usart.ack_sem, 3000, &err);//等待从板回复1s
+		OSSemPend(usart.ack_sem, 5000, &err);//等待从板回复1s
 		if(err==OS_TIMEOUT)    {//回复超时，重发3次
 			sys_status.online_state = DEF_False;
 			//OSQFlush(usart.Str_Q);
@@ -501,9 +500,9 @@ static void SendDataToServer(message_pkt_t *pmsg)
 		}
 	}else if(pmsg->Src==USART_MSG_ACK_TASK)	{
 		usart_tx_start(pmsg,uart_rx_sn.ubyte);
-		OSTimeDlyHMSM(0,0,0,120); 
+		//OSTimeDly(120); //300ms
 	}
-	mutex_unlock(usart.lock);
+	//mutex_unlock(usart.lock);
 }
 /*******************************************************************************************************
 *                                              Usart发送任务
@@ -511,7 +510,7 @@ static void SendDataToServer(message_pkt_t *pmsg)
 static void AppUsartTxTask(void *parg)
 {
     INT8U err;
-    message_pkt_t *msg;
+    static message_pkt_t *msg;
     parg = parg;
 
     UsartInit();
