@@ -49,7 +49,7 @@ u32 uart_tx_sn=0;
 struct uart_rx_sn_t	{
 	u8 ubyte[4];
 }uart_rx_sn;
-static u32 uartrx_starttime,uartrx_endtime;
+static u32 uartrx_starttime=0,uartrx_endtime=0;
 /*
 *********************************************************************************************************
 *                                        LOCAL FUNCTION PROTOTYPES
@@ -91,7 +91,7 @@ void message_rx_handler(usart_t *pUsart, INT8U rx_dat)
               //pUsart->rx_crc	 = rx_dat;
               pUsart->rx_idx   = 0;
               pUsart->rx_cnt   = 0;
-			  //uartrx_starttime = OSTimeGet();
+			  uartrx_starttime = OSTimeGet();
           }
           break;
 			case IG_RX_STATE_LEN0:                    /* waiting for 'len' low byte                      */
@@ -449,16 +449,23 @@ static void UsartInit (void)
 static void AppUsartRxTask(void *parg)
 {
     INT8U err;
-	//u32 time_diff;
+	u32 time_diff;
     parg = parg;
 	   		
     while (DEF_True)
     {
-        OSSemPend(usart.sem, 0, &err);
+        OSSemPend(usart.sem, 100, &err);
         if(err==OS_NO_ERR)    {
           //if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    
 			{		
-				/*uartrx_endtime = OSTimeGet();
+				//if(message_rx_handler(&usart, rxdat))  
+				{
+					UsartCmdParsePkt(&usart);       
+				}
+			}
+		}else if(err==OS_TIMEOUT)	{
+			if(usart.rx_state != IG_RX_STATE_SD0)	{
+				uartrx_endtime = OSTimeGet();
 				if(uartrx_endtime >= uartrx_starttime)
 					time_diff = uartrx_endtime - uartrx_starttime;
 				else
@@ -466,10 +473,6 @@ static void AppUsartRxTask(void *parg)
 				if(time_diff>500)	{//Ω” ’≥¨ ±500ms
 					usart.rx_state = IG_RX_STATE_SD0;
 					//BSP_PRINTF("rx timeout\r\n");
-				}*/
-				//if(message_rx_handler(&usart, rxdat))  
-				{
-					UsartCmdParsePkt(&usart);       
 				}
 			}
 		}
