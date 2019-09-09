@@ -16,7 +16,7 @@ RINGBUFF_T uart3_rxring;
 void	UART1_Init(COMx_InitDefine *COMx)
 {
 	USART_Configuration(USART1, COMx);		//初始化串口2 USART1,USART2
-	RingBuffer_Init(&uart1_rxring, RX1_Buffer, 1, COM_RX1_Lenth);
+	//RingBuffer_Init(&uart1_rxring, RX1_Buffer, 1, COM_RX1_Lenth);
 	//PrintString2("STC15F2K60S2 UART2 Test Prgramme!\r\n");	//SUART2发送一个字符串
 }
 void	UART3_Init(COMx_InitDefine *COMx)
@@ -292,8 +292,9 @@ void UART1_int (void) interrupt UART1_VECTOR
 	{
 		RI = 0;
 		rxdat = SBUF;
-		RingBuffer_Insert(&uart1_rxring, &rxdat);
-		OSSemPost(usart.sem);
+		//RingBuffer_Insert(&uart1_rxring, &rxdat);
+		if (usart.rx_indicate != NULL) usart.rx_indicate(&usart, rxdat);
+		//OSSemPost(usart.sem);
 	}
 
 	if(TI)

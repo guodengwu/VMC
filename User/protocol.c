@@ -30,18 +30,18 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 						if(appShip.state == SHIP_STATE_IDLE)	{//空闲 同意出货
 								memcpy(sys_status.pIMEI->dat, pUsart->rx_buf+pUsart->rx_idx, len);//获取订单号
 								sys_status.pIMEI->len = len;
-								msg[0].Src = MSG_START_SHIP;
-								OSMboxPost(appShip.MBox, &msg[0]);//启动出货控制任务
+								msg[1].Src = MSG_START_SHIP;
+								OSMboxPost(appShip.MBox, &msg[1]);//启动出货控制任务
 								*pAck = MSG_SYSTEM_CMD_ACK;
 								break;
 						}else	{//当前忙 通知出货结果 忙								
 								data_buf[0] = (motor.row<<4)|motor.col;	
 								data_buf[1] = SHIP_BUSY;
 								memcpy(data_buf+2, sys_status.pIMEI->dat, sys_status.pIMEI->len);//拷贝订单号
-								msg[0].Src = USART_MSG_RX_TASK;
-								msg[0].Data = data_buf;
-								msg[0].dLen = 2 + sys_status.pIMEI->len;
-								OSQPost(usart.Str_Q, &msg[0]);
+								msg[1].Src = USART_MSG_RX_TASK;
+								msg[1].Data = data_buf;
+								msg[1].dLen = 2 + sys_status.pIMEI->len;
+								OSQPost(usart.Str_Q, &msg[1]);
 						}
 				}
 			}
@@ -55,8 +55,8 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 			temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 			if(temp==0)	{
 					sys_status.online_state = DEF_True;
-					msg[0].Src = MSG_SYS_ONLINE;
-					OSMboxPost(sysMonitor.Mbox, &msg[0]);
+					msg[1].Src = MSG_SYS_ONLINE;
+					OSMboxPost(sysMonitor.Mbox, &msg[1]);
 					
 			}else if(temp==1)	{
 					sys_status.online_state = DEF_False;
@@ -147,8 +147,8 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 				*pAck = MSG_SYSTEM_CMD_ACK;
 				temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 				if(temp==0)	{
-					msg[0].Src = MSG_SYSTEM_RESTART;
-					OSMboxPost(sysMonitor.Mbox, &msg[0]);
+					msg[1].Src = MSG_SYSTEM_RESTART;
+					OSMboxPost(sysMonitor.Mbox, &msg[1]);
 				}else if(temp==1)	{
 				}else	{
 					*pAck = MSG_SYSTEM_CMD_NAK;

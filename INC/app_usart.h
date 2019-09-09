@@ -78,7 +78,7 @@ typedef struct _usart {
     INT8U              rx_crc;
     INT16U              rx_err;
     INT8U              *rx_buf;
-    u8 (*rx_indicate)(struct _usart *pUsart, INT8U rx_dat);
+    void (*rx_indicate)(struct _usart *pUsart, INT8U rx_dat);
 
     INT8U               tx_state;
     INT8U              tx_idx;

@@ -25,7 +25,7 @@ static void WatchDogEnable(void)
 {
 //  WDT_CONTR = 0x23;                           //使能看门狗,溢出时间约为0.5s
     WDT_CONTR = 0x25;                           //使能看门狗,溢出时间约为1s
-//  WDT_CONTR = 0x27;                           //使能看门狗,溢出时间约为8s
+//  WDT_CONTR = 0x6f;                           //使能看门狗,溢出时间约为3s
 }
 
 static void WatchDogFeed(void)
@@ -35,10 +35,10 @@ static void WatchDogFeed(void)
 
 void	DisplayUI(void)
 {
-	static u8 count=0;
+	static u16 count=0;
 	
 	count++;
-	if(count>=100)	{
+	if(count>=30)	{
 		count = 0;
 		 /*if(display_t.ui_flag==UI_MOTORNUM)	{
 			display_t.ui_flag=UI_INSIDETEMP;
@@ -69,10 +69,11 @@ static void AppDisplayTask(void *parg)
 	BEEP=0;
 	//Ext_Enable(EXT_INT0);
 	BSP_PRINTF("SYS Startup...\r\n");
+	WatchDogEnable();
 	
 	while (DEF_True)
 	{
-		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 30, &err);//系統tick 10ms
+		msg = (message_pkt_t *)OSMboxPend(display_t.mbox, 100, &err);//系統tick 1ms
 		if(err==OS_NO_ERR)	{
 			
 		}else if(err==OS_TIMEOUT)	{//3s 切换数码管显示内容

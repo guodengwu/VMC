@@ -56,7 +56,7 @@ static u32 uartrx_starttime,uartrx_endtime;
 *********************************************************************************************************
 */
 
-u8 message_rx_handler  (usart_t *pUsart, INT8U rx_dat);
+void message_rx_handler  (usart_t *pUsart, INT8U rx_dat);
 void message_tx_handler  (usart_t *pUsart);
 static void UsartCmdParsePkt    (usart_t *pUsart);
 static void AppUsartRxTask      (void *parg);
@@ -80,9 +80,9 @@ void USART_SendBuf(USART_TypeDef *handle,INT8U *buf,INT8U len)
 /*******************************************************************************************************
 *
 ********************************************************************************************************/
-u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
+void message_rx_handler(usart_t *pUsart, INT8U rx_dat)
 { 
-  u8 ret=FALSE;
+  //u8 ret=FALSE;
   
   switch (pUsart->rx_state) {
       case IG_RX_STATE_SD0:                     /* waiting for start first  start delimiter (SD0)  */
@@ -157,7 +157,8 @@ u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
               pUsart->rx_err = IG_MSG_ERR_ETX_WORD;             
           }
           else
-			ret=TRUE;
+			  OSSemPost(usart.sem);
+			//ret=TRUE;
           pUsart->rx_state = IG_RX_STATE_SD0;
           break;
       default:
@@ -165,7 +166,7 @@ u8 message_rx_handler(usart_t *pUsart, INT8U rx_dat)
           pUsart->rx_err   = IG_MSG_ERR_STATE;
           break;
   }
-  return ret;
+  //return ret;
 }
 //单字节发送数据，被uart中断调用
 void message_tx_handler(usart_t *pUsart)
@@ -291,7 +292,7 @@ void usart_tx_start(/*usart_t *pUsart, */message_pkt_t *pmsg, u8 *SN)
 		//uart_tx_sn_bk = uart_tx_sn;
 		//uart_tx_sn++;
 	memcpy(pUsart->tx_buf+1, SN, 4);
-    if ((len>0)&&(len<USART_TX_BUFF_SIZE-IG_CMDANDSN_LEN)) {
+    if ((len>0)&&len<(USART_TX_BUFF_SIZE-IG_CMDANDSN_LEN)) {
         memcpy(pUsart->tx_buf + IG_CMDANDSN_LEN, pmsg->Data, len);
     }
     pUsart->tx_len = len + IG_CMDANDSN_LEN;
@@ -308,11 +309,13 @@ static void UsartSendAck (message_pkt_t *pMsg, INT8U ack)
 		BSP_PRINTF("ack none\r\n");
 		return;
 	}
+	mutex_lock(pUsart->lock);
 	ack_code = ack;
 	pMsg->Src = USART_MSG_ACK_TASK;
 	pMsg->Data   = &ack_code;
     pMsg->dLen= 1;
-	OSQPost(usart.Str_Q, pMsg);
+	//OSQPost(usart.Str_Q, pMsg);
+	usart_tx_start(pMsg,uart_rx_sn.ubyte);
 		//mutex_lock(pUsart->lock);
     /*pUsart->tx_buf[0] = pMsg->Cmd;//返回码
     len = 1;
@@ -343,20 +346,19 @@ static void UsartSendError (message_pkt_t *pMsg, INT16U err)
 */
 static  void  UsartCmdParsePkt (usart_t *pUsart)
 {
-    INT8U cmd,ACK,ret = MSG_FEEDBACK_DISABLE;   
+    INT8U cmd=0,ACK,ret = MSG_FEEDBACK_DISABLE;   
 
-    if (pUsart->rx_err == IG_MSG_ERR_NONE) {
-        msg_pkt_usart[0].Cmd = cmd;
-        msg_pkt_usart[1].Cmd = cmd;
-    } else {
-		BSP_PRINTF("rx err %d\r\n",pUsart->rx_err);
+	if (pUsart->rx_err != IG_MSG_ERR_NONE) {
+		//BSP_PRINTF("rx err %d\r\n",pUsart->rx_err);
         pUsart->rx_err = IG_MSG_ERR_NONE;        // clear rx error
 		//UsartSendAck(&msg_pkt_usart[1], MSG_SYSTEM_CMD_NAK);//数据解析错误 反馈NAK
         return;
     }
 	msg_pkt_usart[0].Src = USART_MSG_RX_TASK;
     msg_pkt_usart[1].Src = USART_MSG_RX_TASK;
-    cmd = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);           /* First byte contains command      */
+    cmd = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+	msg_pkt_usart[0].Cmd = cmd;
+    msg_pkt_usart[1].Cmd = cmd;
 	uart_rx_sn.ubyte[0] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 	uart_rx_sn.ubyte[1] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 	uart_rx_sn.ubyte[2] = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
@@ -372,9 +374,9 @@ static  void  UsartCmdParsePkt (usart_t *pUsart)
 		OSSemPost(usart.ack_sem);
 		return;
 	}else	{
-		ret = protocol_process(pUsart,msg_pkt_usart,&ACK);//协议解析
+		ret = protocol_process(pUsart, msg_pkt_usart, &ACK);//协议解析
 		OSSemPost(usart.ack_sem);
-		UsartSendAck(&msg_pkt_usart[1], ACK);		
+		UsartSendAck(&msg_pkt_usart[0], ACK);		
 	}
 		//if(ret==MSG_FEEDBACK_ENABLE)	{
 			//OSMboxPost(pUsart->mbox, &msg_pkt_usart[1]);
@@ -436,17 +438,17 @@ static void UsartInit (void)
     usart.tx_crc       = 0;
     usart.tx_err       = IG_MSG_ERR_NONE;
     usart.tx_buf       = usart_tx_buf;
-    //usart.rx_indicate  = &message_rx_handler;
+    usart.rx_indicate  = &message_rx_handler;
     usart.tx_complete  = &message_tx_handler;
 }
-extern RINGBUFF_T uart1_rxring;
+//extern RINGBUFF_T uart1_rxring;
 //extern RINGBUFF_T uart3_rxring;
 /*******************************************************************************************************
 *                                              Usart接收任务
 ********************************************************************************************************/
 static void AppUsartRxTask(void *parg)
 {
-    INT8U err,rxdat;
+    INT8U err;
 	//u32 time_diff;
     parg = parg;
 	   		
@@ -454,7 +456,8 @@ static void AppUsartRxTask(void *parg)
     {
         OSSemPend(usart.sem, 0, &err);
         if(err==OS_NO_ERR)    {
-          if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    {		
+          //if(RingBuffer_Pop(&uart1_rxring, (INT8U *)&rxdat))    
+			{		
 				/*uartrx_endtime = OSTimeGet();
 				if(uartrx_endtime >= uartrx_starttime)
 					time_diff = uartrx_endtime - uartrx_starttime;
@@ -464,7 +467,8 @@ static void AppUsartRxTask(void *parg)
 					usart.rx_state = IG_RX_STATE_SD0;
 					//BSP_PRINTF("rx timeout\r\n");
 				}*/
-				if(message_rx_handler(&usart, rxdat))  {
+				//if(message_rx_handler(&usart, rxdat))  
+				{
 					UsartCmdParsePkt(&usart);       
 				}
 			}
@@ -498,10 +502,10 @@ static void SendDataToServer(message_pkt_t *pmsg)
 				flash_savedat.type |= SAVE_SHIP_RESULT;
 			}
 		}
-	}else if(pmsg->Src==USART_MSG_ACK_TASK)	{
+	}/*else if(pmsg->Src==USART_MSG_ACK_TASK)	{
 		usart_tx_start(pmsg,uart_rx_sn.ubyte);
-		//OSTimeDly(120); //300ms
-	}
+		OSTimeDly(120); //300ms
+	}*/
 	//mutex_unlock(usart.lock);
 }
 /*******************************************************************************************************
@@ -514,7 +518,7 @@ static void AppUsartTxTask(void *parg)
     parg = parg;
 
     UsartInit();
-		ES = 1;
+	ES = 1;
 
     while (DEF_True)
     {
