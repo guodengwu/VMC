@@ -34,7 +34,7 @@ C*******************************************************************************
 *********************************************************************************************************
 */
 #define USART_Q_SIZE    10
-#define N_MESSAGES			10
+//#define N_MESSAGES			10
 usart_t      usart;
 
 OS_STK   xdata   AppUsartRxStk       [APP_TASK_USART_RX_STK_SIZE+1];           // Usart接收任务堆栈
@@ -42,14 +42,14 @@ OS_STK   xdata   AppUsartTxStk       [APP_TASK_USART_TX_STK_SIZE+1];           /
  INT8U  xdata     usart_rx_buf        [USART_RX_BUFF_SIZE];
  INT8U  xdata     usart_tx_buf        [USART_TX_BUFF_SIZE];
 static  INT8U       data_buf       [USART_RX_BUFF_SIZE];
-void    *MyArrayOfMsg[N_MESSAGES];//消息队列数组
+//void    *MyArrayOfMsg[N_MESSAGES];//消息队列数组
 static  message_pkt_t    msg_pkt_usart[2];
 //static BIT32 uart_rx_sn;
 u32 uart_tx_sn=0;
 struct uart_rx_sn_t	{
 	u8 ubyte[4];
 }uart_rx_sn;
-static u32 uartrx_starttime=0,uartrx_endtime=0;
+//u32 uartrx_starttime=0,uartrx_endtime=0;
 /*
 *********************************************************************************************************
 *                                        LOCAL FUNCTION PROTOTYPES
@@ -91,7 +91,7 @@ void message_rx_handler(usart_t *pUsart, INT8U rx_dat)
               //pUsart->rx_crc	 = rx_dat;
               pUsart->rx_idx   = 0;
               pUsart->rx_cnt   = 0;
-			  uartrx_starttime = OSTimeGet();
+//			  uartrx_starttime = OSTimeGet();
           }
           break;
 			case IG_RX_STATE_LEN0:                    /* waiting for 'len' low byte                      */
@@ -306,7 +306,7 @@ static void UsartSendAck (message_pkt_t *pMsg, INT8U ack)
 	usart_t *pUsart = &usart;
 	
 	if(ack==MSG_SYSTEM_CMD_NONE)	{//不需要回复ACK
-		BSP_PRINTF("ack none\r\n");
+//		BSP_PRINTF("ack none\r\n");
 		return;
 	}
 	mutex_lock(pUsart->lock);
@@ -314,7 +314,7 @@ static void UsartSendAck (message_pkt_t *pMsg, INT8U ack)
 	pMsg->Src = USART_MSG_ACK_TASK;
 	pMsg->Data   = &ack_code;
     pMsg->dLen= 1;
-	//OSQPost(usart.Str_Q, pMsg);
+	//OSMboxPost(usart., pMsg);
 	usart_tx_start(pMsg,uart_rx_sn.ubyte);
 		//mutex_lock(pUsart->lock);
     /*pUsart->tx_buf[0] = pMsg->Cmd;//返回码
@@ -419,8 +419,8 @@ static void UsartInit (void)
     usart.lock         = OSSemCreate(1);
     usart.sem          = OSSemCreate(0);
 	usart.ack_sem			 = OSSemCreate(0);
-    //usart.mbox         = OSMboxCreate((void *)0);
-	usart.Str_Q 			 = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
+    usart.MBox         = OSMboxCreate((void *)0);
+//	usart.Str_Q 			 = OSQCreate(&MyArrayOfMsg[0],N_MESSAGES);//
 		
     usart.rx_state     = IG_RX_STATE_SD0;
     usart.rx_idx       = 0;
@@ -443,13 +443,13 @@ static void UsartInit (void)
 }
 //extern RINGBUFF_T uart1_rxring;
 //extern RINGBUFF_T uart3_rxring;
+u16 time_diff=0;
 /*******************************************************************************************************
 *                                              Usart接收任务
 ********************************************************************************************************/
 static void AppUsartRxTask(void *parg)
 {
     INT8U err;
-	u32 time_diff;
     parg = parg;
 	   		
     while (DEF_True)
@@ -465,15 +465,19 @@ static void AppUsartRxTask(void *parg)
 			}
 		}else if(err==OS_TIMEOUT)	{
 			if(usart.rx_state != IG_RX_STATE_SD0)	{
-				uartrx_endtime = OSTimeGet();
+				/*uartrx_endtime = OSTimeGet();
 				if(uartrx_endtime >= uartrx_starttime)
 					time_diff = uartrx_endtime - uartrx_starttime;
 				else
-					time_diff = (0xffffffff - uartrx_starttime) + uartrx_endtime;
-				if(time_diff>500)	{//接收超时500ms
+					time_diff = (0xffffffff - uartrx_starttime) + uartrx_endtime;*/
+				time_diff ++;
+				if(time_diff>10)	{//接收超时500ms
+					time_diff = 0;
 					usart.rx_state = IG_RX_STATE_SD0;
 					//BSP_PRINTF("rx timeout\r\n");
 				}
+			}else	{
+				time_diff = 0;
 			}
 		}
     }
@@ -525,7 +529,7 @@ static void AppUsartTxTask(void *parg)
 
     while (DEF_True)
     {
-        msg = (message_pkt_t *)OSQPend(usart.Str_Q, 0, &err);
+        msg = (message_pkt_t *)OSMboxPend(usart.MBox, 0, &err);
         if(err==OS_NO_ERR)    {
             //if(msg->Src==USART_MSG_RX_TASK)     {
                 SendDataToServer(msg);

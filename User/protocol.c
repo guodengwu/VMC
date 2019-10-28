@@ -39,9 +39,10 @@ u8 protocol_process(usart_t *pUsart,message_pkt_t msg[2], u8 *pAck)
 								data_buf[1] = SHIP_BUSY;
 								memcpy(data_buf+2, sys_status.pIMEI->dat, sys_status.pIMEI->len);//¿½±´¶©µ¥ºÅ
 								msg[1].Src = USART_MSG_RX_TASK;
+								msg[1].Cmd = CMD_ReportShipResult;
 								msg[1].Data = data_buf;
 								msg[1].dLen = 2 + sys_status.pIMEI->len;
-								OSQPost(usart.Str_Q, &msg[1]);
+								OSMboxPost(usart.MBox, &msg[1]);
 						}
 				}
 			}

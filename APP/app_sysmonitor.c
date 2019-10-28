@@ -29,7 +29,7 @@ static void SysMonitorInit (void)
 static void SysCheckOnlineState(void)
 {
 	static u16 check_cnt=0,check_timeout=200;
-	u16 asdf;
+	//u16 asdf;
 	check_cnt++;
 	if(sys_status.online_state == DEF_False)	{//
 		check_timeout=200;//10s上报		
@@ -38,12 +38,12 @@ static void SysCheckOnlineState(void)
 	}
 	if((check_cnt>=check_timeout)&&(appShip.state == SHIP_STATE_IDLE))	{
 		check_cnt = 0;
-		asdf = sys_status.pTempCtrl->flag;
-		printf("T Ctrl:%d\r\n",asdf);
+		//asdf = sys_status.pTempCtrl->flag;
+		//printf("T Ctrl:%d\r\n",asdf);
 		msg_pkt_sysmonitor[0].Src = USART_MSG_RX_TASK;
 		msg_pkt_sysmonitor[0].Cmd = CMD_CheckOnlineStatus;
 		msg_pkt_sysmonitor[0].dLen = 0;
-		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查		
+		OSMboxPost(usart.MBox, &msg_pkt_sysmonitor[0]);//请求网络检查		
 	}
 }
 //上传系统参数
@@ -63,7 +63,7 @@ static u8 UploadSysParam(void)
 		data_buf[len++] = !HuaShuangCtrl.enable;//化霜设置开关
 		msg_pkt_sysmonitor[0].Data = (u8 *)data_buf;
 		msg_pkt_sysmonitor[0].dLen = len;
-		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[0]);//请求网络检查
+		OSMboxPost(usart.MBox, &msg_pkt_sysmonitor[0]);//请求网络检查
 		return 1;
 	}
 	else if(sys_status.online_state == DEF_False)	{
@@ -106,7 +106,7 @@ static u8 ReportSysError(void)
 		data_buf_2[len++] = 0;//
 		msg_pkt_sysmonitor[2].dLen = len;
 		msg_pkt_sysmonitor[2].Data = (u8 *)data_buf_2;
-		OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[2]);//请求网络检查
+		OSMboxPost(usart.MBox, &msg_pkt_sysmonitor[2]);//请求网络检查
 		return 1;
 	}else	{
 		return 0;
@@ -334,7 +334,7 @@ static void UploadShipResult(void)
 			msg_pkt_sysmonitor[1].Cmd = CMD_ReportShipResult;
 			msg_pkt_sysmonitor[1].Data = SaveShipDat.buf;
 			msg_pkt_sysmonitor[1].dLen = SaveShipDat.len;
-			OSQPost(usart.Str_Q, &msg_pkt_sysmonitor[1]);//反馈出货结果
+			OSMboxPost(usart.MBox, &msg_pkt_sysmonitor[1]);//反馈出货结果
 	}
 }
 static u8 CopyShipResultFromEEPROM(void)	
@@ -366,6 +366,18 @@ static u8 CopyShipResultFromEEPROM(void)
 	}
 	return 0;
 }
+
+static void WatchDogEnable(void)
+{
+//  WDT_CONTR = 0x23;                           //使能看门狗,溢出时间约为0.5s
+    WDT_CONTR = 0x25;                           //使能看门狗,溢出时间约为1s
+//  WDT_CONTR = 0x6f;                           //使能看门狗,溢出时间约为3s
+}
+
+static void WatchDogFeed(void)
+{
+	 WDT_CONTR |= 0x10; //清看门狗,否则系统复位
+}
 //static u8 startup_flag;
 static void SysMonitorTask(void *parg)
 {
@@ -375,6 +387,7 @@ static void SysMonitorTask(void *parg)
 	
 	SysMonitorInit();
 	CopyShipResultFromEEPROM();
+	WatchDogEnable();
 //	printf("sys startup.\r\n");
 	while (DEF_True)
 	{
@@ -398,8 +411,8 @@ static void SysMonitorTask(void *parg)
 				CalcInsideTemp();
 				CalcOutsideTemp();
 				CalLightSensor();
-				//CheckMotorMoveState();//电机运转状态检测			
-				save_data();
+				//CheckMotorMoveState();//电机运转状态检测	
+				WatchDogFeed();			
 		}
 	}
 }

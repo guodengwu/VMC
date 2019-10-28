@@ -21,18 +21,6 @@ static void DisDataInit(void)
 	display_t.ui_flag = UI_OUTSIDETEMP;
 }
 
-static void WatchDogEnable(void)
-{
-//  WDT_CONTR = 0x23;                           //使能看门狗,溢出时间约为0.5s
-    WDT_CONTR = 0x25;                           //使能看门狗,溢出时间约为1s
-//  WDT_CONTR = 0x6f;                           //使能看门狗,溢出时间约为3s
-}
-
-static void WatchDogFeed(void)
-{
-	 WDT_CONTR |= 0x10; //清看门狗,否则系统复位
-}
-
 void	DisplayUI(void)
 {
 	static u16 count=0;
@@ -69,7 +57,7 @@ static void AppDisplayTask(void *parg)
 	BEEP=0;
 	//Ext_Enable(EXT_INT0);
 	BSP_PRINTF("SYS Startup...\r\n");
-	WatchDogEnable();
+	//WatchDogEnable();
 	
 	while (DEF_True)
 	{
@@ -78,7 +66,7 @@ static void AppDisplayTask(void *parg)
 			
 		}else if(err==OS_TIMEOUT)	{//3s 切换数码管显示内容
 			DisplayUI();
-			WatchDogFeed();
+			save_data();
 		}
 	}
 }

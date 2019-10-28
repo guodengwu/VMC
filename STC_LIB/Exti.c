@@ -29,7 +29,7 @@ void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
 	OSIntEnter();
 	if(IO_IR_CHK==1)	{
 		_nop_();
-		if(IO_IR_CHK==1)	{
+		if(IO_IR_CHK==1&&appShip.state != SHIP_STATE_IDLE)	{
 			sys_status.IR_CheckFlag = DEF_True;//检测到货物
 			if(motor.CtrlType == MOTOR_CTRL_TYPE_HOLE)	{//霍尔控制电机
 				OSSemPost(appShip.Sem);
@@ -46,7 +46,7 @@ void Ext_INT0 (void) interrupt INT0_VECTOR		//进中断时已经清除标志
 void Ext_INT1 (void) interrupt INT1_VECTOR		//进中断时已经清除标志
 {
 	OSIntEnter();	
-	if((motor.status.is_run == MotorState_Run)&&(IO_MOTOR_PLUSE_CHK==0))	{
+	if((motor.status.is_run == MotorState_Run)/*&&(IO_MOTOR_PLUSE_CHK==0)*/)	{
 			//Ext_Disable(EXT_INT1);
 			Ext1_Disable();
 			msg_pkt_ext.Src = MSG_SHIP_MOTOR_NOMAL;//出货过程电机转到一圈

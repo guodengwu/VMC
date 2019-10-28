@@ -77,11 +77,13 @@ static void AppShipTask(void *parg)
 										//appShip.pMotor->plusecnt = 0;
 										stop_motor();
 								}else	{// 1/4圈 继续走
+									OSTimeDlyHMSM(0,0,0,200); 
 									Ext_Enable(EXT_INT1);
 									continue;
 								}
 							}
-							else	if(PluseTime<4000){// 3/4圈 停止
+							else	if(PluseTime<4000)// 3/4圈 停止
+							{
 									//appShip.pMotor->plusecnt = 0;
 									stop_motor();
 							}
@@ -119,7 +121,7 @@ static void AppShipTask(void *parg)
 			//Ext_Disable(EXT_INT0);
 			Ext0_Disable();
 			stop_motor();
-			OSQPost(usart.Str_Q, &msg_pkt_ship);//反馈出货结果
+			OSMboxPost(usart.MBox, &msg_pkt_ship);//反馈出货结果
 		}
 	}
 }
