@@ -12,7 +12,7 @@ void motor_init(void)
 		motor.col = 0;
 		motor.timecnt = 0;
 //		motor.plusecnt = 0;
-		motor.timeout = 60;//单位100ms
+		motor.timeout = 33;//单位100ms
 		motor.CtrlType = MOTOR_CTRL_TYPE_HOLE;
 }
 

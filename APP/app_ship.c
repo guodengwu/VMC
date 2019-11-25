@@ -87,7 +87,7 @@ static void AppShipTask(void *parg)
 									//appShip.pMotor->plusecnt = 0;
 									stop_motor();
 							}
-							OSSemPend(appShip.Sem, 2000, &err);//电机停止后3s货物检测超时 
+							OSSemPend(appShip.Sem, 3000, &err);//电机停止后3s货物检测超时 
 					}
 					msg_pkt_ship.Src = USART_MSG_RX_TASK;
 					msg_pkt_ship.Cmd = CMD_ReportShipResult;
